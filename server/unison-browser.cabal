@@ -4,10 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d58a50912c443550dc448dfa0397150252c96d782b4731ddef48b152e14d16bf
+-- hash: e4a2d40367bd45c0ea36544e26b8a43725399bec66938cf7602e4a65683a34e4
 
 name:           unison-browser
 version:        0.0.0
+license:        BSD3
 build-type:     Simple
 
 library

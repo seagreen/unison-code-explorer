@@ -1,4 +1,5 @@
 name: unison-browser
+license: BSD3
 default-extensions:
 
   # Notable

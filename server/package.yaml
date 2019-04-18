@@ -1,0 +1,79 @@
+name: unison-browser
+default-extensions:
+
+  # Notable
+
+  - StrictData
+
+  # Other
+
+  - DataKinds
+  - DeriveAnyClass
+  - DeriveFunctor
+  - DeriveGeneric
+  - DerivingStrategies
+  - ExistentialQuantification
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - InstanceSigs
+  - LambdaCase
+  - MultiParamTypeClasses
+  - NamedFieldPuns
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - RankNTypes
+  - ScopedTypeVariables
+  - TypeFamilies
+  - TypeOperators
+
+ghc-options: -Wall
+dependencies:
+
+  # Notable
+
+  - gitrev
+  - unison-parser-typechecker
+
+  - safe
+
+  # Other
+
+  - aeson
+  - async
+  - base
+  - bytestring
+  - containers
+  - directory
+  - filepath
+  - hashable
+  - lens
+  - mtl
+  - optparse-applicative
+  - random
+  - safe-exceptions
+  - stm
+  - text
+  - time
+  - transformers
+  - unordered-containers
+
+library:
+  source-dirs: src
+executables:
+  unison-browser:
+    source-dirs: misc
+    main: Main.hs
+    ghc-options: -threaded -rtsopts
+    dependencies:
+      - unison-browser
+tests:
+  spec:
+    source-dirs: test
+    main: Spec.hs
+    dependencies:
+      - hspec
+      - QuickCheck
+      - unison-browser

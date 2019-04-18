@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e4a2d40367bd45c0ea36544e26b8a43725399bec66938cf7602e4a65683a34e4
+-- hash: 8ca629f473d4f2ee907ce696e7ea9dd9a535f1b142335d1b5b2e7cddce3e1399
 
 name:           unison-browser
 version:        0.0.0
@@ -35,7 +35,6 @@ library
     , mtl
     , optparse-applicative
     , random
-    , safe
     , safe-exceptions
     , stm
     , text
@@ -67,7 +66,6 @@ executable unison-browser
     , mtl
     , optparse-applicative
     , random
-    , safe
     , safe-exceptions
     , stm
     , text
@@ -104,7 +102,6 @@ test-suite spec
     , mtl
     , optparse-applicative
     , random
-    , safe
     , safe-exceptions
     , stm
     , text

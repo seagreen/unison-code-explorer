@@ -38,8 +38,6 @@ dependencies:
   - gitrev
   - unison-parser-typechecker
 
-  - safe
-
   # Other
 
   - aeson

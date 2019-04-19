@@ -5,6 +5,7 @@ import Data.Map (Map)
 import Data.Maybe
 import Data.Set (Set)
 import Data.Text (Text)
+import Data.Traversable
 import Prelude hiding (head, id)
 import System.Exit (die)
 import Unison.Codebase (Codebase)
@@ -24,6 +25,7 @@ import qualified Unison.Codebase as Codebase
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
 import qualified Unison.Codebase.Serialization as S
+import qualified Unison.Name as Name
 import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import qualified Unison.Term as Term
@@ -32,23 +34,33 @@ import qualified Unison.Util.Relation as Relation
 
 -- * Interface
 
-newtype Hash = Hash Text
+newtype Hash
+  = Hash Text
+  deriving (Eq, Ord, Show)
 
-data FunctionCallGraph = FunctionCallGraph (Map Hash (Set Hash))
+data Names
+  = Names (Map Hash Text)
+  deriving (Show)
 
-data Names = Names (Map Hash Text)
+data FunctionCallGraph
+  = FunctionCallGraph (Map Hash (Set Hash))
+  deriving (Show)
 
 -- | A meaningless placeholder for now.
-data Config = Config Bool String deriving Show
+data Config
+  = Config Bool String
+  deriving (Show)
 
 run :: Config -> IO ()
 run conf = do
-  res <- load conf
-  print res
+  (names, FunctionCallGraph functionCallGraph) <- load conf
+  print names
+  traverse print (Map.toList functionCallGraph)
+  putStrLn "Success"
 
 -- * Details
 
-load :: Config -> IO (Set Text, Maybe (Set Name))
+load :: Config -> IO (Names, FunctionCallGraph)
 load _ = do
   let
     codebasePath :: FilePath
@@ -61,6 +73,8 @@ load _ = do
 
   exists <- FileCodebase.exists codebasePath
   when (not exists) (die "No codebase found")
+
+  -- Editor.initializeCodebase codebase
 
   mBranch <- Codebase.getBranch codebase "master"
   branch <- case mBranch of
@@ -76,30 +90,63 @@ load _ = do
     terms :: Relation Name Referent
     terms = Branch.termNamespace head
 
-    _nameToRef :: Map Name (Set Referent)
-    _nameToRef = Relation.domain terms
-
     refToName :: Map Referent (Set Name)
     refToName = Relation.range terms
 
-    refList :: [(Referent, Reference.Id)]
-    refList =
-      mapMaybe (\x -> fmap (\y -> (x, y)) (r2r x)) (Map.keys refToName)
+    refMap :: Map Referent Reference.Id
+    refMap =
+      Map.fromList $
+        mapMaybe
+          (\referent ->
+            fmap
+              (\id -> (referent, id))
+              (r2r referent))
+          (Map.keys refToName)
 
-    r1 :: Referent
-    r2 :: Reference.Id
-    (r1, r2) =
-      let x:_ = refList
-      in x
+  res <- fcg codebase (Set.fromList (Map.elems refMap))
+  pure (mkNames refMap refToName, res)
 
-  mTerm <- Codebase.getTerm codebase r2
-  case mTerm of
-    Nothing ->
-      die "No term"
+fcg :: Codebase IO Symbol Ann -> Set Reference.Id -> IO FunctionCallGraph
+fcg codebase refs = do
+  FunctionCallGraph . Map.fromList <$> for (Set.toList refs) f
+  where
+    f :: Reference.Id -> IO (Hash, Set Hash)
+    f ref = do
+      mTerm <- Codebase.getTerm codebase ref
+      case mTerm of
+        Nothing -> do
+          putStrLn ("No term for reference: " <> show ref)
+          pure (Hash (T.pack (show ref)), mempty)
 
-    Just (t :: Codebase.Term Symbol Ann) -> do
-      putStrLn "Success"
-      pure (calls t, Map.lookup r1 refToName)
+        Just (t :: Codebase.Term Symbol Ann) ->
+          pure (Hash (T.pack (show ref)), Set.map Hash (calls t))
+
+mkNames :: Map Referent Reference.Id -> Map Referent (Set Name) -> Names
+mkNames xs nameMap =
+  Names (Map.fromList (fmap f (Map.toList xs)))
+  where
+    f :: (Referent, Reference.Id) -> (Hash, Text)
+    f (referent, id) =
+      case Map.lookup referent nameMap of
+        Nothing ->
+          error "Name not found"
+
+        Just names ->
+          ( Hash (T.pack (show id))
+          , textFromName names
+          )
+
+textFromName :: Set Name -> Text
+textFromName xs =
+  case Set.toList xs of
+    [] ->
+      "<none>"
+
+    [x] ->
+      Name.toText x
+
+    x:_ ->
+      Name.toText x <> " (conflicted)"
 
 -- | @Codebase.Term Symbol Ann@ desugars to
 -- @ABT.Term (Term.F Symbol Ann Ann) Symbol Ann@.

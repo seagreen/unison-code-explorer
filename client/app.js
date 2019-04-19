@@ -4347,6 +4347,7 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
+var author$project$Main$InitialLoad = {$: 'InitialLoad'};
 var mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
 var mdgriffith$elm_ui$Element$none = mdgriffith$elm_ui$Internal$Model$Empty;
 var author$project$Main$view = function (_n0) {
@@ -10774,7 +10775,7 @@ var mdgriffith$elm_ui$Element$layout = mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
 var author$project$Main$main = elm$browser$Browser$sandbox(
 	{
-		init: 0,
+		init: {data: author$project$Main$InitialLoad},
 		update: F2(
 			function (_n0, model) {
 				return model;

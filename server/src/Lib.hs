@@ -1,10 +1,12 @@
 module Lib where
 
+import Control.Monad
 import Data.Map (Map)
 import Data.Maybe
 import Data.Set (Set)
 import Data.Text (Text)
 import Prelude hiding (head, id)
+import System.Exit (die)
 import Unison.Codebase (Codebase)
 import Unison.Codebase.Serialization.V0 (formatSymbol)
 import Unison.Name (Name)
@@ -28,16 +30,26 @@ import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 -- import qualified Unison.Codebase.Editor as Editor
 
+-- * Interface
+
 newtype Hash = Hash Text
 
 data FunctionCallGraph = FunctionCallGraph (Map Hash (Set Hash))
 
 data Names = Names (Map Hash Text)
 
+-- | A meaningless placeholder for now.
 data Config = Config Bool String deriving Show
 
 run :: Config -> IO ()
-run _ = do
+run conf = do
+  res <- load conf
+  print res
+
+-- * Details
+
+load :: Config -> IO (Set Text, Maybe (Set Name))
+load _ = do
   let
     codebasePath :: FilePath
     codebasePath =
@@ -48,56 +60,46 @@ run _ = do
       FileCodebase.codebase1 External formatSymbol formatAnn codebasePath
 
   exists <- FileCodebase.exists codebasePath
-  if exists
-    then do
-      -- Editor.initializeCodebase codebase
-      branches <- Codebase.branches codebase
-      print branches
+  when (not exists) (die "No codebase found")
 
-      mBranch <- Codebase.getBranch codebase "master"
-      case mBranch of
-        Nothing ->
-          putStrLn "getBranch failed"
+  mBranch <- Codebase.getBranch codebase "master"
+  branch <- case mBranch of
+              Nothing ->
+                die "getBranch failed"
 
-        Just branch -> do
-          let
-            head :: Branch.Branch0
-            head = Branch.head branch
+              Just b ->
+                pure b
+  let
+    head :: Branch.Branch0
+    head = Branch.head branch
 
-            terms :: Relation Name Referent
-            terms = Branch.termNamespace head
+    terms :: Relation Name Referent
+    terms = Branch.termNamespace head
 
-            _nameToRef :: Map Name (Set Referent)
-            _nameToRef = Relation.domain terms
+    _nameToRef :: Map Name (Set Referent)
+    _nameToRef = Relation.domain terms
 
-            refToName :: Map Referent (Set Name)
-            refToName = Relation.range terms
+    refToName :: Map Referent (Set Name)
+    refToName = Relation.range terms
 
-            refList :: [(Referent, Reference.Id)]
-            refList =
-              mapMaybe (\x -> fmap (\y -> (x, y)) (r2r x)) (Map.keys refToName)
+    refList :: [(Referent, Reference.Id)]
+    refList =
+      mapMaybe (\x -> fmap (\y -> (x, y)) (r2r x)) (Map.keys refToName)
 
-            r1 :: Referent
-            r2 :: Reference.Id
-            (r1, r2) =
-              let x:_ = refList
-              in x
+    r1 :: Referent
+    r2 :: Reference.Id
+    (r1, r2) =
+      let x:_ = refList
+      in x
 
-          mTerm <- Codebase.getTerm codebase r2
-          case mTerm of
-            Nothing ->
-              putStrLn "No term"
+  mTerm <- Codebase.getTerm codebase r2
+  case mTerm of
+    Nothing ->
+      die "No term"
 
-            Just (t :: Codebase.Term Symbol Ann) -> do
-              print (Map.lookup r1 refToName)
-              print (calls t)
-              putStrLn "Success"
-    else
-      putStrLn "No codebase found"
-
-formatAnn :: S.Format Ann
-formatAnn =
-  S.Format (pure External) (\_ -> pure ())
+    Just (t :: Codebase.Term Symbol Ann) -> do
+      putStrLn "Success"
+      pure (calls t, Map.lookup r1 refToName)
 
 -- | @Codebase.Term Symbol Ann@ desugars to
 -- @ABT.Term (Term.F Symbol Ann Ann) Symbol Ann@.
@@ -122,3 +124,7 @@ r2r r =
 
         Referent.Con a _ ->
           a
+
+formatAnn :: S.Format Ann
+formatAnn =
+  S.Format (pure External) (\_ -> pure ())

@@ -4,10 +4,11 @@ module Cli where
 
 import Data.Version (showVersion)
 import Development.GitRev (gitHash)
-import qualified Lib
 import Options.Applicative
 import Paths_unison_browser (version)
 import Prelude
+
+import qualified Lib
 
 main :: IO ()
 main =

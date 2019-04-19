@@ -2,8 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Dict.Any as Dict exposing (AnyDict)
-import Element as El
-import Html exposing (..)
+import Element as El exposing (Element)
+import Task exposing (Task)
 
 
 main : Program () Model Msg
@@ -64,7 +64,20 @@ init =
 
 getEverything : Cmd Msg
 getEverything =
-    Cmd.none
+    Task.attempt Everything
+        (Task.succeed
+            { functions =
+                Dict.fromList (\(Id s) -> s)
+                    [ ( Id "a", { name = "foo" } )
+                    , ( Id "b", { name = "bar" } )
+                    ]
+            , calls =
+                [ { caller = Id "a"
+                  , callee = Id "b"
+                  }
+                ]
+            }
+        )
 
 
 update : Msg -> Model -> Maybe Model
@@ -106,7 +119,7 @@ update msg model =
                         Nothing
 
 
-view : Model -> El.Element Msg
+view : Model -> Element Msg
 view model =
     case model.data of
         InitialLoad ->

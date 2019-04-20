@@ -2,29 +2,45 @@
 
 module Cli where
 
+import Data.Aeson
+import Data.Text (Text)
 import Data.Version (showVersion)
 import Development.GitRev (gitHash)
 import Options.Applicative
-import Paths_unison_browser (version)
+import Paths_unison_code_browser (version)
 import Prelude
 
-import qualified Lib
+import qualified Data.Aeson.Encode.Pretty as Pretty
+import qualified Data.Text.IO as TIO
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Builder
+import qualified Load
+import qualified Serve
 
 main :: IO ()
-main =
-  Lib.run =<< runParser
+main = do
+  conf <- runParser
+  if Serve.configDumpJson conf
+    then do
+      (names, functionCallGraph) <- Load.load (Serve.configBranch conf)
+      TIO.putStrLn . encodePretty . object $
+        [ "names" .= names
+        , "function_call_graph" .= functionCallGraph
+        ]
+
+    else
+      Serve.run conf
  where
-  runParser :: IO Lib.Config
+  runParser :: IO Serve.Config
   runParser =
     customExecParser (prefs showHelpOnError) parserInfo
 
-  parserInfo :: ParserInfo Lib.Config
+  parserInfo :: ParserInfo Serve.Config
   parserInfo =
     info
       (helper <*> versionOption <*> parser)
       (  fullDesc
-      <> header "Example header"
-      <> progDesc "Example program description."
+      <> progDesc "Make some details of a .unison codebase available over HTTP."
       )
 
   versionOption :: Parser (a -> a)
@@ -36,27 +52,43 @@ main =
       )
 
   -- Make sure you include the `help` section or that flag won't show up
-  -- under "Available options". Instead you'll get:
-  --
-  --     Usage: game-server [--version] [-p|--port PORT]
-  --       Example program description.
-  --     Available options:
-  --       -h,--help                Show this help text
-  --       --version                Show version
-  --
-  parser :: Parser Lib.Config
+  -- under "Available options".
+  parser :: Parser Serve.Config
   parser =
-    Lib.Config
-      <$> switch
-          (  long "bool_param"
-          <> short 'b'
-          <> help "bool parameter"
+    Serve.Config
+      <$>
+        switch
+          (  long "dump-json"
+          <> help "Dump JSON to STDOUT instead of starting server"
           )
-      <*> strOption
-          (  long "string_param"
-          <> short 's'
-          <> metavar "STRING"
-          <> help "string parameter"
-          <> value "default_value"
+      <*>
+        fmap Load.BranchName
+          ( strOption
+            (  long "branch"
+            <> metavar "BRANCH_NAME"
+            <> help "Self-explanatory"
+            <> value "master"
+            <> showDefault
+            )
+          )
+      <*>
+        option auto
+          (  long "port"
+          <> help "Port to run server on"
+          <> value 3000
           <> showDefault
           )
+
+encodePretty :: ToJSON a => a -> Text
+encodePretty =
+    TL.toStrict
+  . Data.Text.Lazy.Builder.toLazyText
+  . Pretty.encodePrettyToTextBuilder' conf
+  where
+    conf :: Pretty.Config
+    conf = Pretty.Config
+      { Pretty.confIndent = Pretty.Spaces 2
+      , Pretty.confCompare = compare
+      , Pretty.confNumFormat = Pretty.Decimal
+      , Pretty.confTrailingNewline = False
+      }

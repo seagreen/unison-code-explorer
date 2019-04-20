@@ -1,4 +1,4 @@
-name: unison-browser
+name: unison-code-browser
 license: BSD3
 default-extensions:
 
@@ -35,8 +35,12 @@ dependencies:
 
   # Notable
 
+  - aeson-pretty
   - gitrev
+  - servant-server
   - unison-parser-typechecker
+  - wai
+  - warp
 
   # Other
 
@@ -62,17 +66,9 @@ dependencies:
 library:
   source-dirs: src
 executables:
-  unison-browser:
+  unison-code-browser:
     source-dirs: misc
     main: Main.hs
     ghc-options: -threaded -rtsopts
     dependencies:
-      - unison-browser
-tests:
-  spec:
-    source-dirs: test
-    main: Spec.hs
-    dependencies:
-      - hspec
-      - QuickCheck
-      - unison-browser
+      - unison-code-browser

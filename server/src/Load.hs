@@ -1,11 +1,13 @@
-module Lib where
+module Load where
 
 import Control.Monad
+import Data.Aeson
 import Data.Map (Map)
 import Data.Maybe
 import Data.Set (Set)
 import Data.Text (Text)
 import Data.Traversable
+import GHC.Generics
 import Prelude hiding (head, id)
 import System.Exit (die)
 import Unison.Codebase (Codebase)
@@ -20,6 +22,8 @@ import Unison.Util.Relation (Relation)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
+import qualified System.IO
 import qualified Unison.ABT as ABT
 import qualified Unison.Codebase as Codebase
 import qualified Unison.Codebase.Branch as Branch
@@ -36,32 +40,27 @@ import qualified Unison.Util.Relation as Relation
 
 newtype Hash
   = Hash Text
-  deriving (Eq, Ord, Show)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON, ToJSONKey)
 
 data Names
   = Names (Map Hash Text)
-  deriving (Show)
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON)
 
 data FunctionCallGraph
   = FunctionCallGraph (Map Hash (Set Hash))
-  deriving (Show)
-
--- | A meaningless placeholder for now.
-data Config
-  = Config Bool String
-  deriving (Show)
-
-run :: Config -> IO ()
-run conf = do
-  (names, FunctionCallGraph functionCallGraph) <- load conf
-  print names
-  traverse print (Map.toList functionCallGraph)
-  putStrLn "Success"
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON)
 
 -- * Details
 
-load :: Config -> IO (Names, FunctionCallGraph)
-load _ = do
+newtype BranchName
+  = BranchName Text
+  deriving (Show)
+
+load :: BranchName -> IO (Names, FunctionCallGraph)
+load (BranchName branchName) = do
   let
     codebasePath :: FilePath
     codebasePath =
@@ -76,7 +75,7 @@ load _ = do
 
   -- Editor.initializeCodebase codebase
 
-  mBranch <- Codebase.getBranch codebase "master"
+  mBranch <- Codebase.getBranch codebase branchName
   branch <- case mBranch of
               Nothing ->
                 die "getBranch failed"
@@ -85,13 +84,16 @@ load _ = do
                 pure b
   let
     head :: Branch.Branch0
-    head = Branch.head branch
+    head =
+      Branch.head branch
 
     terms :: Relation Name Referent
-    terms = Branch.termNamespace head
+    terms =
+      Branch.termNamespace head
 
     refToName :: Map Referent (Set Name)
-    refToName = Relation.range terms
+    refToName =
+      Relation.range terms
 
     refMap :: Map Referent Reference.Id
     refMap =
@@ -115,7 +117,7 @@ fcg codebase refs = do
       mTerm <- Codebase.getTerm codebase ref
       case mTerm of
         Nothing -> do
-          putStrLn ("No term for reference: " <> show ref)
+          TIO.hPutStrLn System.IO.stderr ("No term for reference: " <> T.pack (show ref))
           pure (Hash (T.pack (show ref)), mempty)
 
         Just (t :: Codebase.Term Symbol Ann) ->

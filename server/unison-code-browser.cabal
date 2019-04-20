@@ -4,9 +4,9 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8ca629f473d4f2ee907ce696e7ea9dd9a535f1b142335d1b5b2e7cddce3e1399
+-- hash: 2dd06c39576b00081013bdbd50c0866cb6496c14e533a6de6bf6baf1480263f6
 
-name:           unison-browser
+name:           unison-code-browser
 version:        0.0.0
 license:        BSD3
 build-type:     Simple
@@ -14,15 +14,17 @@ build-type:     Simple
 library
   exposed-modules:
       Cli
-      Lib
+      Load
+      Serve
   other-modules:
-      Paths_unison_browser
+      Paths_unison_code_browser
   hs-source-dirs:
       src
   default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
   ghc-options: -Wall
   build-depends:
       aeson
+    , aeson-pretty
     , async
     , base
     , bytestring
@@ -36,24 +38,28 @@ library
     , optparse-applicative
     , random
     , safe-exceptions
+    , servant-server
     , stm
     , text
     , time
     , transformers
     , unison-parser-typechecker
     , unordered-containers
+    , wai
+    , warp
   default-language: Haskell2010
 
-executable unison-browser
+executable unison-code-browser
   main-is: Main.hs
   other-modules:
-      Paths_unison_browser
+      Paths_unison_code_browser
   hs-source-dirs:
       misc
   default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
   ghc-options: -Wall -threaded -rtsopts
   build-depends:
       aeson
+    , aeson-pretty
     , async
     , base
     , bytestring
@@ -67,47 +73,14 @@ executable unison-browser
     , optparse-applicative
     , random
     , safe-exceptions
+    , servant-server
     , stm
     , text
     , time
     , transformers
-    , unison-browser
+    , unison-code-browser
     , unison-parser-typechecker
     , unordered-containers
-  default-language: Haskell2010
-
-test-suite spec
-  type: exitcode-stdio-1.0
-  main-is: Spec.hs
-  other-modules:
-      LibSpec
-      Paths_unison_browser
-  hs-source-dirs:
-      test
-  default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
-  ghc-options: -Wall
-  build-depends:
-      QuickCheck
-    , aeson
-    , async
-    , base
-    , bytestring
-    , containers
-    , directory
-    , filepath
-    , gitrev
-    , hashable
-    , hspec
-    , lens
-    , mtl
-    , optparse-applicative
-    , random
-    , safe-exceptions
-    , stm
-    , text
-    , time
-    , transformers
-    , unison-browser
-    , unison-parser-typechecker
-    , unordered-containers
+    , wai
+    , warp
   default-language: Haskell2010

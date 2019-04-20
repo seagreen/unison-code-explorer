@@ -80,42 +80,39 @@ getEverything =
         )
 
 
+{-| using Maybe to model "did this msg update the state?"
+-}
 update : Msg -> Model -> Maybe Model
 update msg model =
-    Maybe.map (\x -> { data = x }) <|
-        case msg of
-            Everything (Err err) ->
+    case msg of
+        Everything res ->
+            Maybe.map (\x -> { data = x }) <|
                 case model.data of
                     InitialLoad ->
-                        Just (InitialFail err)
+                        Just <|
+                            case res of
+                                Ok data ->
+                                    Success data
 
-                    InitialFail e ->
-                        Nothing
-
-                    Success a ->
-                        Nothing
-
-                    LoadingAgain a ->
-                        Just (Error err a)
-
-                    Error e a ->
-                        Nothing
-
-            Everything (Ok data) ->
-                case model.data of
-                    InitialLoad ->
-                        Just (Success data)
-
-                    InitialFail e ->
-                        Nothing
-
-                    Success a ->
-                        Nothing
+                                Err e ->
+                                    InitialFail e
 
                     LoadingAgain a ->
-                        Just (Success data)
+                        Just <|
+                            case res of
+                                Ok data ->
+                                    Success data
 
-                    Error e a ->
+                                Err e ->
+                                    Error e a
+
+                    InitialFail _ ->
+                        Nothing
+
+                    Success _ ->
+                        Nothing
+
+                    Error _ _ ->
                         Nothing
 
 

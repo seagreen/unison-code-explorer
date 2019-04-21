@@ -3,6 +3,8 @@ module Main exposing (main)
 import Browser
 import Dict.Any as Dict exposing (AnyDict)
 import Element as El exposing (Element)
+import Http
+import Json.Decode as JD exposing (Decoder)
 import Task exposing (Task)
 
 
@@ -21,7 +23,7 @@ main =
 
 
 type alias Model =
-    { data : Remote String Data
+    { data : Remote Http.Error Data
     }
 
 
@@ -54,7 +56,7 @@ type alias Call =
 
 
 type Msg
-    = Everything (Result String Data)
+    = Everything (Result Http.Error Data)
 
 
 init : ( Model, Cmd Msg )
@@ -64,20 +66,38 @@ init =
 
 getEverything : Cmd Msg
 getEverything =
-    Task.attempt Everything
-        (Task.succeed
-            { functions =
-                Dict.fromList (\(Id s) -> s)
-                    [ ( Id "a", { name = "foo" } )
-                    , ( Id "b", { name = "bar" } )
-                    ]
-            , calls =
-                [ { caller = Id "a"
-                  , callee = Id "b"
-                  }
-                ]
-            }
+    Http.get
+        { url = "/function-call-graph"
+        , expect =
+            Http.expectJson Everything
+                decoder
+        }
+
+
+decoder : Decoder Data
+decoder =
+    JD.list
+        (JD.map2 Tuple.pair
+            (JD.index 0 funcId)
+            (JD.index 1 (JD.list funcId))
         )
+        |> JD.map
+            (\raw ->
+                { functions =
+                    Dict.fromList (\(Id s) -> s) []
+                , calls =
+                    List.concatMap
+                        (\( caller, callees ) ->
+                            List.map (Call caller) callees
+                        )
+                        raw
+                }
+            )
+
+
+funcId : Decoder (Id Function)
+funcId =
+    JD.map Id JD.string
 
 
 {-| using Maybe to model "did this msg update the state?"
@@ -123,7 +143,7 @@ view model =
             El.text "Loading"
 
         InitialFail err ->
-            El.text err
+            El.text (Debug.toString err)
 
         Success a ->
             El.text "success"
@@ -132,4 +152,4 @@ view model =
             El.text "success"
 
         Error e a ->
-            El.text e
+            El.text (Debug.toString e)

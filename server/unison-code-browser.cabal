@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2dd06c39576b00081013bdbd50c0866cb6496c14e533a6de6bf6baf1480263f6
+-- hash: 74695ec101e333580934aff3b9b90e67ce4f78317931b1bb2b106cd47b2c0279
 
 name:           unison-code-browser
 version:        0.0.0
@@ -46,6 +46,7 @@ library
     , unison-parser-typechecker
     , unordered-containers
     , wai
+    , wai-cors
     , warp
   default-language: Haskell2010
 
@@ -82,5 +83,6 @@ executable unison-code-browser
     , unison-parser-typechecker
     , unordered-containers
     , wai
+    , wai-cors
     , warp
   default-language: Haskell2010

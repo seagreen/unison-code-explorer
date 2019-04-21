@@ -5,6 +5,7 @@ import Network.Wai.Handler.Warp
 import Prelude
 import Servant
 import System.IO
+import Network.Wai.Middleware.Cors
 
 import qualified Load
 
@@ -29,7 +30,7 @@ data Config = Config
 run :: Config -> IO ()
 run conf = do
   (names, fcg) <- Load.load (configBranch conf)
-  runSettings settings =<< mkApp names fcg
+  runSettings settings . simpleCors =<< mkApp names fcg
   where
     settings :: Settings
     settings =

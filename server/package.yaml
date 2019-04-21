@@ -62,6 +62,7 @@ dependencies:
   - time
   - transformers
   - unordered-containers
+  - wai-cors
 
 library:
   source-dirs: src

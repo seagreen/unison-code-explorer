@@ -69,13 +69,13 @@ getEverything : Cmd Msg
 getEverything =
     Cmd.batch
         [ Http.get
-            { url = "/function-call-graph"
+            { url = "http://localhost:3000/function-call-graph"
             , expect =
                 Http.expectJson GotCalls
                     decodeCalls
             }
         , Http.get
-            { url = "/names"
+            { url = "http://localhost:3000/names"
             , expect =
                 Http.expectJson GotFunctions
                     decodeFunctions
@@ -87,8 +87,8 @@ decodeCalls : Decoder Calls
 decodeCalls =
     JD.list
         (JD.map2 Tuple.pair
-            (JD.index 0 funcId)
-            (JD.index 1 (JD.list funcId))
+            (JD.index 0 decodeFunctionId)
+            (JD.index 1 (JD.list decodeFunctionId))
         )
         |> JD.map
             (\raw ->
@@ -102,12 +102,21 @@ decodeCalls =
 
 decodeFunctions : Decoder Functions
 decodeFunctions =
-    -- TODO actually parse
-    JD.succeed (Dict.fromList (\(Id s) -> s) [])
+    JD.list
+        (JD.map2 Tuple.pair
+            (JD.index 0 decodeFunctionId)
+            (JD.index 1 decodeFunction)
+        )
+        |> JD.map (Dict.fromList (\(Id a) -> a))
 
 
-funcId : Decoder (Id Function)
-funcId =
+decodeFunction : Decoder Function
+decodeFunction =
+    JD.map Function JD.string
+
+
+decodeFunctionId : Decoder (Id Function)
+decodeFunctionId =
     JD.map Id JD.string
 
 
@@ -127,18 +136,26 @@ update msg model =
 
 view : Model -> Element Msg
 view model =
-    case model.calls of
+    El.column []
+        [ El.row [] [ El.text "calls", debugRemote model.calls ]
+        , El.row [] [ El.text "names", debugRemote model.functions ]
+        ]
+
+
+debugRemote : Remote e a -> Element msg
+debugRemote remote =
+    case remote of
         InitialLoad ->
             El.text "Loading"
 
         InitialFail err ->
-            El.text (Debug.toString err)
+            El.column [] [ El.text "initial err", El.text (Debug.toString err) ]
 
         Success a ->
-            El.text "success"
+            El.column [] [ El.text "success", El.text (Debug.toString a) ]
 
         LoadingAgain a ->
-            El.text "success"
+            El.column [] [ El.text "loading again", El.text (Debug.toString a) ]
 
         Error e a ->
             El.text (Debug.toString e)

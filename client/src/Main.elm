@@ -5,6 +5,7 @@ import Dict.Any as Dict exposing (AnyDict)
 import Element as El exposing (Element)
 import Http
 import Json.Decode as JD exposing (Decoder)
+import Remote exposing (Remote(..))
 import Task exposing (Task)
 
 
@@ -23,22 +24,17 @@ main =
 
 
 type alias Model =
-    { data : Remote Http.Error Data
+    { functions : Remote Http.Error Functions
+    , calls : Remote Http.Error Calls
     }
 
 
-type alias Data =
-    { functions : AnyDict String (Id Function) Function
-    , calls : List Call
-    }
+type alias Calls =
+    List Call
 
 
-type Remote e a
-    = InitialLoad
-    | InitialFail e
-    | Success a
-    | LoadingAgain a
-    | Error e a
+type alias Functions =
+    AnyDict String (Id Function) Function
 
 
 type Id a
@@ -56,26 +52,39 @@ type alias Call =
 
 
 type Msg
-    = Everything (Result Http.Error Data)
+    = GotCalls (Result Http.Error Calls)
+    | GotFunctions (Result Http.Error Functions)
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { data = InitialLoad }, getEverything )
+    ( { calls = InitialLoad
+      , functions = InitialLoad
+      }
+    , getEverything
+    )
 
 
 getEverything : Cmd Msg
 getEverything =
-    Http.get
-        { url = "/function-call-graph"
-        , expect =
-            Http.expectJson Everything
-                decoder
-        }
+    Cmd.batch
+        [ Http.get
+            { url = "/function-call-graph"
+            , expect =
+                Http.expectJson GotCalls
+                    decodeCalls
+            }
+        , Http.get
+            { url = "/names"
+            , expect =
+                Http.expectJson GotFunctions
+                    decodeFunctions
+            }
+        ]
 
 
-decoder : Decoder Data
-decoder =
+decodeCalls : Decoder Calls
+decodeCalls =
     JD.list
         (JD.map2 Tuple.pair
             (JD.index 0 funcId)
@@ -83,16 +92,18 @@ decoder =
         )
         |> JD.map
             (\raw ->
-                { functions =
-                    Dict.fromList (\(Id s) -> s) []
-                , calls =
-                    List.concatMap
-                        (\( caller, callees ) ->
-                            List.map (Call caller) callees
-                        )
-                        raw
-                }
+                List.concatMap
+                    (\( caller, callees ) ->
+                        List.map (Call caller) callees
+                    )
+                    raw
             )
+
+
+decodeFunctions : Decoder Functions
+decodeFunctions =
+    -- TODO actually parse
+    JD.succeed (Dict.fromList (\(Id s) -> s) [])
 
 
 funcId : Decoder (Id Function)
@@ -105,40 +116,18 @@ funcId =
 update : Msg -> Model -> Maybe Model
 update msg model =
     case msg of
-        Everything res ->
-            Maybe.map (\x -> { data = x }) <|
-                case model.data of
-                    InitialLoad ->
-                        Just <|
-                            case res of
-                                Ok data ->
-                                    Success data
+        GotFunctions res ->
+            Maybe.map (\x -> { model | functions = x }) <|
+                Remote.update res model.functions
 
-                                Err e ->
-                                    InitialFail e
-
-                    LoadingAgain a ->
-                        Just <|
-                            case res of
-                                Ok data ->
-                                    Success data
-
-                                Err e ->
-                                    Error e a
-
-                    InitialFail _ ->
-                        Nothing
-
-                    Success _ ->
-                        Nothing
-
-                    Error _ _ ->
-                        Nothing
+        GotCalls res ->
+            Maybe.map (\x -> { model | calls = x }) <|
+                Remote.update res model.calls
 
 
 view : Model -> Element Msg
 view model =
-    case model.data of
+    case model.calls of
         InitialLoad ->
             El.text "Loading"
 

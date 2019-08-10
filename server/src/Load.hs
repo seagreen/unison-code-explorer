@@ -102,9 +102,9 @@ load = do
       where
         f :: Referent -> Maybe (Referent, Reference.Id)
         f referent =
-         fmap
-           (\id -> (referent, id))
-           (referenceToId (referentToReference referent))
+          fmap
+            (\id -> (referent, id))
+            (referenceToId (referentToReference referent))
 
   callGraph <- fcg codebase (Set.fromList (Map.elems refToId))
   pure (mkNames refToId refToName, callGraph)

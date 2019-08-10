@@ -101,10 +101,10 @@ load = do
       Map.fromList $ mapMaybe f (Map.keys refToName)
       where
         f :: Referent -> Maybe (Referent, Reference.Id)
-        f referent =
-          fmap
-            (\id -> (referent, id))
-            (referenceToId (referentToReference referent))
+        f referent = do
+          ref <- Referent.toTermReference referent
+          id <- referenceToId ref
+          pure (referent, id)
 
   callGraph <- fcg codebase (Set.fromList (Map.elems refToId))
   pure (mkNames refToId refToName, callGraph)
@@ -182,15 +182,6 @@ referenceToId ref =
 
     Reference.DerivedId id ->
       Just id
-
-referentToReference :: Referent -> Reference
-referentToReference r =
-  case r of
-    Referent.Ref a ->
-      a
-
-    Referent.Con a _ _ ->
-      a
 
 formatAnn :: S.Format Ann
 formatAnn =

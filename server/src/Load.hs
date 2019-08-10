@@ -98,7 +98,7 @@ load = do
           (\referent ->
             fmap
               (\id -> (referent, id))
-              (r2r referent))
+              (referenceToId (referentToReference referent)))
           (Map.keys refToName)
 
   res <- fcg codebase (Set.fromList (Map.elems refMap))
@@ -164,30 +164,26 @@ calls =
   Set.fromList . mapMaybe f . Set.toList . Term.dependencies
   where
     f :: Reference -> Maybe Hash
-    f = \case
-      Reference.Builtin _ ->
-        Nothing
+    f =
+      fmap refToHash . referenceToId
 
-      Reference.DerivedId id ->
-        Just (refToHash id)
-
-r2r :: Referent -> Maybe Reference.Id
-r2r r =
-  case reference of
+referenceToId :: Reference -> Maybe Reference.Id
+referenceToId ref =
+  case ref of
     Reference.Builtin _ ->
       Nothing
 
     Reference.DerivedId id ->
       Just id
-  where
-    reference :: Reference
-    reference =
-      case r of
-        Referent.Ref a ->
-          a
 
-        Referent.Con a _ _ ->
-          a
+referentToReference :: Referent -> Reference
+referentToReference r =
+  case r of
+    Referent.Ref a ->
+      a
+
+    Referent.Con a _ _ ->
+      a
 
 formatAnn :: S.Format Ann
 formatAnn =

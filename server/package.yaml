@@ -1,4 +1,4 @@
-name: unison-code-browser
+name: unison-code-explorer
 license: BSD3
 default-extensions:
 
@@ -67,9 +67,9 @@ dependencies:
 library:
   source-dirs: src
 executables:
-  unison-code-browser:
+  unison-code-explorer:
     source-dirs: misc
     main: Main.hs
     ghc-options: -threaded -rtsopts
     dependencies:
-      - unison-code-browser
+      - unison-code-explorer

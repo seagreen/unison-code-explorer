@@ -7,7 +7,7 @@ import Data.Text (Text)
 import Data.Version (showVersion)
 import Development.GitRev (gitHash)
 import Options.Applicative
-import Paths_unison_code_browser (version)
+import Paths_unison_code_explorer (version)
 import Prelude
 
 import qualified Data.Aeson.Encode.Pretty as Pretty

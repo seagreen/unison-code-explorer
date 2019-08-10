@@ -1,3 +1,4 @@
+-- | Use the Unison compiler as a library to get info about a codebase.
 module Load
   ( load
   , FunctionCallGraph(..)

@@ -91,43 +91,59 @@ load = do
     refToName =
       Relation.domain (Star3.d1 terms)
 
-    refMap :: Map Referent Reference.Id
-    refMap =
-      Map.fromList $
-        mapMaybe
-          (\referent ->
-            fmap
-              (\id -> (referent, id))
-              (referenceToId (referentToReference referent)))
-          (Map.keys refToName)
+    -- Start with @refToName@, filter out builtins with @referenceToId@,
+    -- and replace the values with @Reference.Id@s.
+    --
+    -- We can't go ahead and turn these @Reference.Id@s into @Hash@es,
+    -- because @fcg@ needs @Reference.Id@s to pass to @Term.dependencies@.
+    refToId :: Map Referent Reference.Id
+    refToId =
+      Map.fromList $ mapMaybe f (Map.keys refToName)
+      where
+        f :: Referent -> Maybe (Referent, Reference.Id)
+        f referent =
+         fmap
+           (\id -> (referent, id))
+           (referenceToId (referentToReference referent))
 
-  res <- fcg codebase (Set.fromList (Map.elems refMap))
-  pure (mkNames refMap refToName, res)
+  callGraph <- fcg codebase (Set.fromList (Map.elems refToId))
+  pure (mkNames refToId refToName, callGraph)
 
 -- * Helpers
 
+-- | A lot of ceremony around 'Term.dependencies'.
 fcg :: Codebase IO Symbol Ann -> Set Reference.Id -> IO FunctionCallGraph
-fcg codebase refs = do
-  FunctionCallGraph . Map.fromList <$> for (Set.toList refs) f
+fcg codebase refIds = do
+  FunctionCallGraph . Map.fromList <$> for (Set.toList refIds) f
   where
     f :: Reference.Id -> IO (Hash, Set Hash)
-    f ref = do
-      mTerm <- Codebase.getTerm codebase ref
+    f id = do
+      mTerm <- Codebase.getTerm codebase id
       case mTerm of
         Nothing -> do
-          TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> refToHashText ref)
-          pure (refToHash ref, mempty)
+          TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> idToHashText id)
+          pure (idToHash id, mempty)
 
         Just (t :: Codebase.Term Symbol Ann) ->
-          pure (refToHash ref, calls t)
+          pure (idToHash id, calls t)
 
-refToHash :: Reference.Id -> Hash
-refToHash =
-  Hash . refToHashText
+-- | @Codebase.Term Symbol Ann@ desugars to
+-- @ABT.Term (Term.F Symbol Ann Ann) Symbol Ann@.
+calls :: ABT.Term (Term.F Symbol Ann Ann) Symbol Ann -> Set Hash
+calls =
+  Set.fromList . mapMaybe f . Set.toList . Term.dependencies
+  where
+    f :: Reference -> Maybe Hash
+    f =
+      fmap idToHash . referenceToId
 
--- | A separate function from 'refToHash' for use in making logs.
-refToHashText :: Reference.Id -> Text
-refToHashText (Reference.Id hash _ _) =
+idToHash :: Reference.Id -> Hash
+idToHash =
+  Hash . idToHashText
+
+-- | A separate function from 'idToHash' for use in making logs.
+idToHashText :: Reference.Id -> Text
+idToHashText (Reference.Id hash _ _) =
   T.pack (show hash)
 
 mkNames :: Map Referent Reference.Id -> Map Referent (Set Name) -> Names
@@ -141,7 +157,7 @@ mkNames xs nameMap =
           error "Name not found"
 
         Just names ->
-          ( refToHash id
+          ( idToHash id
           , textFromName names
           )
 
@@ -157,16 +173,7 @@ textFromName xs =
     x:_ ->
       Name.toText x <> " (conflicted)"
 
--- | @Codebase.Term Symbol Ann@ desugars to
--- @ABT.Term (Term.F Symbol Ann Ann) Symbol Ann@.
-calls :: ABT.Term (Term.F Symbol Ann Ann) Symbol Ann -> Set Hash
-calls =
-  Set.fromList . mapMaybe f . Set.toList . Term.dependencies
-  where
-    f :: Reference -> Maybe Hash
-    f =
-      fmap refToHash . referenceToId
-
+-- | Filters out builtins.
 referenceToId :: Reference -> Maybe Reference.Id
 referenceToId ref =
   case ref of

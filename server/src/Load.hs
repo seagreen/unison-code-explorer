@@ -1,4 +1,9 @@
-module Load where
+module Load
+  ( load
+  , FunctionCallGraph(..)
+  , Names(..)
+  , Hash(..)
+  ) where
 
 import Control.Monad
 import Data.Aeson
@@ -11,13 +16,13 @@ import GHC.Generics
 import Prelude hiding (head, id)
 import System.Exit (die)
 import Unison.Codebase (Codebase)
-import Unison.Codebase.Serialization.V0 (formatSymbol)
+import Unison.Codebase.Serialization.V1 (formatSymbol)
 import Unison.Name (Name)
 import Unison.Parser (Ann(External))
 import Unison.Reference (Reference)
 import Unison.Referent (Referent)
 import Unison.Symbol (Symbol)
-import Unison.Util.Relation (Relation)
+import Unison.Util.Star3 (Star3)
 
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -34,66 +39,56 @@ import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
--- import qualified Unison.Codebase.Editor as Editor
-
--- * Interface
-
-newtype Hash
-  = Hash Text
-  deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (ToJSON, ToJSONKey)
-
-data Names
-  = Names (Map Hash Text)
-  deriving stock (Show, Generic)
-  deriving anyclass (ToJSON)
+import qualified Unison.Util.Star3 as Star3
 
 data FunctionCallGraph
   = FunctionCallGraph (Map Hash (Set Hash))
   deriving stock (Show, Generic)
   deriving anyclass (ToJSON)
 
--- * Details
+data Names
+  = Names (Map Hash Text)
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON)
 
-newtype BranchName
-  = BranchName Text
-  deriving (Show)
+newtype Hash
+  = Hash Text
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON, ToJSONKey)
 
-load :: BranchName -> IO (Names, FunctionCallGraph)
-load (BranchName branchName) = do
+load :: IO (Names, FunctionCallGraph)
+load = do
   let
     codebasePath :: FilePath
     codebasePath =
-      ".unison"
+      ".unison/v1"
 
     codebase :: Codebase IO Symbol Ann
     codebase =
-      FileCodebase.codebase1 External formatSymbol formatAnn codebasePath
+      FileCodebase.codebase1 formatSymbol formatAnn codebasePath
 
   exists <- FileCodebase.exists codebasePath
   when (not exists) (die "No codebase found")
 
-  -- Editor.initializeCodebase codebase
+  branch <- Codebase.getRootBranch codebase
 
-  mBranch <- Codebase.getBranch codebase branchName
-  branch <- case mBranch of
-              Nothing ->
-                die "getBranch failed"
-
-              Just b ->
-                pure b
   let
-    head :: Branch.Branch0
+    head :: Branch.Branch0 IO
     head =
       Branch.head branch
 
-    terms :: Relation Name Referent
+    terms
+      :: Star3
+           Referent
+           Name
+           Reference -- Type
+           (Reference, Reference) -- Type, Value
     terms =
-      Branch.termNamespace head
+      Branch.deepTerms head
 
     refToName :: Map Referent (Set Name)
     refToName =
-      Relation.range terms
+      Relation.domain (Star3.d1 terms)
 
     refMap :: Map Referent Reference.Id
     refMap =
@@ -107,6 +102,8 @@ load (BranchName branchName) = do
 
   res <- fcg codebase (Set.fromList (Map.elems refMap))
   pure (mkNames refMap refToName, res)
+
+-- * Helpers
 
 fcg :: Codebase IO Symbol Ann -> Set Reference.Id -> IO FunctionCallGraph
 fcg codebase refs = do
@@ -171,7 +168,7 @@ r2r r =
         Referent.Ref a ->
           a
 
-        Referent.Con a _ ->
+        Referent.Con a _ _ ->
           a
 
 formatAnn :: S.Format Ann

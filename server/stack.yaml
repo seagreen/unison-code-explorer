@@ -1,7 +1,8 @@
-resolver: lts-12.5
+resolver: lts-12.14
+allow-newer: true # See Unison's stack.yaml
 extra-deps:
   - git: git@github.com:unisonweb/unison.git
-    commit: 'bca45bf81ab4924229afd468b8359e80d71f285a'
+    commit: '11871bb9ff1e9a315c5ee4635e5988a8e555c5d9'
     subdirs:
       - parser-typechecker
       - yaks/easytest
@@ -12,3 +13,5 @@ extra-deps:
   - strings-1.1
   - relation-0.2.1
   - guid-0.1.0
+  - shellmet-0.0.1
+  - fsutils-0.1.2

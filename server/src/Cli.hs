@@ -22,7 +22,7 @@ main = do
   conf <- runParser
   if Serve.configDumpJson conf
     then do
-      (names, functionCallGraph) <- Load.load (Serve.configBranch conf)
+      (names, functionCallGraph) <- Load.load
       TIO.putStrLn . encodePretty . object $
         [ "names" .= names
         , "function_call_graph" .= functionCallGraph
@@ -60,16 +60,6 @@ main = do
         switch
           (  long "dump-json"
           <> help "Dump JSON to STDOUT instead of starting server"
-          )
-      <*>
-        fmap Load.BranchName
-          ( strOption
-            (  long "branch"
-            <> metavar "BRANCH_NAME"
-            <> help "Self-explanatory"
-            <> value "master"
-            <> showDefault
-            )
           )
       <*>
         option auto

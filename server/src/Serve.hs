@@ -1,13 +1,16 @@
-module Serve where
+module Serve
+  ( Config(..)
+  , run
+  ) where
 
 import Network.Wai
-import Network.Wai.Handler.Warp
+import Network.Wai.Middleware.Cors (simpleCors)
 import Prelude
 import Servant
 import System.IO
-import Network.Wai.Middleware.Cors
 
 import qualified Load
+import qualified Network.Wai.Handler.Warp as Warp
 
 -- * API
 
@@ -23,21 +26,20 @@ itemApi =
 
 data Config = Config
   { configDumpJson :: Bool
-  , configBranch :: Load.BranchName
   , configPort :: Int
   } deriving (Show)
 
 run :: Config -> IO ()
 run conf = do
-  (names, fcg) <- Load.load (configBranch conf)
-  runSettings settings . simpleCors =<< mkApp names fcg
+  (names, fcg) <- Load.load
+  Warp.runSettings settings . simpleCors =<< mkApp names fcg
   where
-    settings :: Settings
+    settings :: Warp.Settings
     settings =
-      setPort (configPort conf) $
-        setBeforeMainLoop
+      Warp.setPort (configPort conf) $
+        Warp.setBeforeMainLoop
           (hPutStrLn stderr ("listening on port " <> show (configPort conf)))
-          defaultSettings
+          Warp.defaultSettings
 
 mkApp :: Load.Names -> Load.FunctionCallGraph -> IO Application
 mkApp names fcg =

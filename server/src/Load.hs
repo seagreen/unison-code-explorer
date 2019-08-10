@@ -115,11 +115,20 @@ fcg codebase refs = do
       mTerm <- Codebase.getTerm codebase ref
       case mTerm of
         Nothing -> do
-          TIO.hPutStrLn System.IO.stderr ("No term for reference: " <> T.pack (show ref))
-          pure (Hash (T.pack (show ref)), mempty)
+          TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> refToHashText ref)
+          pure (refToHash ref, mempty)
 
         Just (t :: Codebase.Term Symbol Ann) ->
-          pure (Hash (T.pack (show ref)), Set.map Hash (calls t))
+          pure (refToHash ref, calls t)
+
+refToHash :: Reference.Id -> Hash
+refToHash =
+  Hash . refToHashText
+
+-- | A separate function from 'refToHash' for use in making logs.
+refToHashText :: Reference.Id -> Text
+refToHashText (Reference.Id hash _ _) =
+  T.pack (show hash)
 
 mkNames :: Map Referent Reference.Id -> Map Referent (Set Name) -> Names
 mkNames xs nameMap =
@@ -132,7 +141,7 @@ mkNames xs nameMap =
           error "Name not found"
 
         Just names ->
-          ( Hash (T.pack (show id))
+          ( refToHash id
           , textFromName names
           )
 
@@ -150,9 +159,17 @@ textFromName xs =
 
 -- | @Codebase.Term Symbol Ann@ desugars to
 -- @ABT.Term (Term.F Symbol Ann Ann) Symbol Ann@.
-calls :: ABT.Term (Term.F Symbol Ann Ann) Symbol Ann -> Set Text
-calls t =
-  Set.map (T.pack . show) (Term.dependencies t)
+calls :: ABT.Term (Term.F Symbol Ann Ann) Symbol Ann -> Set Hash
+calls =
+  Set.fromList . mapMaybe f . Set.toList . Term.dependencies
+  where
+    f :: Reference -> Maybe Hash
+    f = \case
+      Reference.Builtin _ ->
+        Nothing
+
+      Reference.DerivedId id ->
+        Just (refToHash id)
 
 r2r :: Referent -> Maybe Reference.Id
 r2r r =

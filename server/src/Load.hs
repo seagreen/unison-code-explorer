@@ -1,6 +1,8 @@
 -- | Use the Unison compiler as a library to get info about a codebase.
 module Load
   ( load
+  , API(..)
+  , SearchResult
   , FunctionCallGraph(..)
   , Names(..)
   , Hash(..)
@@ -42,6 +44,14 @@ import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 import qualified Unison.Util.Star3 as Star3
 
+type SearchResult = IO [()]
+
+data API = API
+  { apiNames :: Names
+  , apiFcg :: FunctionCallGraph
+  , apiSearch :: Text -> SearchResult
+  }
+
 data FunctionCallGraph
   = FunctionCallGraph (Map Hash (Set Hash))
   deriving stock (Show, Generic)
@@ -57,7 +67,7 @@ newtype Hash
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON, ToJSONKey)
 
-load :: IO (Names, FunctionCallGraph)
+load :: IO API
 load = do
   let
     codebasePath :: FilePath
@@ -106,8 +116,12 @@ load = do
           id <- referenceToId ref
           pure (referent, id)
 
+  let
+    search :: Text -> SearchResult
+    search = undefined
+
   callGraph <- fcg codebase (Set.fromList (Map.elems refToId))
-  pure (mkNames refToId refToName, callGraph)
+  pure (API (mkNames refToId refToName) callGraph search)
 
 -- * Helpers
 

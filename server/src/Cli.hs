@@ -22,10 +22,10 @@ main = do
   conf <- runParser
   if Serve.configDumpJson conf
     then do
-      (names, functionCallGraph) <- Load.load
+      api <- Load.load
       TIO.putStrLn . encodePretty . object $
-        [ "names" .= names
-        , "function_call_graph" .= functionCallGraph
+        [ "names" .= Load.apiNames api
+        , "function_call_graph" .= Load.apiFcg api
         ]
 
     else

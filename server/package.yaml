@@ -38,6 +38,7 @@ dependencies:
   - aeson-pretty
   - gitrev
   - servant-server
+  - unison-core
   - unison-parser-typechecker
   - wai
   - wai-cors

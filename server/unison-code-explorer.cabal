@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 75110535e662d2df147704e0f2fc7d4d9af092060b22cbddf29250bf6e1ae4f5
+-- hash: 32a9711bda5994b2ab3b14045188f77606ea5ec505d84dd0009870dbaf6982d4
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -43,6 +43,7 @@ library
     , text
     , time
     , transformers
+    , unison-core
     , unison-parser-typechecker
     , unordered-containers
     , wai
@@ -80,6 +81,7 @@ executable unison-code-explorer
     , time
     , transformers
     , unison-code-explorer
+    , unison-core
     , unison-parser-typechecker
     , unordered-containers
     , wai

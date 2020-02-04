@@ -25,7 +25,7 @@ import Unison.Parser (Ann(External))
 import Unison.Reference (Reference)
 import Unison.Referent (Referent)
 import Unison.Symbol (Symbol)
-import Unison.Util.Star3 (Star3)
+import Unison.Util.Relation (Relation)
 
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -42,7 +42,6 @@ import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
-import qualified Unison.Util.Star3 as Star3
 
 type SearchResult = IO [()]
 
@@ -88,18 +87,13 @@ load = do
     head =
       Branch.head branch
 
-    terms
-      :: Star3
-           Referent
-           Name
-           Reference -- Type
-           (Reference, Reference) -- Type, Value
+    terms :: Relation Referent Name
     terms =
       Branch.deepTerms head
 
     refToName :: Map Referent (Set Name)
     refToName =
-      Relation.domain (Star3.d1 terms)
+      Relation.domain terms
 
     -- Start with @refToName@, filter out builtins with @referenceToId@,
     -- and replace the values with @Reference.Id@s.

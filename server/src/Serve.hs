@@ -3,8 +3,6 @@ module Serve
   , run
   ) where
 
-import Control.Monad.IO.Class
-import Data.Text (Text)
 import Network.Wai
 import Network.Wai.Middleware.Cors (simpleCors)
 import Prelude
@@ -17,22 +15,13 @@ import qualified Network.Wai.Handler.Warp as Warp
 -- * API
 
 type ItemApi =
-
-  -- These are meant for small libraries.
-  -- We'll need to turn them off for the megaserver.
-
        "names" :> Get '[JSON] Load.Names
   :<|> "function-call-graph" :> Get '[JSON] Load.FunctionCallGraph
-
-  -- Megaserver appropriate.
-
-  :<|> "search" :> Capture "query-by-name" Text :> Get '[JSON] [()]
 
 server :: Load.API -> Server ItemApi
 server api =
        pure (Load.apiNames api)
   :<|> pure (Load.apiFcg api)
-  :<|> (\txt -> liftIO $ (Load.apiSearch api) txt)
 
 itemApi :: Proxy ItemApi
 itemApi =

@@ -2,7 +2,6 @@
 module Load
   ( load
   , API(..)
-  , SearchResult
   , FunctionCallGraph(..)
   , Names(..)
   , Hash(..)
@@ -43,12 +42,9 @@ import qualified Unison.Referent as Referent
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 
-type SearchResult = IO [()]
-
 data API = API
   { apiNames :: Names
   , apiFcg :: FunctionCallGraph
-  , apiSearch :: Text -> SearchResult
   }
 
 data FunctionCallGraph
@@ -110,12 +106,8 @@ load = do
           id <- referenceToId ref
           pure (referent, id)
 
-  let
-    search :: Text -> SearchResult
-    search = undefined
-
   callGraph <- fcg codebase (Set.fromList (Map.elems refToId))
-  pure (API (mkNames refToId refToName) callGraph search)
+  pure (API (mkNames refToId refToName) callGraph)
 
 -- * Helpers
 

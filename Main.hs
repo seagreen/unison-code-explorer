@@ -14,8 +14,8 @@ import qualified Data.Aeson.Encode.Pretty as Pretty
 import qualified Data.Text.IO as TIO
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.Builder
-import qualified Load
-import qualified Serve
+import qualified UCE.Load as Load
+import qualified UCE.Serve as Serve
 
 main :: IO ()
 main = do

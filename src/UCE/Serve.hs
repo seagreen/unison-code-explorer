@@ -1,4 +1,4 @@
-module Serve
+module UCE.Serve
   ( Config(..)
   , run
   ) where
@@ -9,8 +9,8 @@ import Prelude
 import Servant
 import System.IO
 
-import qualified Load
 import qualified Network.Wai.Handler.Warp as Warp
+import qualified UCE.Load as Load
 
 -- * API
 

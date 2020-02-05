@@ -65,7 +65,7 @@ main = do
         option auto
           (  long "port"
           <> help "Port to run server on"
-          <> value 3000
+          <> value 8080
           <> showDefault
           )
 

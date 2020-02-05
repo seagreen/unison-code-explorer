@@ -56,7 +56,6 @@ dependencies:
   - hashable
   - lens
   - mtl
-  - optparse-applicative
   - random
   - safe-exceptions
   - stm
@@ -69,8 +68,9 @@ library:
   source-dirs: src
 executables:
   unison-code-explorer:
-    source-dirs: misc
+    source-dirs: .
     main: Main.hs
     ghc-options: -threaded -rtsopts
     dependencies:
+      - optparse-applicative
       - unison-code-explorer

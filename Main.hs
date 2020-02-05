@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Cli where
+module Main where
 
 import Data.Aeson
 import Data.Text (Text)

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 32a9711bda5994b2ab3b14045188f77606ea5ec505d84dd0009870dbaf6982d4
+-- hash: 39210997789e43bbb53811b223308f92970ae5b10eaf2ad9f797763c65201bed
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -13,7 +13,6 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Cli
       Load
       Serve
   other-modules:
@@ -35,7 +34,6 @@ library
     , hashable
     , lens
     , mtl
-    , optparse-applicative
     , random
     , safe-exceptions
     , servant-server
@@ -56,7 +54,7 @@ executable unison-code-explorer
   other-modules:
       Paths_unison_code_explorer
   hs-source-dirs:
-      misc
+      ./.
   default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
   ghc-options: -Wall -threaded -rtsopts
   build-depends:

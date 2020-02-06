@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b2dbfe135a40c85c5e1e32728df5b2645407deabed49e391696292314255268c
+-- hash: 20c546c56abe43f27d444c8a985684f09991019adae5fa9baee4ca134212b1ad
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -13,9 +13,10 @@ build-type:     Simple
 
 library
   exposed-modules:
+      UCE
+      UCE.App
       UCE.Load
       UCE.Prelude
-      UCE.Serve
   other-modules:
       Paths_unison_code_explorer
   hs-source-dirs:
@@ -28,6 +29,8 @@ library
     , async
     , base
     , bytestring
+    , concur-core
+    , concur-replica
     , containers
     , directory
     , filepath
@@ -46,8 +49,8 @@ library
     , unison-parser-typechecker
     , unordered-containers
     , wai
-    , wai-cors
-    , warp
+    , wai-middleware-static
+    , websockets
   default-language: Haskell2010
 
 executable unison-code-explorer
@@ -64,6 +67,8 @@ executable unison-code-explorer
     , async
     , base
     , bytestring
+    , concur-core
+    , concur-replica
     , containers
     , directory
     , filepath
@@ -84,6 +89,6 @@ executable unison-code-explorer
     , unison-parser-typechecker
     , unordered-containers
     , wai
-    , wai-cors
-    , warp
+    , wai-middleware-static
+    , websockets
   default-language: Haskell2010

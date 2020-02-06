@@ -1,3 +1,6 @@
+######################################################################
+# match unison exactly
+
 resolver: lts-14.7
 allow-newer: true # See Unison's stack.yaml
 extra-deps:
@@ -9,7 +12,6 @@ extra-deps:
       - yaks/haskeline
       - unison-core
 
-  # Needed for unison
   - base58-bytestring-0.1.0
   - relation-0.2.1
   - shellmet-0.0.1
@@ -20,3 +22,20 @@ extra-deps:
   - prelude-extras-0.4.0.3@sha256:1c10b0123ea13a6423d74a8fcbaeb2d5249b472588abde418a36b47b7c4f48c8
   - sandi-0.5@sha256:b278d072ca717706ea38f9bd646e023f7f2576a778fb43565b434f93638849aa
   - megaparsec-6.5.0
+
+  ######################################################################
+  # additional deps
+
+  # The latest
+  - git: git@github.com:pkamenarsky/concur-replica
+    commit: 'fc85458d7ed74c8ee1dc7944875c8355fb745ab6'
+
+  # From `master`, with SVG support
+  - git: git@github.com:pkamenarsky/replica
+    commit: 'a46c17f6326eb154b2d76e31a1d62ed4b02a4a3c'
+
+  # From concur-replica's stack.yaml. Jun 26, 2019
+  - git: git@github.com:ajnsit/concur
+    commit: '6c6bcc07b2688182945b28f154a013eee3f624c5'
+    subdirs:
+      - concur-core

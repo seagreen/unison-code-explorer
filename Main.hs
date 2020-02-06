@@ -13,28 +13,34 @@ import qualified Data.Aeson.Encode.Pretty as Pretty
 import qualified Data.Text.IO as TIO
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.Builder
+import qualified UCE
 import qualified UCE.Load as Load
-import qualified UCE.Serve as Serve
+
+data Config = Config
+  { configDumpJson :: Bool
+  , configPort :: Int
+  } deriving (Show)
 
 main :: IO ()
 main = do
+  logLn "Starting"
   conf <- runParser
-  if Serve.configDumpJson conf
+  api <- Load.load
+  if configDumpJson conf
     then do
-      api <- Load.load
       TIO.putStrLn . encodePretty . object $
         [ "names" .= Load.apiNames api
         , "function_call_graph" .= Load.apiFcg api
         ]
 
     else
-      Serve.run conf
+      UCE.run (configPort conf) api
  where
-  runParser :: IO Serve.Config
+  runParser :: IO Config
   runParser =
     customExecParser (prefs showHelpOnError) parserInfo
 
-  parserInfo :: ParserInfo Serve.Config
+  parserInfo :: ParserInfo Config
   parserInfo =
     info
       (helper <*> versionOption <*> parser)
@@ -52,9 +58,9 @@ main = do
 
   -- Make sure you include the `help` section or that flag won't show up
   -- under "Available options".
-  parser :: Parser Serve.Config
+  parser :: Parser Config
   parser =
-    Serve.Config
+    Config
       <$>
         switch
           (  long "dump-json"

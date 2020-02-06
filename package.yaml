@@ -35,18 +35,20 @@ dependencies:
 
   # Notable
 
-  - aeson-pretty
+  - concur-core
+  - concur-replica
   - gitrev
   - servant-server
   - unison-core
   - unison-parser-typechecker
   - wai
-  - wai-cors
-  - warp
+  - wai-middleware-static
+  - websockets
 
   # Other
 
   - aeson
+  - aeson-pretty
   - async
   - base
   - bytestring

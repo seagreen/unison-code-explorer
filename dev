@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# not watching css file because --watch takes a dir
+watchexec .bin/unison-code-explorer --restart --watch .bin

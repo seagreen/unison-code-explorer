@@ -45,7 +45,7 @@ data FunctionCallGraph
   deriving anyclass (ToJSON)
 
 data Names
-  = Names (Map Hash Text)
+  = Names { unNames :: Map Hash Text }
   deriving stock (Show, Generic)
   deriving anyclass (ToJSON)
 

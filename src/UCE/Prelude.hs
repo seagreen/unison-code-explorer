@@ -11,6 +11,7 @@ import Prelude as X hiding (error, foldl, head, id, lookup)
 import Control.Applicative as X
 import Control.Concurrent as X
 import Control.Concurrent.STM as X
+import Control.Lens as X hiding ((.=), (<.>), children, from, index, to)
 import Control.Monad as X
 import Control.Monad.IO.Class as X
 import Data.Either as X

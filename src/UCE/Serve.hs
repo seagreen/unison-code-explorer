@@ -5,9 +5,8 @@ module UCE.Serve
 
 import Network.Wai
 import Network.Wai.Middleware.Cors (simpleCors)
-import Prelude
 import Servant
-import System.IO
+import UCE.Prelude
 
 import qualified Network.Wai.Handler.Warp as Warp
 import qualified UCE.Load as Load
@@ -43,7 +42,7 @@ run conf = do
     settings =
       Warp.setPort (configPort conf) $
         Warp.setBeforeMainLoop
-          (hPutStrLn stderr ("listening on port " <> show (configPort conf)))
+          (logLn ("listening on port " <> show (configPort conf)))
           Warp.defaultSettings
 
 mkApp :: Load.API -> IO Application

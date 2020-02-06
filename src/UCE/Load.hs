@@ -7,16 +7,8 @@ module UCE.Load
   , Hash(..)
   ) where
 
-import Control.Monad
 import Data.Aeson
-import Data.Map (Map)
-import Data.Maybe
-import Data.Set (Set)
-import Data.Text (Text)
-import Data.Traversable
-import GHC.Generics
-import Prelude hiding (head, id)
-import System.Exit (die)
+import UCE.Prelude
 import Unison.Codebase (Codebase)
 import Unison.Codebase.Serialization.V1 (formatSymbol)
 import Unison.Name (Name)
@@ -154,7 +146,7 @@ mkNames xs nameMap =
     f (referent, id) =
       case Map.lookup referent nameMap of
         Nothing ->
-          error "Name not found"
+          panic "Name not found"
 
         Just names ->
           ( idToHash id

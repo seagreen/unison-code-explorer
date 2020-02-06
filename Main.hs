@@ -3,12 +3,11 @@
 module Main where
 
 import Data.Aeson
-import Data.Text (Text)
 import Data.Version (showVersion)
 import Development.GitRev (gitHash)
 import Options.Applicative
 import Paths_unison_code_explorer (version)
-import Prelude
+import UCE.Prelude
 
 import qualified Data.Aeson.Encode.Pretty as Pretty
 import qualified Data.Text.IO as TIO

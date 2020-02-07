@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 20c546c56abe43f27d444c8a985684f09991019adae5fa9baee4ca134212b1ad
+-- hash: 3677593695d4cbbf53b2ca65308a2375005d8d181363f690a1c66122e146b917
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -24,9 +24,7 @@ library
   default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
   ghc-options: -Wall
   build-depends:
-      aeson
-    , aeson-pretty
-    , async
+      async
     , base
     , bytestring
     , concur-core
@@ -62,9 +60,7 @@ executable unison-code-explorer
   default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
   ghc-options: -Wall -threaded -rtsopts
   build-depends:
-      aeson
-    , aeson-pretty
-    , async
+      async
     , base
     , bytestring
     , concur-core

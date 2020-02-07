@@ -47,8 +47,6 @@ dependencies:
 
   # Other
 
-  - aeson
-  - aeson-pretty
   - async
   - base
   - bytestring

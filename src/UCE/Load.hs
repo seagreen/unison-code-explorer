@@ -7,7 +7,6 @@ module UCE.Load
   , Hash(..)
   ) where
 
-import Data.Aeson
 import UCE.Prelude
 import Unison.Codebase (Codebase)
 import Unison.Codebase.Serialization.V1 (formatSymbol)
@@ -42,17 +41,14 @@ data CodeInfo = CodeInfo
 data FunctionCallGraph
   = FunctionCallGraph (Map Hash (Set Hash))
   deriving stock (Show, Generic)
-  deriving anyclass (ToJSON)
 
 data Names
   = Names { unNames :: Map Hash Text }
   deriving stock (Show, Generic)
-  deriving anyclass (ToJSON)
 
 newtype Hash
   = Hash Text
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (ToJSON, ToJSONKey)
 
 load :: IO CodeInfo
 load = do

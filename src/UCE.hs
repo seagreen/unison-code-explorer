@@ -3,9 +3,9 @@ module UCE where
 import Concur.Replica (Attr(..), Attrs, HTML, VDOM(..), clientDriver)
 import Data.Text.Encoding (decodeUtf8)
 import Network.WebSockets (defaultConnectionOptions)
-import UCE.App (State(Searching), app)
-import UCE.CodeInfo
+import UCE.Code
 import UCE.Prelude
+import UCE.UI (State(Searching), app)
 
 import qualified Concur.Replica.Run
 import qualified Data.Map as Map

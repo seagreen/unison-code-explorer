@@ -1,5 +1,5 @@
 -- | Use the Unison compiler as a library to get info about a codebase.
-module UCE.CodeInfo
+module UCE.Code
   ( load
   , CodeInfo(..)
   , FunctionCallGraph(..)

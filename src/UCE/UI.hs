@@ -1,8 +1,8 @@
-module UCE.App where
+module UCE.UI where
 
 import Concur.Core (Widget)
 import Concur.Replica (HTML)
-import UCE.CodeInfo
+import UCE.Code
 import UCE.Prelude
 
 import qualified Concur.Replica.DOM as H

@@ -45,7 +45,7 @@ app codeinfo state = do
 viewSingle :: CodeInfo -> Reference -> Widget HTML State
 viewSingle codeinfo ref =
   H.div []
-    [ H.h1 [P.className "h1"]
+    [ H.h3 [P.className "title is-3"]
         [H.text (refName ref codeinfo)]
     , ViewSingle <$> viewBody codeinfo (Set.singleton ref)
     , Searching <$ backToSearch
@@ -157,7 +157,9 @@ viewBody codeinfo refs =
     viewLink ref = do
       _ <-
         H.li [P.onClick]
-          [H.text (refName ref codeinfo)]
+          [ H.a []
+              [H.text (refName ref codeinfo)]
+          ]
       pure ref
       where
 

@@ -9,7 +9,7 @@ import Paths_unison_code_explorer (version)
 import UCE.Prelude
 
 import qualified UCE
-import qualified UCE.Load as Load
+import qualified UCE.CodeInfo as CodeInfo
 
 data Config = Config
   { configPort :: Int
@@ -19,7 +19,7 @@ main :: IO ()
 main = do
   logLn "Starting"
   conf <- runParser
-  codeinfo <- Load.load
+  codeinfo <- CodeInfo.load
   UCE.run (configPort conf) codeinfo
  where
   runParser :: IO Config

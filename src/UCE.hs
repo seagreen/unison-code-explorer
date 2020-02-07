@@ -4,7 +4,7 @@ import Concur.Replica (Attr(..), Attrs, HTML, VDOM(..), clientDriver)
 import Data.Text.Encoding (decodeUtf8)
 import Network.WebSockets (defaultConnectionOptions)
 import UCE.App (app)
-import UCE.Load
+import UCE.CodeInfo
 import UCE.Prelude
 
 import qualified Concur.Replica.Run

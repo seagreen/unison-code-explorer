@@ -2,7 +2,7 @@ module UCE.App where
 
 import Concur.Core (Widget)
 import Concur.Replica (HTML)
-import UCE.Load
+import UCE.CodeInfo
 import UCE.Prelude
 
 import qualified Concur.Replica.DOM as H

@@ -3,7 +3,7 @@ module UCE where
 import Concur.Replica (Attr(..), Attrs, HTML, VDOM(..), clientDriver)
 import Data.Text.Encoding (decodeUtf8)
 import Network.WebSockets (defaultConnectionOptions)
-import UCE.App (app)
+import UCE.App (State(Searching), app)
 import UCE.CodeInfo
 import UCE.Prelude
 
@@ -19,7 +19,7 @@ run port codeinfo =
     index
     defaultConnectionOptions
     static
-    (app codeinfo)
+    (app codeinfo Searching)
 
 static :: Wai.Middleware
 static =

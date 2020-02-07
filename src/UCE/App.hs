@@ -14,13 +14,22 @@ import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Unison.Name as Name
 
-app :: CodeInfo -> Widget HTML a
-app codeinfo = do
+data State = Searching | ViewSingle Reference
+
+app :: CodeInfo -> State -> Widget HTML a
+app codeinfo state = do
   liftIO (logLn "Running app")
-  H.div []
-    [ welcome
-    , search codeinfo mempty mempty
-    ]
+  newState <-
+    H.div []
+      [ welcome
+      , case state of
+          Searching ->
+            ViewSingle <$> search codeinfo mempty mempty
+
+          ViewSingle ref ->
+            viewSingle codeinfo ref
+      ]
+  app codeinfo newState
   where
     welcome :: Widget HTML a
     welcome =
@@ -33,11 +42,26 @@ app codeinfo = do
             ]
         ]
 
+viewSingle :: CodeInfo -> Reference -> Widget HTML State
+viewSingle codeinfo ref =
+  H.div []
+    [ H.h1 [P.className "h1"]
+        [H.text (refName ref codeinfo)]
+    , ViewSingle <$> viewBody codeinfo (Set.singleton ref)
+    , Searching <$ backToSearch
+    ]
+  where
+    backToSearch :: Widget HTML P.MouseEvent
+    backToSearch =
+      H.button [P.onClick, P.className "button"]
+        [ H.text "Back to search"
+        ]
+
 newtype OpenNames
   = OpenNames { unOpenNames :: Set Name }
   deriving newtype (Semigroup, Monoid)
 
-search :: CodeInfo -> Text -> OpenNames -> Widget HTML a
+search :: CodeInfo -> Text -> OpenNames -> Widget HTML Reference
 search codeinfo searchStr openNames = do
   res <-
     H.div []
@@ -48,8 +72,11 @@ search codeinfo searchStr openNames = do
     One2 t ->
       search codeinfo t openNames
 
-    Two2 newOpenNames ->
+    Two2 (Left newOpenNames) ->
       search codeinfo searchStr newOpenNames
+
+    Two2 (Right ref) ->
+      pure ref
   where
     searchBox :: Widget HTML Text
     searchBox = do
@@ -66,7 +93,7 @@ search codeinfo searchStr openNames = do
           ]
       pure (P.targetValue (P.target e))
 
-    results :: Widget HTML OpenNames
+    results :: Widget HTML (Either OpenNames Reference)
     results =
       H.ul []
         (codeinfo
@@ -80,16 +107,15 @@ search codeinfo searchStr openNames = do
         strLower =
           Text.toLower searchStr
 
-    viewTerm :: (Name, Set Reference) -> Widget HTML OpenNames
+    viewTerm :: (Name, Set Reference) -> Widget HTML (Either OpenNames Reference)
     viewTerm (name, refs) = do
-      _ <-
-        H.li []
-          [ H.button [P.onClick, P.className "button"]
-              [ H.text (btn <> " " <> Name.toText name)
-              ]
-          , body
-          ]
-      pure (OpenNames (setSwap name (unOpenNames openNames)))
+      H.li []
+        [ Left (OpenNames (setSwap name (unOpenNames openNames)))
+            <$ H.button [P.onClick, P.className "button"]
+                 [ H.text (btn <> " " <> Name.toText name)
+                 ]
+        , Right <$> body
+        ]
       where
         isOpen :: Bool
         isOpen =
@@ -100,66 +126,71 @@ search codeinfo searchStr openNames = do
           | isOpen    = "-"
           | otherwise = "+"
 
-        body :: Widget HTML a
+        body :: Widget HTML Reference
         body
           | not isOpen = H.div [] []
-          | otherwise  =
-              H.div [P.className "box"]
-                [ H.pre []
-                    [ H.code []
-                        [H.text txt]
-                    ]
-                , H.ul []
-                    (viewLink <$> callList)
-                ]
-          where
-            callList :: [Reference]
-            callList =
-              case Set.toList refs of
-                [] ->
-                  mempty
+          | otherwise  = viewBody codeinfo refs
 
-                [r] ->
-                  Set.toList (functionCalls r (apiFcg codeinfo))
+viewBody :: CodeInfo -> Set Reference -> Widget HTML Reference
+viewBody codeinfo refs =
+  H.div [P.className "box"]
+    [ H.pre []
+        [ H.code []
+            [H.text txt]
+        ]
+    , H.ul []
+        (viewLink <$> callList)
+    ]
+  where
+    callList :: [Reference]
+    callList =
+      case Set.toList refs of
+        [] ->
+          mempty
 
-                _ -> mempty -- todo
+        [r] ->
+          Set.toList (functionCalls r (apiFcg codeinfo))
 
-            viewLink :: Reference -> Widget HTML a
-            viewLink ref =
-              H.li []
-                [H.text refName]
+        _ -> mempty -- todo
 
-              where
-                refName :: Text
-                refName =
-                  case Set.toList <$> Map.lookup ref (apiRefsToNames codeinfo) of
-                    Nothing ->
-                      showText ref
+    viewLink :: Reference -> Widget HTML Reference
+    viewLink ref = do
+      _ <-
+        H.li [P.onClick]
+          [H.text (refName ref codeinfo)]
+      pure ref
+      where
 
-                    Just [] ->
-                      showText ref
+    txt =
+      case Set.toList refs of
+        [] ->
+          "<programmer error: no ref>"
 
-                    Just [n] ->
-                      Name.toText n
+        [r] ->
+          case Map.lookup r (termBodies codeinfo) of
+            Nothing ->
+              "<not found>"
 
-                    Just (x:y:[]) ->
-                      Name.toText x <> " (also " <> Name.toText y <> ")"
+            Just t ->
+              t
 
-                    Just (x:y:_) ->
-                      Name.toText x <> " (also " <> Name.toText y <> " and others)"
+        _ ->
+          "<confliced name>"
 
-            txt =
-              case Set.toList refs of
-                [] ->
-                  "<programmer error: no ref>"
+refName :: Reference -> CodeInfo -> Text
+refName ref codeinfo =
+  case Set.toList <$> Map.lookup ref (apiRefsToNames codeinfo) of
+    Nothing ->
+      showText ref
 
-                [r] ->
-                  case Map.lookup r (termBodies codeinfo) of
-                    Nothing ->
-                      "<not found>"
+    Just [] ->
+      showText ref
 
-                    Just t ->
-                      t
+    Just [n] ->
+      Name.toText n
 
-                _ ->
-                  "<confliced name>"
+    Just (x:y:[]) ->
+      Name.toText x <> " (also " <> Name.toText y <> ")"
+
+    Just (x:y:_) ->
+      Name.toText x <> " (also " <> Name.toText y <> " and others)"

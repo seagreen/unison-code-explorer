@@ -3,8 +3,8 @@ module UCE.CodeInfo
   ( load
   , CodeInfo(..)
   , FunctionCallGraph(..)
-  , Names(..)
   , Hash(..)
+  , Name
   ) where
 
 import UCE.Prelude
@@ -27,23 +27,20 @@ import qualified Unison.Codebase as Codebase
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
 import qualified Unison.Codebase.Serialization as S
-import qualified Unison.Name as Name
 import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 
 data CodeInfo = CodeInfo
-  { apiNames :: Names
+  { apiNames :: Map Name (Set Hash)
+    -- ^ Invariant: @Set Hash@ is nonempty.
+
   , apiFcg :: FunctionCallGraph
   }
 
 data FunctionCallGraph
   = FunctionCallGraph (Map Hash (Set Hash))
-  deriving stock (Show, Generic)
-
-data Names
-  = Names { unNames :: Map Hash Text }
   deriving stock (Show, Generic)
 
 newtype Hash
@@ -134,32 +131,18 @@ idToHashText :: Reference.Id -> Text
 idToHashText (Reference.Id hash _ _) =
   T.pack (show hash)
 
-mkNames :: Map Referent Reference.Id -> Map Referent (Set Name) -> Names
+mkNames :: Map Referent Reference.Id -> Map Referent (Set Name) -> Map Name (Set Hash)
 mkNames xs nameMap =
-  Names (Map.fromList (fmap f (Map.toList xs)))
+  Set.map f <$> swapMap nameMap
   where
-    f :: (Referent, Reference.Id) -> (Hash, Text)
-    f (referent, id) =
-      case Map.lookup referent nameMap of
+    f :: Referent -> Hash
+    f referent =
+      case Map.lookup referent xs of
         Nothing ->
-          panic "Name not found"
+          panic "Reference.Id not found"
 
-        Just names ->
-          ( idToHash id
-          , textFromName names
-          )
-
-textFromName :: Set Name -> Text
-textFromName xs =
-  case Set.toList xs of
-    [] ->
-      "<none>"
-
-    [x] ->
-      Name.toText x
-
-    x:_ ->
-      Name.toText x <> " (conflicted)"
+        Just id ->
+          idToHash id
 
 -- | Filters out builtins.
 referenceToId :: Reference -> Maybe Reference.Id

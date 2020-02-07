@@ -11,6 +11,7 @@ import qualified Concur.Replica.Props as P
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
+import qualified Unison.Name as Name
 
 app :: CodeInfo -> Widget HTML a
 app codeinfo = do
@@ -32,7 +33,7 @@ app codeinfo = do
         ]
 
 newtype OpenNames
-  = OpenNames { unOpenNames :: Set Text }
+  = OpenNames { unOpenNames :: Set Name }
   deriving newtype (Semigroup, Monoid)
 
 search :: CodeInfo -> Text -> OpenNames -> Widget HTML a
@@ -69,21 +70,20 @@ search codeinfo searchStr openNames = do
       H.ul []
         (codeinfo
           & apiNames
-          & unNames
-          & Map.filter (\n -> Text.isInfixOf strLower (Text.toLower n))
-          & Map.elems
+          & Map.filterWithKey (\n _ -> Text.isInfixOf strLower (Text.toLower (Name.toText n)))
+          & Map.keys
           & map viewName)
       where
         strLower :: Text
         strLower =
           Text.toLower searchStr
 
-    viewName :: Text -> Widget HTML OpenNames
+    viewName :: Name -> Widget HTML OpenNames
     viewName name = do
       _ <-
         H.li []
           [ H.button [P.onClick, P.className "button"]
-              [ H.text (btn <> " " <> name)
+              [ H.text (btn <> " " <> Name.toText name)
               ]
           ]
       pure (OpenNames (setSwap name (unOpenNames openNames)))

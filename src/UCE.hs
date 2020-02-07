@@ -24,7 +24,7 @@ run port codebase =
 static :: Wai.Middleware
 static =
   Static.staticPolicy $
-    Static.only [("custom.css", "custom.css")]
+    Static.only [("custom.css", "custom.css"), ("bulmaswatch.min.css", "bulmaswatch.min.css")]
 
 index :: HTML
 index =
@@ -34,7 +34,7 @@ index =
       [ VNode "head" mempty Nothing
           [ VNode "title" mempty Nothing [VText "Unison Code Explorer"]
           , VNode "link"
-              (fl [ ("href", AText "https://unpkg.com/picnic")
+              (fl [ ("href", AText "./bulmaswatch.min.css")
                   , ("rel", AText "stylesheet")
                   ])
               Nothing

@@ -38,7 +38,8 @@ search codebase str = do
       e <-
         H.div []
           [ H.input
-            [ P.autofocus True
+            [ P.className "input"
+            , P.autofocus True
             , P.placeholder "Search string"
             , P.value str
             , P.onInput

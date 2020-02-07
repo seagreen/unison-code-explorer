@@ -8,6 +8,7 @@ import UCE.Prelude
 import qualified Concur.Replica.DOM as H
 import qualified Concur.Replica.Events as P
 import qualified Concur.Replica.Props as P
+import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
@@ -71,24 +72,52 @@ search codeinfo searchStr openNames = do
         (codeinfo
           & apiNames
           & Map.filterWithKey (\n _ -> Text.isInfixOf strLower (Text.toLower (Name.toText n)))
-          & Map.keys
-          & map viewName)
+          & Map.toList
+          & List.sortOn fst
+          & map viewTerm)
       where
         strLower :: Text
         strLower =
           Text.toLower searchStr
 
-    viewName :: Name -> Widget HTML OpenNames
-    viewName name = do
+    viewTerm :: (Name, Set Reference) -> Widget HTML OpenNames
+    viewTerm (name, refs) = do
       _ <-
         H.li []
           [ H.button [P.onClick, P.className "button"]
               [ H.text (btn <> " " <> Name.toText name)
               ]
+          , body
           ]
       pure (OpenNames (setSwap name (unOpenNames openNames)))
       where
+        isOpen :: Bool
+        isOpen =
+          Set.member name (unOpenNames openNames)
+
         btn :: Text
         btn
-          | Set.member name (unOpenNames openNames) = "-"
-          | otherwise                               = "+"
+          | isOpen    = "-"
+          | otherwise = "+"
+
+        body :: Widget HTML a
+        body
+          | not isOpen = H.div [] []
+          | otherwise  =
+              H.div [] [H.text txt]
+          where
+            txt =
+              case Set.toList refs of
+                [] ->
+                  "<programmer error: no ref>"
+
+                [rs] ->
+                  case Map.lookup rs (termBodies codeinfo) of
+                    Nothing ->
+                      "<not found>"
+
+                    Just t ->
+                      t
+
+                _ ->
+                  "<confliced name>"

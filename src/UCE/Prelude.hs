@@ -65,6 +65,9 @@ panic :: HasCallStack => Text -> a
 panic =
   error . Text.unpack
 
+showText :: Show a => a -> Text
+showText = Text.pack . show
+
 logLn :: [Char] -> IO ()
 logLn =
   System.IO.hPutStrLn System.IO.stderr
@@ -85,3 +88,15 @@ swapMap x =
     f :: (a, Set b) -> [(b, Set a)]
     f (a, bs) =
       (\b -> (b, Set.singleton a)) <$> Set.toList bs
+
+setToMaybe :: Set a -> Maybe a
+setToMaybe =
+  headMaybe . Set.toList
+
+headMaybe :: [a] -> Maybe a
+headMaybe = \case
+  [] ->
+    Nothing
+
+  a:_ ->
+    Just a

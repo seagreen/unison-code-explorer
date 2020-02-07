@@ -32,7 +32,6 @@ import Unison.Util.SyntaxText
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
-import qualified Data.Text as T
 import qualified Data.Text as Text
 import qualified Data.Text.IO as TIO
 import qualified Unison.Codebase as Codebase
@@ -41,7 +40,6 @@ import qualified Unison.Codebase.FileCodebase as FileCodebase
 import qualified Unison.Codebase.Serialization as S
 import qualified Unison.Name as Name
 import qualified Unison.PrettyPrintEnv as PPE
-import qualified Unison.Reference as Reference
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 
@@ -96,21 +94,28 @@ load = do
     head =
       Branch.head branch
 
-    terms :: Relation Referent Name
-    terms =
-      Branch.deepTerms head
-
     referentToName :: Map Referent (Set Name)
     referentToName =
-      Relation.domain terms
+      let
+        terms :: Relation Referent Name
+        terms =
+          Branch.deepTerms head
+      in
+        Relation.domain terms
 
     refToName :: Map Reference (Set Name)
     refToName =
       dropConstructors referentToName
 
-  termBodies <- getTerms codebase head --todo
+  termBodies <- getTerms codebase head
   callGraph <- functionCallGraph codebase (Map.keysSet refToName)
-  pure (CodeInfo (mkNames referentToName) (dropConstructors referentToName) termBodies callGraph)
+
+  pure CodeInfo
+    { apiNames       = swapMap refToName
+    , apiRefsToNames = refToName
+    , termBodies     = termBodies
+    , apiFcg         = callGraph
+    }
 
 -- * Helpers
 
@@ -129,37 +134,11 @@ functionCallGraph codebase refs = do
           mTerm <- Codebase.getTerm codebase id
           case mTerm of
             Nothing -> do
-              TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> idToHashText id)
+              TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> showText id)
               pure (ref, mempty)
 
             Just (t :: Codebase.Term Symbol Ann) ->
               pure (ref, Term.dependencies t)
-
--- | A separate function from 'idToHash' for use in making logs.
-idToHashText :: Reference.Id -> Text
-idToHashText (Reference.Id hash _ _) =
-  T.pack (show hash)
-
-mkNames :: Map Referent (Set Name) -> Map Name (Set Reference)
-mkNames nameMap =
-  Map.mapMaybe f (swapMap nameMap)
-  where
-    f :: Set Referent -> Maybe (Set Reference)
-    f referents =
-      case mapMaybe g (Set.toList referents) of
-        [] ->
-          Nothing
-
-        zs ->
-          Just (Set.fromList zs)
-
-    g :: Referent -> Maybe Reference
-    g = \case
-      Con{} ->
-        Nothing
-
-      Ref ref ->
-        Just ref
 
 referentToRef :: Referent -> Maybe Reference
 referentToRef referent =
@@ -182,16 +161,6 @@ dropConstructors referentMap =
           (,a) <$> fk k
       in
         Map.fromList . mapMaybe g . Map.toList $ xs
-
--- | Filters out builtins.
-referenceToId :: Reference -> Maybe Reference.Id
-referenceToId ref =
-  case ref of
-    Reference.Builtin _ ->
-      Nothing
-
-    Reference.DerivedId id ->
-      Just id
 
 formatAnn :: S.Format Ann
 formatAnn =

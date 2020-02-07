@@ -9,6 +9,7 @@ import qualified Concur.Replica.DOM as H
 import qualified Concur.Replica.Events as P
 import qualified Concur.Replica.Props as P
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 import qualified Data.Text as Text
 
 app :: CodeInfo -> Widget HTML a
@@ -16,7 +17,7 @@ app codeinfo = do
   liftIO (logLn "Running app")
   H.div []
     [ welcome
-    , search codeinfo mempty
+    , search codeinfo mempty mempty
     ]
   where
     welcome :: Widget HTML a
@@ -30,14 +31,23 @@ app codeinfo = do
             ]
         ]
 
-search :: CodeInfo -> Text -> Widget HTML a
-search codeinfo str = do
-  t <-
+newtype OpenNames
+  = OpenNames { unOpenNames :: Set Text }
+  deriving newtype (Semigroup, Monoid)
+
+search :: CodeInfo -> Text -> OpenNames -> Widget HTML a
+search codeinfo searchStr openNames = do
+  res <-
     H.div []
-      [ searchBox
-      , results
+      [ One2 <$> searchBox
+      , Two2 <$> results
       ]
-  search codeinfo t
+  case res of
+    One2 t ->
+      search codeinfo t openNames
+
+    Two2 newOpenNames ->
+      search codeinfo searchStr newOpenNames
   where
     searchBox :: Widget HTML Text
     searchBox = do
@@ -47,14 +57,14 @@ search codeinfo str = do
             [ P.className "input"
             , P.autofocus True
             , P.placeholder "Search string"
-            , P.value str
+            , P.value searchStr
             , P.onInput
             , P.type_ "text"
             ]
           ]
       pure (P.targetValue (P.target e))
 
-    results :: Widget HTML a
+    results :: Widget HTML OpenNames
     results =
       H.ul []
         (codeinfo
@@ -66,12 +76,19 @@ search codeinfo str = do
       where
         strLower :: Text
         strLower =
-          Text.toLower str
+          Text.toLower searchStr
 
-    viewName :: Text -> Widget HTML a
-    viewName name =
-      H.li []
-        [ H.button [P.className "button"]
-            [ H.text ("+ " <> name)
-            ]
-        ]
+    viewName :: Text -> Widget HTML OpenNames
+    viewName name = do
+      _ <-
+        H.li []
+          [ H.button [P.onClick, P.className "button"]
+              [ H.text (btn <> " " <> name)
+              ]
+          ]
+      pure (OpenNames (setSwap name (unOpenNames openNames)))
+      where
+        btn :: Text
+        btn
+          | Set.member name (unOpenNames openNames) = "-"
+          | otherwise                               = "+"

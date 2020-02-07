@@ -12,14 +12,14 @@ import qualified Data.Map as Map
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Middleware.Static as Static
 
-run :: Int -> API -> IO ()
-run port codebase =
+run :: Int -> CodeInfo -> IO ()
+run port codeinfo =
   Concur.Replica.Run.run
     port
     index
     defaultConnectionOptions
     static
-    (app codebase)
+    (app codeinfo)
 
 static :: Wai.Middleware
 static =

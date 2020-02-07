@@ -11,12 +11,12 @@ import qualified Concur.Replica.Props as P
 import qualified Data.Map as Map
 import qualified Data.Text as Text
 
-app :: API -> Widget HTML a
-app codebase = do
+app :: CodeInfo -> Widget HTML a
+app codeinfo = do
   liftIO (logLn "Running app")
   H.div []
     [ welcome
-    , search codebase mempty
+    , search codeinfo mempty
     ]
   where
     welcome :: Widget HTML a
@@ -30,14 +30,14 @@ app codebase = do
             ]
         ]
 
-search :: API -> Text -> Widget HTML a
-search codebase str = do
+search :: CodeInfo -> Text -> Widget HTML a
+search codeinfo str = do
   t <-
     H.div []
       [ searchBox
       , results
       ]
-  search codebase t
+  search codeinfo t
   where
     searchBox :: Widget HTML Text
     searchBox = do
@@ -57,7 +57,7 @@ search codebase str = do
     results :: Widget HTML a
     results =
       H.ul []
-        (codebase
+        (codeinfo
           & apiNames
           & unNames
           & Map.filter (\n -> Text.isInfixOf strLower (Text.toLower n))

@@ -1,7 +1,7 @@
 -- | Use the Unison compiler as a library to get info about a codebase.
 module UCE.Load
   ( load
-  , API(..)
+  , CodeInfo(..)
   , FunctionCallGraph(..)
   , Names(..)
   , Hash(..)
@@ -34,7 +34,7 @@ import qualified Unison.Referent as Referent
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 
-data API = API
+data CodeInfo = CodeInfo
   { apiNames :: Names
   , apiFcg :: FunctionCallGraph
   }
@@ -54,7 +54,7 @@ newtype Hash
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON, ToJSONKey)
 
-load :: IO API
+load :: IO CodeInfo
 load = do
   let
     codebasePath :: FilePath
@@ -99,7 +99,7 @@ load = do
           pure (referent, id)
 
   callGraph <- fcg codebase (Set.fromList (Map.elems refToId))
-  pure (API (mkNames refToId refToName) callGraph)
+  pure (CodeInfo (mkNames refToId refToName) callGraph)
 
 -- * Helpers
 

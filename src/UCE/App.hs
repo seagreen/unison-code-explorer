@@ -126,7 +126,7 @@ search codeinfo searchStr openNames = do
 
             viewLink :: Reference -> Widget HTML a
             viewLink ref =
-              H.div []
+              H.li []
                 [H.text refName]
 
               where
@@ -142,8 +142,11 @@ search codeinfo searchStr openNames = do
                     Just [n] ->
                       Name.toText n
 
-                    Just (x:y:_) -> -- NOTE: only shows two
-                      "Name conflicted, first is: " <> Name.toText x <> " second is: " <> Name.toText y
+                    Just (x:y:[]) ->
+                      Name.toText x <> " (also " <> Name.toText y <> ")"
+
+                    Just (x:y:_) ->
+                      Name.toText x <> " (also " <> Name.toText y <> " and others)"
 
             txt =
               case Set.toList refs of

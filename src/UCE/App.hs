@@ -127,7 +127,23 @@ search codeinfo searchStr openNames = do
             viewLink :: Reference -> Widget HTML a
             viewLink ref =
               H.div []
-                [H.text (showText ref)]
+                [H.text refName]
+
+              where
+                refName :: Text
+                refName =
+                  case Set.toList <$> Map.lookup ref (apiRefsToNames codeinfo) of
+                    Nothing ->
+                      showText ref
+
+                    Just [] ->
+                      showText ref
+
+                    Just [n] ->
+                      Name.toText n
+
+                    Just (x:y:_) -> -- NOTE: only shows two
+                      "Name conflicted, first is: " <> Name.toText x <> " second is: " <> Name.toText y
 
             txt =
               case Set.toList refs of

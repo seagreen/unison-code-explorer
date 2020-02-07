@@ -61,6 +61,8 @@ data CodeInfo = CodeInfo
   { apiNames :: Map Name (Set Reference)
     -- ^ Invariant: @Set Hash@ is nonempty.
 
+  , apiRefsToNames :: Map Reference (Set Name)
+
   , termBodies :: Map Reference Text
   , apiFcg :: FunctionCallGraph
   }
@@ -108,7 +110,7 @@ load = do
 
   termBodies <- getTerms codebase head --todo
   callGraph <- functionCallGraph codebase (Map.keysSet refToName)
-  pure (CodeInfo (mkNames referentToName) termBodies callGraph)
+  pure (CodeInfo (mkNames referentToName) (dropConstructors referentToName) termBodies callGraph)
 
 -- * Helpers
 
@@ -159,19 +161,19 @@ mkNames nameMap =
       Ref ref ->
         Just ref
 
+referentToRef :: Referent -> Maybe Reference
+referentToRef referent =
+  case referent of
+    Con{} ->
+      Nothing
+
+    Ref ref ->
+      Just ref
+
 dropConstructors :: Map Referent a -> Map Reference a
 dropConstructors referentMap =
-  mapMaybeKey f referentMap
+  mapMaybeKey referentToRef referentMap
   where
-    f :: Referent -> Maybe Reference
-    f referent =
-      case referent of
-        Con{} ->
-          Nothing
-
-        Ref ref ->
-          Just ref
-
     mapMaybeKey :: forall k x a. Ord x => (k -> Maybe x) -> Map k a -> Map x a
     mapMaybeKey fk xs =
       let

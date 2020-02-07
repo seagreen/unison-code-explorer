@@ -27,6 +27,7 @@ default-extensions:
   - OverloadedStrings
   - RankNTypes
   - ScopedTypeVariables
+  - TupleSections
   - TypeFamilies
   - TypeOperators
 

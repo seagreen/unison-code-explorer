@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a2725cea448179c88f6ab681db8f45e71e57a842854c99f701c48167e6ca5070
+-- hash: c38c9e99f38be4989ef4cf8d667656564815431a20d3734a1b64594ac1824682
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -21,7 +21,7 @@ library
       Paths_unison_code_explorer
   hs-source-dirs:
       src
-  default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
+  default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators
   ghc-options: -Wall
   build-depends:
       async
@@ -57,7 +57,7 @@ executable unison-code-explorer
       Paths_unison_code_explorer
   hs-source-dirs:
       ./.
-  default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TypeFamilies TypeOperators
+  default-extensions: StrictData DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators
   ghc-options: -Wall -threaded -rtsopts
   build-depends:
       async

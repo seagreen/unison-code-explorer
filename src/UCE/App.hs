@@ -109,15 +109,33 @@ search codeinfo searchStr openNames = do
                     [ H.code []
                         [H.text txt]
                     ]
+                , H.ul []
+                    (viewLink <$> callList)
                 ]
           where
+            callList :: [Reference]
+            callList =
+              case Set.toList refs of
+                [] ->
+                  mempty
+
+                [r] ->
+                  Set.toList (functionCalls r (apiFcg codeinfo))
+
+                _ -> mempty -- todo
+
+            viewLink :: Reference -> Widget HTML a
+            viewLink ref =
+              H.div []
+                [H.text (showText ref)]
+
             txt =
               case Set.toList refs of
                 [] ->
                   "<programmer error: no ref>"
 
-                [rs] ->
-                  case Map.lookup rs (termBodies codeinfo) of
+                [r] ->
+                  case Map.lookup r (termBodies codeinfo) of
                     Nothing ->
                       "<not found>"
 

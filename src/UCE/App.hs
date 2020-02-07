@@ -15,14 +15,20 @@ app :: API -> Widget HTML a
 app codebase = do
   liftIO (logLn "Running app")
   H.div []
-    [ H.p []
-        [ H.text "Welcome to Unison Code Explorer. This is a work in progress ("
-        , H.a [P.href "https://github.com/seagreen/unison-code-explorer"]
-            [H.text "GitHub link"]
-        , H.text ")."
-        ]
+    [ welcome
     , search codebase mempty
     ]
+  where
+    welcome :: Widget HTML a
+    welcome =
+      H.div [P.className "box"]
+        [ H.p []
+            [ H.text "Welcome to Unison Code Explorer. This is a work in progress ("
+            , H.a [P.href "https://github.com/seagreen/unison-code-explorer"]
+                [H.text "GitHub link"]
+            , H.text ")."
+            ]
+        ]
 
 search :: API -> Text -> Widget HTML a
 search codebase str = do
@@ -54,12 +60,18 @@ search codebase str = do
         (codebase
           & apiNames
           & unNames
-          & Map.filter (\n -> Text.isInfixOf str n)
+          & Map.filter (\n -> Text.isInfixOf strLower (Text.toLower n))
           & Map.elems
           & map viewName)
+      where
+        strLower :: Text
+        strLower =
+          Text.toLower str
 
     viewName :: Text -> Widget HTML a
     viewName name =
       H.li []
-        [ H.text name
+        [ H.button [P.className "button"]
+            [ H.text ("+ " <> name)
+            ]
         ]

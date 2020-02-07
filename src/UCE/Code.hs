@@ -11,35 +11,27 @@ module UCE.Code
 import Data.Map (Map)
 import Data.Text (Text)
 import System.IO (stderr)
+import UCE.Code.Print
 import UCE.Prelude
 import Unison.Codebase (Codebase)
-import Unison.Codebase
 import Unison.Codebase.Branch (Branch0(..))
 import Unison.Codebase.Serialization.V1 (formatSymbol)
-import Unison.HashQualified
 import Unison.Name (Name)
-import Unison.Names3
 import Unison.Parser (Ann(External))
 import Unison.Reference (Reference)
 import Unison.Reference
 import Unison.Referent (Referent)
 import Unison.Referent
 import Unison.Symbol (Symbol)
-import Unison.TermPrinter
-import Unison.Util.Pretty hiding (toPlain)
 import Unison.Util.Relation (Relation)
-import Unison.Util.SyntaxText
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
-import qualified Data.Text as Text
 import qualified Data.Text.IO as TIO
 import qualified Unison.Codebase as Codebase
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
 import qualified Unison.Codebase.Serialization as S
-import qualified Unison.Name as Name
-import qualified Unison.PrettyPrintEnv as PPE
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 
@@ -74,7 +66,11 @@ functionCalls ref (FunctionCallGraph fcg) =
   Map.findWithDefault mempty ref fcg
 
 load :: IO CodeInfo
-load = do
+load =
+  loadCodeInfo =<< loadCodebaseAndBranch
+
+loadCodebaseAndBranch :: IO (Codebase IO Symbol Ann, Branch0 IO)
+loadCodebaseAndBranch = do
   let
     codebasePath :: FilePath
     codebasePath =
@@ -94,6 +90,15 @@ load = do
     head =
       Branch.head branch
 
+  pure (codebase, head)
+  where
+    formatAnn :: S.Format Ann
+    formatAnn =
+      S.Format (pure External) (\_ -> pure ())
+
+loadCodeInfo :: (Codebase IO Symbol Ann, Branch0 IO) -> IO CodeInfo
+loadCodeInfo (codebase, head) = do
+  let
     referentToName :: Map Referent (Set Name)
     referentToName =
       let
@@ -117,8 +122,6 @@ load = do
     , apiFcg         = callGraph
     }
 
--- * Helpers
-
 -- | A lot of ceremony around 'Term.dependencies'.
 functionCallGraph :: Codebase IO Symbol Ann -> Set Reference -> IO FunctionCallGraph
 functionCallGraph codebase refs = do
@@ -139,32 +142,6 @@ functionCallGraph codebase refs = do
 
             Just (t :: Codebase.Term Symbol Ann) ->
               pure (ref, Term.dependencies t)
-
-referentToRef :: Referent -> Maybe Reference
-referentToRef referent =
-  case referent of
-    Con{} ->
-      Nothing
-
-    Ref ref ->
-      Just ref
-
-dropConstructors :: Map Referent a -> Map Reference a
-dropConstructors referentMap =
-  mapMaybeKey referentToRef referentMap
-  where
-    mapMaybeKey :: forall k x a. Ord x => (k -> Maybe x) -> Map k a -> Map x a
-    mapMaybeKey fk xs =
-      let
-        g :: (k, a) -> Maybe (x, a)
-        g (k, a) =
-          (,a) <$> fk k
-      in
-        Map.fromList . mapMaybe g . Map.toList $ xs
-
-formatAnn :: S.Format Ann
-formatAnn =
-  S.Format (pure External) (\_ -> pure ())
 
 getTerms :: Codebase IO Symbol ann -> Branch0 IO -> IO (Map Reference Text)
 getTerms codebase branch0 =
@@ -189,37 +166,24 @@ getTerms codebase branch0 =
   in
     Map.traverseWithKey (printTerm codebase branch0) termMap
 
-printTerm
-  :: Codebase IO Symbol ann
-  -> Branch0 IO
-  -> Reference
-  -> Set Name
-  -> IO Text
-printTerm codebase branch0 ref nameSet =
-  case ref of
-    Unison.Reference.Builtin _ ->
-      pure "<builtin>"
-
-    DerivedId id -> do
-      mTerm <- getTerm codebase id
-      case mTerm of
-        Nothing -> do
-          putStrLn "printTerm 1"
-          panic (showText (name, id))
-
-        Just term ->
-          let
-            pret :: Pretty SyntaxText
-            pret =
-              prettyBinding (printEnv branch0) (NameOnly name) term
-          in
-            pure . Text.pack . toPlain $ render 80 pret
+dropConstructors :: Map Referent a -> Map Reference a
+dropConstructors referentMap =
+  mapMaybeKey referentToRef referentMap
   where
-    name =
-      case setToMaybe nameSet of
-        Nothing -> Name.fromString "<name not found>"
-        Just n -> n
+    mapMaybeKey :: forall k x a. Ord x => (k -> Maybe x) -> Map k a -> Map x a
+    mapMaybeKey fk xs =
+      let
+        g :: (k, a) -> Maybe (x, a)
+        g (k, a) =
+          (,a) <$> fk k
+      in
+        Map.fromList . mapMaybe g . Map.toList $ xs
 
-printEnv :: Branch0 m -> PPE.PrettyPrintEnv
-printEnv branch =
-  PPE.fromNames 10 $ Names (Branch.toNames0 branch) mempty
+referentToRef :: Referent -> Maybe Reference
+referentToRef referent =
+  case referent of
+    Con{} ->
+      Nothing
+
+    Ref ref ->
+      Just ref

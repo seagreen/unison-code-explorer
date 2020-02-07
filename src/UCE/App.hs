@@ -104,7 +104,12 @@ search codeinfo searchStr openNames = do
         body
           | not isOpen = H.div [] []
           | otherwise  =
-              H.div [] [H.text txt]
+              H.div [P.className "box"]
+                [ H.pre []
+                    [ H.code []
+                        [H.text txt]
+                    ]
+                ]
           where
             txt =
               case Set.toList refs of

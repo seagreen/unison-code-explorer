@@ -55,7 +55,7 @@ search codeinfo searchStr openNames = do
     results =
       H.ul []
         (codeinfo
-          & apiNames
+          & codeNames
           & Map.filterWithKey (\n _ -> Text.isInfixOf strLower (Text.toLower (Name.toText n)))
           & Map.toList
           & List.sortOn fst

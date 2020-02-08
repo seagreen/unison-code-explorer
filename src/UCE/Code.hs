@@ -48,10 +48,10 @@ import qualified Unison.Util.Relation as Relation
 -- data Id = Id H.Hash Pos Size
 
 data CodeInfo = CodeInfo
-  { apiNames :: Map Name (Set Reference)
+  { codeNames :: Map Name (Set Reference)
     -- ^ Invariant: @Set Hash@ is nonempty.
 
-  , apiRefsToNames :: Map Reference (Set Name)
+  , codeRefsToNames :: Map Reference (Set Name)
 
   , termBodies :: Map Reference Text
   , apiFcg :: FunctionCallGraph
@@ -116,10 +116,10 @@ loadCodeInfo (codebase, head) = do
   callGraph <- functionCallGraph codebase (Map.keysSet refToName)
 
   pure CodeInfo
-    { apiNames       = swapMap refToName
-    , apiRefsToNames = refToName
-    , termBodies     = termBodies
-    , apiFcg         = callGraph
+    { codeNames       = swapMap refToName
+    , codeRefsToNames = refToName
+    , termBodies      = termBodies
+    , apiFcg          = callGraph
     }
 
 -- | A lot of ceremony around 'Term.dependencies'.

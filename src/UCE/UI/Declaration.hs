@@ -62,7 +62,7 @@ viewBody codeinfo refs =
 
 refName :: Reference -> CodeInfo -> Text
 refName ref codeinfo =
-  case Set.toList <$> Map.lookup ref (apiRefsToNames codeinfo) of
+  case Set.toList <$> Map.lookup ref (codeRefsToNames codeinfo) of
     Nothing ->
       showText ref
 

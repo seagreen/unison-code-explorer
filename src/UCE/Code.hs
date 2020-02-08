@@ -2,8 +2,9 @@
 module UCE.Code
   ( load
   , CodeInfo(..)
-  , FunctionCallGraph(..)
-  , functionCalls
+  , DependencyGraph(..)
+  , shallowDependencies
+  , shallowReferences
   , Name
   , Reference
   ) where
@@ -58,16 +59,21 @@ data CodeInfo = CodeInfo
     -- with the data constructors filtered out.
 
   , codeBodies :: Map Reference Text
-  , codeCallGraph :: FunctionCallGraph
+  , codeDependencies :: DependencyGraph
   }
 
-newtype FunctionCallGraph
-  = FunctionCallGraph (Map Reference (Set Reference))
+newtype DependencyGraph
+  = DependencyGraph (Relation Reference Reference)
+  -- ^ Relation from references to dependencies.
   deriving stock (Show, Generic)
 
-functionCalls :: Reference -> FunctionCallGraph -> Set Reference
-functionCalls ref (FunctionCallGraph fcg) =
-  Map.findWithDefault mempty ref fcg
+shallowDependencies :: Reference -> DependencyGraph -> Set Reference
+shallowDependencies ref (DependencyGraph deps) =
+  Map.findWithDefault mempty ref (Relation.domain deps)
+
+shallowReferences :: Reference -> DependencyGraph -> Set Reference
+shallowReferences ref (DependencyGraph deps) =
+  Map.findWithDefault mempty ref (Relation.range deps)
 
 load :: IO CodeInfo
 load =
@@ -128,15 +134,15 @@ loadCodeInfo (codebase, head) = do
     , codeTypeNames        = types
     , codeDeclarationNames = termsNoConstructors <> types
     , codeBodies           = refsToBodies
-    , codeCallGraph        = callGraph
+    , codeDependencies     = callGraph
     }
 
 -- | Ceremony around 'Term.dependencies' and 'Type.dependencies'.
-functionCallGraph :: Codebase IO Symbol Ann -> Set Reference -> Set Reference -> IO FunctionCallGraph
+functionCallGraph :: Codebase IO Symbol Ann -> Set Reference -> Set Reference -> IO DependencyGraph
 functionCallGraph codebase terms types = do
   termDeps <- Map.fromList <$> for (Set.toList terms) termDependencies
   typeDeps <- Map.fromList <$> for (Set.toList types) typeDependencies
-  pure (FunctionCallGraph (termDeps <> typeDeps))
+  pure (DependencyGraph (Relation.fromMultimap (termDeps <> typeDeps)))
   where
     termDependencies :: Reference -> IO (Reference, Set Reference)
     termDependencies ref =

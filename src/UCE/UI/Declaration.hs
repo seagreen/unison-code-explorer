@@ -20,18 +20,53 @@ viewBody codeinfo refs =
         [ H.code []
             [H.text txt]
         ]
+    , depTitle
     , H.ul []
-        (viewLink <$> callList)
+        (viewLink <$> depList)
+    , mentionTitle
+    , H.ul []
+        (viewLink <$> mentionList)
     ]
   where
-    callList :: [Reference]
-    callList =
+    depTitle :: Widget HTML a
+    depTitle =
+      case depList of
+        [] ->
+          H.div [] []
+
+        _ ->
+          H.h5 [P.className "title is-5"]
+            [H.text "Dependencies" ]
+
+    mentionTitle :: Widget HTML a
+    mentionTitle =
+      case mentionList of
+        [] ->
+          H.div [] []
+
+        _ ->
+          H.h5 [P.className "title is-5"]
+            [H.text "Mentioned by" ]
+
+    depList :: [Reference]
+    depList =
       case Set.toList refs of
         [] ->
           mempty
 
         [r] ->
-          Set.toList (functionCalls r (codeCallGraph codeinfo))
+          Set.toList (shallowDependencies r (codeDependencies codeinfo))
+
+        _ -> mempty -- todo
+
+    mentionList :: [Reference]
+    mentionList =
+      case Set.toList refs of
+        [] ->
+          mempty
+
+        [r] ->
+          Set.toList (shallowReferences r (codeDependencies codeinfo))
 
         _ -> mempty -- todo
 

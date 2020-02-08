@@ -7,10 +7,15 @@ body {
   max-width: 400px;
 }
 
-ul {
-  margin-top: 8px;
+h5 {
+  margin-top: 15px;
+  margin-bottom: 5px !important;
 }
 
-li {
-  margin-top: 8px;
+ul .search {
+  margin-top: 5px;
+}
+
+li .search {
+  margin-top: 5px;
 }

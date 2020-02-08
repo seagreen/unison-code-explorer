@@ -54,22 +54,22 @@ search codeinfo searchStr openNames = do
 
     results :: Widget HTML (Either OpenNames Reference)
     results =
-      H.ul []
+      H.ul [P.className "search"]
         (codeinfo
           & codeDeclarationNames
           & Relation.range
           & Map.filterWithKey (\n _ -> Text.isInfixOf strLower (Text.toLower (Name.toText n)))
           & Map.toList
           & List.sortOn fst
-          & map viewTerm)
+          & map viewResult)
       where
         strLower :: Text
         strLower =
           Text.toLower searchStr
 
-    viewTerm :: (Name, Set Reference) -> Widget HTML (Either OpenNames Reference)
-    viewTerm (name, refs) = do
-      H.li []
+    viewResult :: (Name, Set Reference) -> Widget HTML (Either OpenNames Reference)
+    viewResult (name, refs) = do
+      H.li [P.className "search"]
         [ Left (OpenNames (setSwap name (unOpenNames openNames)))
             <$ H.button [P.onClick, P.className "button"]
                  [ H.text (btn <> " " <> Name.toText name)

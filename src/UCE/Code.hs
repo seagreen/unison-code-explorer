@@ -8,7 +8,7 @@ module UCE.Code
   , Reference
   ) where
 
-import Data.Map (Map)
+import Data.Map.Strict (Map)
 import Data.Text (Text)
 import System.IO (stderr)
 import UCE.Code.Print

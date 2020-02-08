@@ -8,7 +8,7 @@ import UCE.Prelude
 import qualified Concur.Replica.DOM as H
 import qualified Concur.Replica.Events as P
 import qualified Concur.Replica.Props as P
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Unison.Name as Name
 

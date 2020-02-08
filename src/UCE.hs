@@ -8,7 +8,7 @@ import UCE.Prelude
 import UCE.UI (State(Searching), app)
 
 import qualified Concur.Replica.Run
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Middleware.Static as Static
 

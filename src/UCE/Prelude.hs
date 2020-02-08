@@ -28,7 +28,7 @@ import System.Exit as X
 
 import Data.ByteString as X (ByteString)
 import Data.HashMap.Strict as X (HashMap)
-import Data.Map as X (Map)
+import Data.Map.Strict as X (Map)
 import Data.Set as X (Set)
 import Data.Text as X (Text)
 import GHC.Generics as X (Generic)
@@ -38,7 +38,7 @@ import Numeric.Natural as X (Natural)
 
 import GHC.Stack.Types (HasCallStack)
 
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Prelude

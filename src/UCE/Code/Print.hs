@@ -34,8 +34,7 @@ printTerm codebase branch0 ref nameSet =
     DerivedId id -> do
       mTerm <- getTerm codebase id
       case mTerm of
-        Nothing -> do
-          putStrLn "printTerm 1"
+        Nothing ->
           panic (showText (name, id))
 
         Just term ->

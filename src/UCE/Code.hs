@@ -16,6 +16,7 @@ import UCE.Prelude
 import Unison.Codebase (Codebase)
 import Unison.Codebase.Branch (Branch0(..))
 import Unison.Codebase.Serialization.V1 (formatSymbol)
+import Unison.DataDeclaration (Decl)
 import Unison.Name (Name)
 import Unison.Parser (Ann(External))
 import Unison.Reference (Reference)
@@ -31,7 +32,8 @@ import qualified Data.Text.IO as TIO
 import qualified Unison.Codebase as Codebase
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
-import qualified Unison.Codebase.Serialization as S
+import qualified Unison.Codebase.Serialization as Serialization
+import qualified Unison.DataDeclaration as Decl
 import qualified Unison.Term as Term
 import qualified Unison.Util.Relation as Relation
 
@@ -48,13 +50,15 @@ import qualified Unison.Util.Relation as Relation
 -- data Id = Id H.Hash Pos Size
 
 data CodeInfo = CodeInfo
-  { codeNames :: Map Name (Set Reference)
-    -- ^ Invariant: @Set Hash@ is nonempty.
+  { codeTermNames :: Relation Referent Name
+  , codeTypeNames :: Relation Reference Name
 
-  , codeRefsToNames :: Map Reference (Set Name)
+  , codeDeclarationNames :: Relation Reference Name
+    -- ^ A combination of @codeTermNames@ and @codeTypeNames@,
+    -- with the data constructors filtered out.
 
-  , termBodies :: Map Reference Text
-  , apiFcg :: FunctionCallGraph
+  , codeBodies :: Map Reference Text
+  , codeCallGraph :: FunctionCallGraph
   }
 
 newtype FunctionCallGraph
@@ -92,43 +96,50 @@ loadCodebaseAndBranch = do
 
   pure (codebase, head)
   where
-    formatAnn :: S.Format Ann
+    formatAnn :: Serialization.Format Ann
     formatAnn =
-      S.Format (pure External) (\_ -> pure ())
+      Serialization.Format (pure External) (\_ -> pure ())
 
 loadCodeInfo :: (Codebase IO Symbol Ann, Branch0 IO) -> IO CodeInfo
 loadCodeInfo (codebase, head) = do
   let
-    referentToName :: Map Referent (Set Name)
-    referentToName =
-      let
-        terms :: Relation Referent Name
-        terms =
-          Branch.deepTerms head
-      in
-        Relation.domain terms
+    terms :: Relation Referent Name
+    terms =
+      Branch.deepTerms head
 
-    refToName :: Map Reference (Set Name)
-    refToName =
-      dropConstructors referentToName
+    termsNoConstructors :: Relation Reference Name
+    termsNoConstructors =
+      mapMaybeRelation referentToRef terms
 
-  termBodies <- getTerms codebase head
-  callGraph <- functionCallGraph codebase (Map.keysSet refToName)
+    types :: Relation Reference Name
+    types =
+      Branch.deepTypes head
+
+  refsToBodies <- getBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
+
+  callGraph <-
+    functionCallGraph
+      codebase
+      (Map.keysSet (Relation.domain termsNoConstructors))
+      (Map.keysSet (Relation.domain types))
 
   pure CodeInfo
-    { codeNames       = swapMap refToName
-    , codeRefsToNames = refToName
-    , termBodies      = termBodies
-    , apiFcg          = callGraph
+    { codeTermNames        = terms
+    , codeTypeNames        = types
+    , codeDeclarationNames = termsNoConstructors <> types
+    , codeBodies           = refsToBodies
+    , codeCallGraph        = callGraph
     }
 
--- | A lot of ceremony around 'Term.dependencies'.
-functionCallGraph :: Codebase IO Symbol Ann -> Set Reference -> IO FunctionCallGraph
-functionCallGraph codebase refs = do
-  FunctionCallGraph . Map.fromList <$> for (Set.toList refs) f
+-- | Ceremony around 'Term.dependencies' and 'Type.dependencies'.
+functionCallGraph :: Codebase IO Symbol Ann -> Set Reference -> Set Reference -> IO FunctionCallGraph
+functionCallGraph codebase terms types = do
+  termDeps <- Map.fromList <$> for (Set.toList terms) termDependencies
+  typeDeps <- Map.fromList <$> for (Set.toList types) typeDependencies
+  pure (FunctionCallGraph (termDeps <> typeDeps))
   where
-    f :: Reference -> IO (Reference, Set Reference)
-    f ref =
+    termDependencies :: Reference -> IO (Reference, Set Reference)
+    termDependencies ref =
       case ref of
         Builtin _ ->
           pure (ref, mempty)
@@ -143,41 +154,44 @@ functionCallGraph codebase refs = do
             Just (t :: Codebase.Term Symbol Ann) ->
               pure (ref, Term.dependencies t)
 
-getTerms :: Codebase IO Symbol ann -> Branch0 IO -> IO (Map Reference Text)
-getTerms codebase branch0 =
-  let
-    -- Referent: reference to a term
-    terms :: Relation Referent Name
-    terms =
-      Branch.deepTerms branch0
+    typeDependencies :: Reference -> IO (Reference, Set Reference)
+    typeDependencies ref =
+      case ref of
+        Builtin _ ->
+          pure (ref, mempty)
 
-    termMap :: Map Reference (Set Name)
-    termMap =
-      Map.fromList $ mapMaybe filterOutConstructors (Map.toList (Relation.domain terms))
-      where
-        filterOutConstructors :: (Referent, a) -> Maybe (Reference, a)
-        filterOutConstructors (referent, a) =
-          case referent of
-            Ref ref ->
-              Just (ref, a)
+        DerivedId id -> do
+          mType <- Codebase.getTypeDeclaration codebase id
+          case mType of
+            Nothing -> do
+              TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find type): " <> showText id)
+              pure (ref, mempty)
 
-            Con{} ->
-              Nothing
-  in
-    Map.traverseWithKey (printTerm codebase branch0) termMap
+            Just (t :: Decl Symbol Ann) ->
+              pure (ref, Decl.declDependencies t)
 
-dropConstructors :: Map Referent a -> Map Reference a
-dropConstructors referentMap =
-  mapMaybeKey referentToRef referentMap
+getBodies
+  :: Codebase IO Symbol ann
+  -> Branch0 IO
+  -> Map Reference (Set Name)
+  -> Map Reference (Set Name)
+  -> IO (Map Reference Text)
+getBodies codebase branch0 termMap typeMap = do
+  termBodies <- Map.traverseWithKey (printTerm codebase branch0) termMap
+  typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap
+  pure (termBodies <> typeBodies)
+
+mapMaybeRelation
+  :: forall a b c. (Ord b, Ord c)
+  => (a -> Maybe b)
+  -> Relation a c
+  -> Relation b c
+mapMaybeRelation f =
+  Relation.fromList . mapMaybe g . Relation.toList
   where
-    mapMaybeKey :: forall k x a. Ord x => (k -> Maybe x) -> Map k a -> Map x a
-    mapMaybeKey fk xs =
-      let
-        g :: (k, a) -> Maybe (x, a)
-        g (k, a) =
-          (,a) <$> fk k
-      in
-        Map.fromList . mapMaybe g . Map.toList $ xs
+    g :: (a, c) -> Maybe (b, c)
+    g (a, c) =
+      (,c) <$> f a
 
 referentToRef :: Referent -> Maybe Reference
 referentToRef referent =

@@ -14,6 +14,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Unison.Name as Name
+import qualified Unison.Util.Relation as Relation
 
 newtype OpenNames
   = OpenNames { unOpenNames :: Set Name }
@@ -55,7 +56,8 @@ search codeinfo searchStr openNames = do
     results =
       H.ul []
         (codeinfo
-          & codeNames
+          & codeDeclarationNames
+          & Relation.range
           & Map.filterWithKey (\n _ -> Text.isInfixOf strLower (Text.toLower (Name.toText n)))
           & Map.toList
           & List.sortOn fst

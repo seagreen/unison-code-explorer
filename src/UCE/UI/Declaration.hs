@@ -11,6 +11,7 @@ import qualified Concur.Replica.Props as P
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Unison.Name as Name
+import qualified Unison.Util.Relation as Relation
 
 viewBody :: CodeInfo -> Set Reference -> Widget HTML Reference
 viewBody codeinfo refs =
@@ -30,7 +31,7 @@ viewBody codeinfo refs =
           mempty
 
         [r] ->
-          Set.toList (functionCalls r (apiFcg codeinfo))
+          Set.toList (functionCalls r (codeCallGraph codeinfo))
 
         _ -> mempty -- todo
 
@@ -50,7 +51,7 @@ viewBody codeinfo refs =
           "<programmer error: no ref>"
 
         [r] ->
-          case Map.lookup r (termBodies codeinfo) of
+          case Map.lookup r (codeBodies codeinfo) of
             Nothing ->
               "<not found>"
 
@@ -62,7 +63,7 @@ viewBody codeinfo refs =
 
 refName :: Reference -> CodeInfo -> Text
 refName ref codeinfo =
-  case Set.toList <$> Map.lookup ref (codeRefsToNames codeinfo) of
+  case Set.toList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
     Nothing ->
       showText ref
 

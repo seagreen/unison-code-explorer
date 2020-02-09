@@ -142,7 +142,7 @@ functionCallGraph :: Codebase IO Symbol Ann -> Set Reference -> Set Reference ->
 functionCallGraph codebase terms types = do
   termDeps <- Map.fromList <$> for (Set.toList terms) termDependencies
   typeDeps <- Map.fromList <$> for (Set.toList types) typeDependencies
-  pure (DependencyGraph (Relation.fromMultimap (termDeps <> typeDeps)))
+  pure (DependencyGraph (dropSelfEdges (Relation.fromMultimap (termDeps <> typeDeps))))
   where
     termDependencies :: Reference -> IO (Reference, Set Reference)
     termDependencies ref =
@@ -175,6 +175,10 @@ functionCallGraph codebase terms types = do
 
             Just (t :: Decl Symbol Ann) ->
               pure (ref, Decl.declDependencies t)
+
+    dropSelfEdges :: Ord a => Relation a a -> Relation a a
+    dropSelfEdges =
+      Relation.filter (uncurry (/=))
 
 getBodies
   :: Codebase IO Symbol ann

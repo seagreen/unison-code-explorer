@@ -20,11 +20,11 @@ In addition to lots of minor issues there are three serious enough to mention he
 
 `haskell-code-explorer` is built on [concur-replica](https://github.com/pkamenarsky/concur-replica).
 
-Similar to [phoenix-liveview](https://github.com/phoenixframework/phoenix_live_view), `concur-replica` let's your write web UIs without any custom JavaScript. It does this by keeping a VDOM on the server and sending updates to the user's browser over a websocket.
+Similar to [phoenix-liveview](https://github.com/phoenixframework/phoenix_live_view), `concur-replica` let's your write web UIs without any custom JavaScript. It does this by keeping a VDOM on the server for each user and sending updates to the user's browser over a websocket.
 
 It's important to note that this is only a good fit under a the following conditions:
 
-1. Instant user feedback not required (fine for CRUD apps, not fine for AAA games. [replica](https://github.com/pkamenarsky/replica) has client side prediction built-in for text but nothing else.)
+1. Instant user feedback isn't required (fine for CRUD apps, not fine for AAA games. [replica](https://github.com/pkamenarsky/replica) has client side prediction built-in for text but nothing else.)
 
 2. Offline use not required
 

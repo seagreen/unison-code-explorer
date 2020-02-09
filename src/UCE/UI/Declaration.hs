@@ -34,7 +34,7 @@ viewBody codeinfo refs =
           H.div [] []
 
         _ ->
-          H.h5 [P.className "title is-5"]
+          H.h5 [P.className "title is-5 dependency-header"]
             [H.text "Dependencies" ]
 
     mentionTitle :: Widget HTML a
@@ -44,7 +44,7 @@ viewBody codeinfo refs =
           H.div [] []
 
         _ ->
-          H.h5 [P.className "title is-5"]
+          H.h5 [P.className "title is-5 dependency-header"]
             [H.text "Mentioned by" ]
 
     depList :: [Widget HTML Reference]

@@ -1,21 +1,47 @@
 body {
-  margin: 40px;
-  max-width: 700px;
+  margin: 2rem;
+  max-width: 50rem;
 }
 
-.input {
-  max-width: 400px;
+.search-box {
+  max-width: 75%;
 }
 
-h5 {
-  margin-top: 15px;
-  margin-bottom: 5px !important;
+li.search-result {
+  margin-top: 0.5rem;
 }
 
-ul .search {
-  margin-top: 5px;
+.dependency-header {
+  margin-top: 1.2rem;
+  margin-bottom: 0.5rem !important;
 }
 
-li .search {
-  margin-top: 5px;
+/* Hack to keep boxes within the screen on mobile devices.
+
+If someone who knows CSS can suggest the proper way to do this
+that would be awesome. */
+@media only screen and (max-width: 100rem) {
+  body {
+    max-width: 45rem;
+  }
+}
+@media only screen and (max-width: 90rem) {
+  body {
+    max-width: 40rem;
+  }
+}
+@media only screen and (max-width: 80rem) {
+  body {
+    max-width: 35rem;
+  }
+}
+@media only screen and (max-width: 70rem) {
+  body {
+    max-width: 30rem;
+  }
+}
+@media only screen and (max-width: 60rem) {
+  body {
+    max-width: 25rem;
+  }
 }

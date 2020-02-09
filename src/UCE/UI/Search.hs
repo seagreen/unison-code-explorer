@@ -41,7 +41,7 @@ search codeinfo searchStr openNames = do
       e <-
         H.div []
           [ H.input
-            [ P.className "input"
+            [ P.className "input search-box"
             , P.autofocus True
             , P.placeholder "Search string"
             , P.value searchStr
@@ -53,7 +53,7 @@ search codeinfo searchStr openNames = do
 
     results :: Widget HTML (Either OpenNames Reference)
     results =
-      H.ul [P.className "search"]
+      H.ul []
         (codeinfo
           & codeDeclarationNames
           & Relation.range
@@ -67,7 +67,7 @@ search codeinfo searchStr openNames = do
 
     viewResult :: (Name, Set Reference) -> Widget HTML (Either OpenNames Reference)
     viewResult (name, refs) = do
-      H.li [P.className "search"]
+      H.li [P.className "search-result"]
         [ Left (OpenNames (setSwap name (unOpenNames openNames)))
             <$ H.button [P.onClick, P.className "button"]
                  [ H.text (btn <> " " <> Name.toText name)

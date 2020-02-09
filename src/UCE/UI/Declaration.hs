@@ -8,6 +8,7 @@ import UCE.Prelude
 import qualified Concur.Replica.DOM as H
 import qualified Concur.Replica.Events as P
 import qualified Concur.Replica.Props as P
+import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Unison.Name as Name
@@ -18,14 +19,12 @@ viewBody codeinfo refs =
   H.div [P.className "box"]
     [ H.pre []
         [ H.code []
-            [H.text txt]
+            [H.text bodyTxt]
         ]
     , depTitle
-    , H.ul []
-        (viewLink <$> depList)
+    , H.ul [] depList
     , mentionTitle
-    , H.ul []
-        (viewLink <$> mentionList)
+    , H.ul [] mentionList
     ]
   where
     depTitle :: Widget HTML a
@@ -48,40 +47,54 @@ viewBody codeinfo refs =
           H.h5 [P.className "title is-5"]
             [H.text "Mentioned by" ]
 
-    depList :: [Reference]
+    depList :: [Widget HTML Reference]
     depList =
-      case Set.toList refs of
-        [] ->
-          mempty
+      let
+        deps :: Set Reference
+        deps =
+          case Set.toList refs of
+            [] ->
+              mempty
 
-        [r] ->
-          Set.toList (shallowDependencies r (codeDependencies codeinfo))
+            [r] ->
+              shallowDependencies r (codeDependencies codeinfo)
 
-        _ -> mempty -- todo
+            _ -> mempty -- todo
+      in
+        viewLink <$> namesToRefs deps
 
-    mentionList :: [Reference]
+    mentionList :: [Widget HTML Reference]
     mentionList =
-      case Set.toList refs of
-        [] ->
-          mempty
+      let
+        mentions :: Set Reference
+        mentions =
+          case Set.toAscList refs of
+            [] ->
+              mempty
 
-        [r] ->
-          Set.toList (shallowReferences r (codeDependencies codeinfo))
+            [r] ->
+              shallowReferences r (codeDependencies codeinfo)
 
-        _ -> mempty -- todo
+            _ -> mempty -- todo
+      in
+        viewLink <$> namesToRefs mentions
 
-    viewLink :: Reference -> Widget HTML Reference
-    viewLink ref = do
+    viewLink :: (Text, Reference) -> Widget HTML Reference
+    viewLink (name, ref) = do
       _ <-
         H.li [P.onClick]
           [ H.a []
-              [H.text (refName ref codeinfo)]
+              [H.text name]
           ]
       pure ref
-      where
 
-    txt =
-      case Set.toList refs of
+    namesToRefs :: Set Reference -> [(Text, Reference)]
+    namesToRefs =
+      List.sortOn fst . fmap (\r -> (refName r codeinfo, r)) . Set.toList
+
+    bodyTxt :: Text
+    bodyTxt =
+      case Set.toAscList refs of
         [] ->
           "<programmer error: no ref>"
 
@@ -98,7 +111,7 @@ viewBody codeinfo refs =
 
 refName :: Reference -> CodeInfo -> Text
 refName ref codeinfo =
-  case Set.toList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
+  case Set.toAscList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
     Nothing ->
       showText ref
 

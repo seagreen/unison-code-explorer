@@ -72,10 +72,28 @@ logLn :: [Char] -> IO ()
 logLn =
   System.IO.hPutStrLn System.IO.stderr
 
+-- * List stuff
+
+headMaybe :: [a] -> Maybe a
+headMaybe = \case
+  [] ->
+    Nothing
+
+  a:_ ->
+    Just a
+
+-- * Set stuff
+
 setSwap :: Ord a => a -> Set a -> Set a
 setSwap a set
   | Set.member a set = Set.delete a set
   | otherwise        = Set.insert a set
+
+setToMaybe :: Set a -> Maybe a
+setToMaybe =
+  headMaybe . Set.toAscList
+
+-- * Map stuff
 
 swapMap :: forall a b. (Ord a, Ord b) => Map a (Set b) -> Map b (Set a)
 swapMap x =
@@ -88,15 +106,3 @@ swapMap x =
     f :: (a, Set b) -> [(b, Set a)]
     f (a, bs) =
       (\b -> (b, Set.singleton a)) <$> Set.toList bs
-
-setToMaybe :: Set a -> Maybe a
-setToMaybe =
-  headMaybe . Set.toList
-
-headMaybe :: [a] -> Maybe a
-headMaybe = \case
-  [] ->
-    Nothing
-
-  a:_ ->
-    Just a

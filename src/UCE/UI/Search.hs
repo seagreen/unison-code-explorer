@@ -9,7 +9,6 @@ import UCE.UI.Declaration
 import qualified Concur.Replica.DOM as H
 import qualified Concur.Replica.Events as P
 import qualified Concur.Replica.Props as P
-import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
@@ -59,8 +58,7 @@ search codeinfo searchStr openNames = do
           & codeDeclarationNames
           & Relation.range
           & Map.filterWithKey (\n _ -> Text.isInfixOf strLower (Text.toLower (Name.toText n)))
-          & Map.toList
-          & List.sortOn fst
+          & Map.toAscList
           & map viewResult)
       where
         strLower :: Text

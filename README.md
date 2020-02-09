@@ -18,7 +18,7 @@ In addition to lots of minor issues there are three serious enough to mention he
 
 # Technology
 
-Unison Code Explorer is built on [concur-replica](https://github.com/pkamenarsky/concur-replica).
+*Unison Code Explorer* is built on [concur-replica](https://github.com/pkamenarsky/concur-replica).
 
 # Use
 

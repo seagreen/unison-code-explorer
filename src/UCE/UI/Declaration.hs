@@ -109,7 +109,7 @@ refName ref codeinfo =
       Name.toText n
 
     Just (x:y:[]) ->
-      Name.toText x <> " (also " <> Name.toText y <> ")"
+      Name.toText x <> " (also called " <> Name.toText y <> ")"
 
     Just (x:y:_) ->
-      Name.toText x <> " (also " <> Name.toText y <> " and others)"
+      Name.toText x <> " (also called " <> Name.toText y <> " and others)"

@@ -28,32 +28,30 @@ static =
 
 index :: HTML
 index =
-  [ VLeaf "meta" (fl [("charset", AText "utf-8")]) Nothing
-  , VLeaf "!doctype" (fl [("html", ABool True)]) Nothing
+  [ VLeaf "!doctype" (fl [("html", ABool True)]) Nothing
   , VNode "html" mempty Nothing
       [ VNode "head" mempty Nothing
-          [ VNode "title" mempty Nothing [VText "Unison Code Explorer"]
+          [ VLeaf "meta" (fl [("charset", AText "utf-8")]) Nothing
 
-          , VNode "meta"
+          , VNode "title" mempty Nothing [VText "Unison Code Explorer"]
+
+          , VLeaf "meta"
               (fl [ ("name", AText "viewport")
                   , ("content", AText "width=device-width, initial-scale=1")
                   ])
               Nothing
-              []
 
-          , VNode "link"
+          , VLeaf "link"
               (fl [ ("href", AText "./bulmaswatch.min.css")
                   , ("rel", AText "stylesheet")
                   ])
               Nothing
-              []
 
-          , VNode "link"
+          , VLeaf "link"
               (fl [ ("href", AText "custom.css")
                   , ("rel", AText "stylesheet")
                   ])
               Nothing
-              []
           ]
       , VNode "body" mempty Nothing
           [ VNode "script" (fl [("language", AText "javascript")]) Nothing

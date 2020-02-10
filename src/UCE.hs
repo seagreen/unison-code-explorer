@@ -33,12 +33,21 @@ index =
   , VNode "html" mempty Nothing
       [ VNode "head" mempty Nothing
           [ VNode "title" mempty Nothing [VText "Unison Code Explorer"]
+
+          , VNode "meta"
+              (fl [ ("name", AText "viewport")
+                  , ("content", AText "width=device-width, initial-scale=1")
+                  ])
+              Nothing
+              []
+
           , VNode "link"
               (fl [ ("href", AText "./bulmaswatch.min.css")
                   , ("rel", AText "stylesheet")
                   ])
               Nothing
               []
+
           , VNode "link"
               (fl [ ("href", AText "custom.css")
                   , ("rel", AText "stylesheet")

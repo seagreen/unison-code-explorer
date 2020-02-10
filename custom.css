@@ -15,33 +15,3 @@ li.search-result {
   margin-top: 1.2rem;
   margin-bottom: 0.5rem !important;
 }
-
-/* Hack to keep boxes within the screen on mobile devices.
-
-If someone who knows CSS can suggest the proper way to do this
-that would be awesome. */
-@media only screen and (max-width: 100rem) {
-  body {
-    max-width: 45rem;
-  }
-}
-@media only screen and (max-width: 90rem) {
-  body {
-    max-width: 40rem;
-  }
-}
-@media only screen and (max-width: 80rem) {
-  body {
-    max-width: 35rem;
-  }
-}
-@media only screen and (max-width: 70rem) {
-  body {
-    max-width: 30rem;
-  }
-}
-@media only screen and (max-width: 60rem) {
-  body {
-    max-width: 25rem;
-  }
-}

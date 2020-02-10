@@ -1,7 +1,5 @@
 # About
 
-![sloc](./misc/sloc.svg)
-
 Code explorer for the [Unison](https://www.unisonweb.org/) language. Inspired by [haskell-code-explorer](https://github.com/alexwl/haskell-code-explorer).
 
 See it live [here](http://unison.readvar.com/).
@@ -19,6 +17,8 @@ In addition to lots of minor issues there are three serious enough to mention he
 + Auto-reconnect for a certain amount of time ([issue #6](https://github.com/seagreen/unison-code-explorer/issues/6))
 
 # Technology
+
+![sloc](./misc/sloc.svg)
 
 `unison-code-explorer` is built on [concur-replica](https://github.com/pkamenarsky/concur-replica).
 

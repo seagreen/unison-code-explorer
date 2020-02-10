@@ -16,7 +16,6 @@ data State = Searching | ViewSingle Reference
 
 app :: CodeInfo -> State -> Widget HTML a
 app codeinfo state = do
-  liftIO (logLn "Running app")
   newState <-
     H.div []
       [ welcome

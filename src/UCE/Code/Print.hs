@@ -10,8 +10,7 @@ import Unison.DeclPrinter
 import Unison.HashQualified
 import Unison.Name (Name)
 import Unison.Names3
-import Unison.Reference (Reference)
-import Unison.Reference
+import Unison.Reference (Reference(..))
 import Unison.Symbol (Symbol)
 import Unison.TermPrinter
 import Unison.Util.Pretty hiding (toPlain)
@@ -30,7 +29,7 @@ printTerm
   -> IO Text
 printTerm codebase branch0 ref nameSet =
   case ref of
-    Unison.Reference.Builtin _ ->
+    Builtin _ ->
       pure "<builtin>"
 
     DerivedId id -> do

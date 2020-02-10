@@ -20,10 +20,8 @@ import Unison.Codebase.Serialization.V1 (formatSymbol)
 import Unison.DataDeclaration (Decl)
 import Unison.Name (Name)
 import Unison.Parser (Ann(External))
-import Unison.Reference (Reference)
-import Unison.Reference
-import Unison.Referent (Referent)
-import Unison.Referent
+import Unison.Reference (Reference(..))
+import Unison.Referent (Referent(..))
 import Unison.Symbol (Symbol)
 import Unison.Util.Relation (Relation)
 

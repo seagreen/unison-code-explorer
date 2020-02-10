@@ -3,23 +3,24 @@ module UCE where
 import Concur.Replica (Attr(..), Attrs, HTML, VDOM(..), clientDriver)
 import Data.Text.Encoding (decodeUtf8)
 import Network.WebSockets (defaultConnectionOptions)
-import UCE.Code
 import UCE.Prelude
-import UCE.UI (State(Searching), app)
 
 import qualified Concur.Replica.Run
 import qualified Data.Map.Strict as Map
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Middleware.Static as Static
+import qualified UCE.Code
+import qualified UCE.UI
 
-run :: Int -> CodeInfo -> IO ()
-run port codeinfo =
+run :: Int -> IO ()
+run port = do
+  codeinfo <- UCE.Code.load
   Concur.Replica.Run.run
     port
     index
     defaultConnectionOptions
     static
-    (app codeinfo Searching)
+    (UCE.UI.app codeinfo UCE.UI.Searching)
 
 static :: Wai.Middleware
 static =

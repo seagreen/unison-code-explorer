@@ -18,7 +18,7 @@ In addition to lots of minor issues there are three serious enough to mention he
 
 # Technology
 
-`haskell-code-explorer` is built on [concur-replica](https://github.com/pkamenarsky/concur-replica).
+`unison-code-explorer` is built on [concur-replica](https://github.com/pkamenarsky/concur-replica).
 
 Similar to [phoenix-liveview](https://github.com/phoenixframework/phoenix_live_view), `concur-replica` let's your write web UIs without any custom JavaScript. It does this by keeping a VDOM on the server for each user and sending updates to the user's browser over a websocket.
 

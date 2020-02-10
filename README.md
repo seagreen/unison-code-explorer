@@ -1,5 +1,7 @@
 # About
 
+![sloc](./misc/sloc.svg)
+
 Code explorer for the [Unison](https://www.unisonweb.org/) language. Inspired by [haskell-code-explorer](https://github.com/alexwl/haskell-code-explorer).
 
 See it live [here](http://unison.readvar.com/).

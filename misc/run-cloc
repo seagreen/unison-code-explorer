@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+# Generate badges showing how many lines of code are in different
+# parts of the project.
+
+# Dependencies:
+#
+# sudo npm install -g gh-badges
+# sudo apt install jq
+
+SLOC1=$(cloc --json ./src ./Main.hs | jq '.Haskell.code')
+badge sloc "$SLOC1" :blue .svg > ./misc/sloc.svg
+#     |    |
+#     |    The value (second part) of the badge.
+#     |
+#     The title (first part) of the badge.

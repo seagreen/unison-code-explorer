@@ -29,7 +29,7 @@ main = do
     info
       (helper <*> versionOption <*> parser)
       (  fullDesc
-      <> progDesc "Make some details of a .unison codebase available over HTTP."
+      <> progDesc "Web UI for viewing a Unison codebase"
       )
 
   versionOption :: Parser (a -> a)

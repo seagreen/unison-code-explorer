@@ -23,6 +23,7 @@ import Unison.Parser (Ann(External))
 import Unison.Reference (Reference(..))
 import Unison.Referent (Referent(..))
 import Unison.Symbol (Symbol)
+import Unison.Term (Term)
 import Unison.Util.Relation (Relation)
 
 import qualified Data.Map.Strict as Map
@@ -155,7 +156,7 @@ functionCallGraph codebase terms types = do
               TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> showText id)
               pure (ref, mempty)
 
-            Just (t :: Codebase.Term Symbol Ann) ->
+            Just (t :: Term Symbol Ann) ->
               pure (ref, Term.dependencies t)
 
     typeDependencies :: Reference -> IO (Reference, Set Reference)

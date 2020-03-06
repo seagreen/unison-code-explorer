@@ -5,7 +5,7 @@ resolver: lts-14.7
 allow-newer: true # See Unison's stack.yaml
 extra-deps:
   - git: git@github.com:unisonweb/unison.git
-    commit: '589d112a57d3837dd8b70d5296aed7363bf52cf0'
+    commit: 'ff50b3b4f836b0da8da4ce01bea7595587240a90'
     subdirs:
       - yaks/easytest
       - parser-typechecker

@@ -15,11 +15,11 @@ packages:
     pantry-tree:
       size: 274
       sha256: e4710d8a58911703da6aae5e3215a8e9eb9fbcb88c15dedde91660392890f19b
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
   original:
     subdir: yaks/easytest
     git: git@github.com:unisonweb/unison.git
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
 - completed:
     subdir: parser-typechecker
     cabal-file:
@@ -29,13 +29,13 @@ packages:
     version: '0.1'
     git: git@github.com:unisonweb/unison.git
     pantry-tree:
-      size: 9545
-      sha256: 0c08642620a412f9cf6aa249d7cb0eae6a98e94930f532eefed65fd3a0775cee
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+      size: 9546
+      sha256: 85ef679cbd65fc45c0594bdfcb633c15fad9fb2e2f8624f04bb616570c1fb46b
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
   original:
     subdir: parser-typechecker
     git: git@github.com:unisonweb/unison.git
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
 - completed:
     subdir: yaks/haskeline
     cabal-file:
@@ -47,11 +47,11 @@ packages:
     pantry-tree:
       size: 3717
       sha256: 6d3e0222c9ccc276aa8899c3a81c52dfadd7234ee6c9a64d8f2d2441d19522a0
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
   original:
     subdir: yaks/haskeline
     git: git@github.com:unisonweb/unison.git
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
 - completed:
     subdir: unison-core
     cabal-file:
@@ -62,12 +62,12 @@ packages:
     git: git@github.com:unisonweb/unison.git
     pantry-tree:
       size: 2288
-      sha256: 3fe5e2c5bce51878dd5e92317b791669fb6c021975b6c3eb3896adcff915ba95
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+      sha256: 0b41f868247441af55eb17c06f5edeea7e1f2040a515ad1bf223b719c8c5dd7e
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
   original:
     subdir: unison-core
     git: git@github.com:unisonweb/unison.git
-    commit: 589d112a57d3837dd8b70d5296aed7363bf52cf0
+    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
 - completed:
     hackage: base58-bytestring-0.1.0@sha256:a1da72ee89d5450bac1c792d9fcbe95ed7154ab7246f2172b57bd4fd9b5eab79,1913
     pantry-tree:

@@ -8,8 +8,8 @@ import UCE.UI.Declaration
 import UCE.UI.Search
 
 import qualified Concur.Replica.DOM as H
-import qualified Concur.Replica.Events as P
-import qualified Concur.Replica.Props as P
+import qualified Concur.Replica.DOM.Events as P
+import qualified Concur.Replica.DOM.Props as P
 import qualified Data.Set as Set
 
 data State = Searching | ViewSingle Reference

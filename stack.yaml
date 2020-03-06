@@ -28,11 +28,11 @@ extra-deps:
 
   # The latest
   - git: git@github.com:pkamenarsky/concur-replica
-    commit: 'fc85458d7ed74c8ee1dc7944875c8355fb745ab6'
+    commit: '0bcf622fce055be4cdc3793ef73a16e227384817'
 
-  # From `master`, with SVG support
+  # The latest:
   - git: git@github.com:pkamenarsky/replica
-    commit: 'a46c17f6326eb154b2d76e31a1d62ed4b02a4a3c'
+    commit: 'db4af3572705bb20222fff1203a1eea3ca5cd542'
 
   # From concur-replica's stack.yaml. Jun 26, 2019
   - git: git@github.com:ajnsit/concur

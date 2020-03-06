@@ -20,7 +20,7 @@ run port = do
     index
     defaultConnectionOptions
     static
-    (UCE.UI.app codeinfo UCE.UI.Searching)
+    (\_ -> UCE.UI.app codeinfo UCE.UI.Searching)
 
 static :: Wai.Middleware
 static =

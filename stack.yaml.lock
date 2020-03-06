@@ -140,18 +140,18 @@ packages:
     hackage: megaparsec-6.5.0
 - completed:
     cabal-file:
-      size: 4179
-      sha256: 0316035528ac8bcbe4f221d1a00bf0ddc18854d7f83cc05f2c37af6d3960e94e
+      size: 5175
+      sha256: b0ef708cc578ed345217e88d93679f76999a50f10243892901731fd61fba505f
     name: concur-replica
     version: 0.1.0.0
     git: git@github.com:pkamenarsky/concur-replica
     pantry-tree:
-      size: 1084
-      sha256: b7bee54422624c88bef5cc574fa86b5ce7cf51ec83b971131daea734d2b341da
-    commit: fc85458d7ed74c8ee1dc7944875c8355fb745ab6
+      size: 1420
+      sha256: 282d4e8a3caa4938748f6aea7dc07503595102b317ed730b9374bd252678226d
+    commit: 0bcf622fce055be4cdc3793ef73a16e227384817
   original:
     git: git@github.com:pkamenarsky/concur-replica
-    commit: fc85458d7ed74c8ee1dc7944875c8355fb745ab6
+    commit: 0bcf622fce055be4cdc3793ef73a16e227384817
 - completed:
     cabal-file:
       size: 2016
@@ -161,11 +161,11 @@ packages:
     git: git@github.com:pkamenarsky/replica
     pantry-tree:
       size: 1319
-      sha256: 9f900614c6f5932ec647c838e65bb65fd335fde5200efb98cb87913309022986
-    commit: a46c17f6326eb154b2d76e31a1d62ed4b02a4a3c
+      sha256: 1b98fd6a367cd66308ce2ebaa2ef0d081f9f2f6f6fdcfb5a0e492a85c8d964a2
+    commit: db4af3572705bb20222fff1203a1eea3ca5cd542
   original:
     git: git@github.com:pkamenarsky/replica
-    commit: a46c17f6326eb154b2d76e31a1d62ed4b02a4a3c
+    commit: db4af3572705bb20222fff1203a1eea3ca5cd542
 - completed:
     subdir: concur-core
     cabal-file:

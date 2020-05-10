@@ -1,15 +1,14 @@
 module UCE where
 
-import Concur.Replica (Attr(..), Attrs, HTML, VDOM(..), clientDriver)
-import Data.Text.Encoding (decodeUtf8)
-import Network.WebSockets (defaultConnectionOptions)
-import UCE.Prelude
-
+import Concur.Replica (Attr (..), Attrs, HTML, VDOM (..), clientDriver)
 import qualified Concur.Replica.Run
 import qualified Data.Map.Strict as Map
+import Data.Text.Encoding (decodeUtf8)
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Middleware.Static as Static
+import Network.WebSockets (defaultConnectionOptions)
 import qualified UCE.Code
+import UCE.Prelude
 import qualified UCE.UI
 
 run :: Int -> IO ()
@@ -29,34 +28,51 @@ static =
 
 index :: HTML
 index =
-  [ VLeaf "!doctype" (fl [("html", ABool True)]) Nothing
-  , VNode "html" mempty Nothing
-      [ VNode "head" mempty Nothing
-          [ VLeaf "meta" (fl [("charset", AText "utf-8")]) Nothing
-
-          , VNode "title" mempty Nothing [VText "Unison Code Explorer"]
-
-          , VLeaf "meta"
-              (fl [ ("name", AText "viewport")
-                  , ("content", AText "width=device-width, initial-scale=1")
-                  ])
+  [ VLeaf "!doctype" (fl [("html", ABool True)]) Nothing,
+    VNode
+      "html"
+      mempty
+      Nothing
+      [ VNode
+          "head"
+          mempty
+          Nothing
+          [ VLeaf "meta" (fl [("charset", AText "utf-8")]) Nothing,
+            VNode "title" mempty Nothing [VText "Unison Code Explorer"],
+            VLeaf
+              "meta"
+              ( fl
+                  [ ("name", AText "viewport"),
+                    ("content", AText "width=device-width, initial-scale=1")
+                  ]
+              )
+              Nothing,
+            VLeaf
+              "link"
+              ( fl
+                  [ ("href", AText "./bulmaswatch.min.css"),
+                    ("rel", AText "stylesheet")
+                  ]
+              )
+              Nothing,
+            VLeaf
+              "link"
+              ( fl
+                  [ ("href", AText "custom.css"),
+                    ("rel", AText "stylesheet")
+                  ]
+              )
               Nothing
-
-          , VLeaf "link"
-              (fl [ ("href", AText "./bulmaswatch.min.css")
-                  , ("rel", AText "stylesheet")
-                  ])
+          ],
+        VNode
+          "body"
+          mempty
+          Nothing
+          [ VNode
+              "script"
+              (fl [("language", AText "javascript")])
               Nothing
-
-          , VLeaf "link"
-              (fl [ ("href", AText "custom.css")
-                  , ("rel", AText "stylesheet")
-                  ])
-              Nothing
-          ]
-      , VNode "body" mempty Nothing
-          [ VNode "script" (fl [("language", AText "javascript")]) Nothing
-              [ VRawText $ decodeUtf8 clientDriver ]
+              [VRawText $ decodeUtf8 clientDriver]
           ]
       ]
   ]

@@ -1,8 +1,11 @@
 -- | Tweak the @Prelude@. Includes no domain logic.
 module UCE.Prelude
-  ( module UCE.Prelude
-  , module X
-  ) where
+  ( module UCE.Prelude,
+    module X,
+  )
+where
+
+{- ORMOLU_DISABLE -}
 
 -- Re-exports:
 
@@ -44,6 +47,8 @@ import qualified Data.Text as Text
 import qualified Prelude
 import qualified System.IO
 
+{- ORMOLU_ENABLE -}
+
 data OneOf2 a b = One2 a | Two2 b
 
 data OneOf3 a b c = One3 a | Two3 b | Three3 c
@@ -78,8 +83,7 @@ headMaybe :: [a] -> Maybe a
 headMaybe = \case
   [] ->
     Nothing
-
-  a:_ ->
+  a : _ ->
     Just a
 
 -- * Set stuff
@@ -87,7 +91,7 @@ headMaybe = \case
 setSwap :: Ord a => a -> Set a -> Set a
 setSwap a set
   | Set.member a set = Set.delete a set
-  | otherwise        = Set.insert a set
+  | otherwise = Set.insert a set
 
 setToMaybe :: Set a -> Maybe a
 setToMaybe =
@@ -102,7 +106,6 @@ swapMap x =
     y :: [(b, Set a)]
     y =
       concatMap f (Map.toList x)
-
     f :: (a, Set b) -> [(b, Set a)]
     f (a, bs) =
       (\b -> (b, Set.singleton a)) <$> Set.toList bs

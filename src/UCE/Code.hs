@@ -1,40 +1,40 @@
 -- | Use the Unison compiler as a library to get info about a codebase.
 module UCE.Code
-  ( load
-  , CodeInfo(..)
-  , DependencyGraph(..)
-  , shallowDependencies
-  , shallowReferences
-  , Name
-  , Reference
-  ) where
+  ( load,
+    CodeInfo (..),
+    DependencyGraph (..),
+    shallowDependencies,
+    shallowReferences,
+    Name,
+    Reference,
+  )
+where
 
 import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
 import Data.Text (Text)
+import qualified Data.Text.IO as TIO
 import System.IO (stderr)
 import UCE.Code.Print
 import UCE.Prelude
 import Unison.Codebase (Codebase)
-import Unison.Codebase.Branch (Branch0(..))
-import Unison.Codebase.Serialization.V1 (formatSymbol)
-import Unison.DataDeclaration (Decl)
-import Unison.Name (Name)
-import Unison.Parser (Ann(External))
-import Unison.Reference (Reference(..))
-import Unison.Referent (Referent(..))
-import Unison.Symbol (Symbol)
-import Unison.Term (Term)
-import Unison.Util.Relation (Relation)
-
-import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
-import qualified Data.Text.IO as TIO
 import qualified Unison.Codebase as Codebase
+import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
 import qualified Unison.Codebase.Serialization as Serialization
+import Unison.Codebase.Serialization.V1 (formatSymbol)
+import Unison.DataDeclaration (Decl)
 import qualified Unison.DataDeclaration as Decl
+import Unison.Name (Name)
+import Unison.Parser (Ann (External))
+import Unison.Reference (Reference (..))
+import Unison.Referent (Referent (..))
+import Unison.Symbol (Symbol)
+import Unison.Term (Term)
 import qualified Unison.Term as Term
+import Unison.Util.Relation (Relation)
 import qualified Unison.Util.Relation as Relation
 
 -- A Referent can be a value, function, or constructor.
@@ -50,20 +50,18 @@ import qualified Unison.Util.Relation as Relation
 -- data Id = Id H.Hash Pos Size
 
 data CodeInfo = CodeInfo
-  { codeTermNames :: Relation Referent Name
-  , codeTypeNames :: Relation Reference Name
-
-  , codeDeclarationNames :: Relation Reference Name
-    -- ^ A combination of @codeTermNames@ and @codeTypeNames@,
+  { codeTermNames :: Relation Referent Name,
+    codeTypeNames :: Relation Reference Name,
+    -- | A combination of @codeTermNames@ and @codeTypeNames@,
     -- with the data constructors filtered out.
-
-  , codeBodies :: Map Reference Text
-  , codeDependencies :: DependencyGraph
+    codeDeclarationNames :: Relation Reference Name,
+    codeBodies :: Map Reference Text,
+    codeDependencies :: DependencyGraph
   }
 
 newtype DependencyGraph
-  = DependencyGraph (Relation Reference Reference)
-  -- ^ Relation from references to dependencies.
+  = -- | Relation from references to dependencies.
+    DependencyGraph (Relation Reference Reference)
   deriving stock (Show, Generic)
 
 shallowDependencies :: Reference -> DependencyGraph -> Set Reference
@@ -80,24 +78,21 @@ load =
 
 loadCodebaseAndBranch :: IO (Codebase IO Symbol Ann, Branch0 IO)
 loadCodebaseAndBranch = do
-  let
-    codebasePath :: FilePath
-    codebasePath =
-      ".unison/v1"
-
-    codebase :: Codebase IO Symbol Ann
-    codebase =
-      FileCodebase.codebase1 formatSymbol formatAnn codebasePath
+  let codebasePath :: FilePath
+      codebasePath =
+        ".unison/v1"
+      codebase :: Codebase IO Symbol Ann
+      codebase =
+        FileCodebase.codebase1 formatSymbol formatAnn codebasePath
 
   exists <- FileCodebase.exists codebasePath
   when (not exists) (die "No codebase found")
 
   branch <- Codebase.getRootBranch codebase
 
-  let
-    head :: Branch0 IO
-    head =
-      Branch.head branch
+  let head :: Branch0 IO
+      head =
+        Branch.head branch
 
   pure (codebase, head)
   where
@@ -107,18 +102,15 @@ loadCodebaseAndBranch = do
 
 loadCodeInfo :: (Codebase IO Symbol Ann, Branch0 IO) -> IO CodeInfo
 loadCodeInfo (codebase, head) = do
-  let
-    terms :: Relation Referent Name
-    terms =
-      Branch.deepTerms head
-
-    termsNoConstructors :: Relation Reference Name
-    termsNoConstructors =
-      mapMaybeRelation referentToRef terms
-
-    types :: Relation Reference Name
-    types =
-      Branch.deepTypes head
+  let terms :: Relation Referent Name
+      terms =
+        Branch.deepTerms head
+      termsNoConstructors :: Relation Reference Name
+      termsNoConstructors =
+        mapMaybeRelation referentToRef terms
+      types :: Relation Reference Name
+      types =
+        Branch.deepTypes head
 
   refsToBodies <- getBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
 
@@ -128,13 +120,14 @@ loadCodeInfo (codebase, head) = do
       (Map.keysSet (Relation.domain termsNoConstructors))
       (Map.keysSet (Relation.domain types))
 
-  pure CodeInfo
-    { codeTermNames        = terms
-    , codeTypeNames        = types
-    , codeDeclarationNames = termsNoConstructors <> types
-    , codeBodies           = refsToBodies
-    , codeDependencies     = callGraph
-    }
+  pure
+    CodeInfo
+      { codeTermNames = terms,
+        codeTypeNames = types,
+        codeDeclarationNames = termsNoConstructors <> types,
+        codeBodies = refsToBodies,
+        codeDependencies = callGraph
+      }
 
 -- | Ceremony around 'Term.dependencies' and 'Type.dependencies'.
 functionCallGraph :: Codebase IO Symbol Ann -> Set Reference -> Set Reference -> IO DependencyGraph
@@ -148,53 +141,48 @@ functionCallGraph codebase terms types = do
       case ref of
         Builtin _ ->
           pure (ref, mempty)
-
         DerivedId id -> do
           mTerm <- Codebase.getTerm codebase id
           case mTerm of
             Nothing -> do
               TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> showText id)
               pure (ref, mempty)
-
             Just (t :: Term Symbol Ann) ->
               pure (ref, Term.dependencies t)
-
     typeDependencies :: Reference -> IO (Reference, Set Reference)
     typeDependencies ref =
       case ref of
         Builtin _ ->
           pure (ref, mempty)
-
         DerivedId id -> do
           mType <- Codebase.getTypeDeclaration codebase id
           case mType of
             Nothing -> do
               TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find type): " <> showText id)
               pure (ref, mempty)
-
             Just (t :: Decl Symbol Ann) ->
               pure (ref, Decl.declDependencies t)
-
     dropSelfEdges :: Ord a => Relation a a -> Relation a a
     dropSelfEdges =
       Relation.filter (uncurry (/=))
 
-getBodies
-  :: Codebase IO Symbol ann
-  -> Branch0 IO
-  -> Map Reference (Set Name)
-  -> Map Reference (Set Name)
-  -> IO (Map Reference Text)
+getBodies ::
+  Codebase IO Symbol ann ->
+  Branch0 IO ->
+  Map Reference (Set Name) ->
+  Map Reference (Set Name) ->
+  IO (Map Reference Text)
 getBodies codebase branch0 termMap typeMap = do
   termBodies <- Map.traverseWithKey (printTerm codebase branch0) termMap
   typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap
   pure (termBodies <> typeBodies)
 
-mapMaybeRelation
-  :: forall a b c. (Ord b, Ord c)
-  => (a -> Maybe b)
-  -> Relation a c
-  -> Relation b c
+mapMaybeRelation ::
+  forall a b c.
+  (Ord b, Ord c) =>
+  (a -> Maybe b) ->
+  Relation a c ->
+  Relation b c
 mapMaybeRelation f =
   Relation.fromList . mapMaybe g . Relation.toList
   where
@@ -205,8 +193,7 @@ mapMaybeRelation f =
 referentToRef :: Referent -> Maybe Reference
 referentToRef referent =
   case referent of
-    Con{} ->
+    Con {} ->
       Nothing
-
     Ref ref ->
       Just ref

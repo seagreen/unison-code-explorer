@@ -1,13 +1,8 @@
 name: unison-code-explorer
 license: BSD3
+
+# NOTE: StrictData is on.
 default-extensions:
-
-  # Notable
-
-  - StrictData
-
-  # Other
-
   - DataKinds
   - DeriveAnyClass
   - DeriveFunctor
@@ -27,11 +22,13 @@ default-extensions:
   - OverloadedStrings
   - RankNTypes
   - ScopedTypeVariables
+  - StrictData
   - TupleSections
   - TypeFamilies
   - TypeOperators
 
 ghc-options: -Wall
+
 dependencies:
 
   # Notable
@@ -67,6 +64,7 @@ dependencies:
 
 library:
   source-dirs: src
+
 executables:
   unison-code-explorer:
     source-dirs: .

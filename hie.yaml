@@ -1,0 +1,6 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "unison-code-explorer:lib"
+    - path: "./Main.hs"
+      component: "unison-code-explorer:exe:unison-code-explorer"

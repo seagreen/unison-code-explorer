@@ -1,7 +1,7 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 module UCE where
 
-import Text.JSON.Generic
+-- import Text.JSON.Generic
+import qualified Text.JSON.Generic
 
 import Concur.Replica (Attr (..), Attrs, HTML, VDOM (..), clientDriver)
 import qualified Concur.Replica.Run
@@ -13,11 +13,16 @@ import Network.WebSockets (defaultConnectionOptions)
 import qualified UCE.Code
 import UCE.Prelude
 import qualified UCE.UI
+import qualified Unison.Util.Relation as Relation
+import qualified UCE.DeclarationJson
 
--- run :: Int -> String -> IO ()
--- run _port projectDirectory = do
---   codeinfo <- UCE.Code.load projectDirectory
---   print "Folks"
+dumpJson :: String -> IO ()
+dumpJson projectDirectory = do
+  codeinfo <- UCE.Code.load projectDirectory
+  let names = codeinfo & UCE.Code.codeDeclarationNames & Relation.domain & Map.toAscList
+  let y = map (UCE.DeclarationJson.viewBody codeinfo . fst) names
+  let text = Text.JSON.Generic.encodeJSON y
+  putStrLn text
 
 run :: Int -> String -> IO ()
 run port projectDirectory = do

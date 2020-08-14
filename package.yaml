@@ -8,6 +8,7 @@ default-extensions:
   - DeriveFunctor
   - DeriveGeneric
   - DerivingStrategies
+  - DeriveDataTypeable
   - ExistentialQuantification
   - FlexibleContexts
   - FlexibleInstances

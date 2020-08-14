@@ -19,7 +19,8 @@ main :: IO ()
 main = do
   logLn "Starting"
   conf <- runParser
-  UCE.run (configPort conf) (directory conf)
+  UCE.dumpJson (directory conf)
+  -- UCE.run (configPort conf) (directory conf)
   where
     runParser :: IO Config
     runParser =

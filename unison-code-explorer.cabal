@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c492f64962b0e7e58614186029965e2a7af71db7fbdf58f23320107c71f6e86e
+-- hash: 2264fa4247cf33d7270f307cd1f9fa42e0c2148773adaae13795c6ee3decbfef
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -16,6 +16,7 @@ library
       UCE
       UCE.Code
       UCE.Code.Print
+      UCE.DeclarationJson
       UCE.Prelude
       UCE.UI
       UCE.UI.Declaration
@@ -24,7 +25,7 @@ library
       Paths_unison_code_explorer
   hs-source-dirs:
       src
-  default-extensions: DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables StrictData TupleSections TypeFamilies TypeOperators
+  default-extensions: DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies DeriveDataTypeable ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables StrictData TupleSections TypeFamilies TypeOperators
   ghc-options: -Wall
   build-depends:
       async
@@ -61,7 +62,7 @@ executable unison-code-explorer
       Paths_unison_code_explorer
   hs-source-dirs:
       ./.
-  default-extensions: DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables StrictData TupleSections TypeFamilies TypeOperators
+  default-extensions: DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies DeriveDataTypeable ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables StrictData TupleSections TypeFamilies TypeOperators
   ghc-options: -Wall -threaded -rtsopts
   build-depends:
       async

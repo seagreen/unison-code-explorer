@@ -36,6 +36,7 @@ import Unison.Term (Term)
 import qualified Unison.Term as Term
 import Unison.Util.Relation (Relation)
 import qualified Unison.Util.Relation as Relation
+import Unison.Util.SyntaxText (SyntaxText)
 
 -- A Referent can be a value, function, or constructor.
 --
@@ -55,7 +56,7 @@ data CodeInfo = CodeInfo
     -- | A combination of @codeTermNames@ and @codeTypeNames@,
     -- with the data constructors filtered out.
     codeDeclarationNames :: Relation Reference Name,
-    codeBodies :: Map Reference Text,
+    codeBodies :: Map Reference SyntaxText,
     codeDependencies :: DependencyGraph
   }
 
@@ -170,7 +171,7 @@ getBodies ::
   Branch0 IO ->
   Map Reference (Set Name) ->
   Map Reference (Set Name) ->
-  IO (Map Reference Text)
+  IO (Map Reference SyntaxText)
 getBodies codebase branch0 termMap typeMap = do
   termBodies <- Map.traverseWithKey (printTerm codebase branch0) termMap
   typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap

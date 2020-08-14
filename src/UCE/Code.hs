@@ -72,21 +72,20 @@ shallowReferences :: Reference -> DependencyGraph -> Set Reference
 shallowReferences ref (DependencyGraph deps) =
   Map.findWithDefault mempty ref (Relation.range deps)
 
-load :: IO CodeInfo
-load =
-  loadCodeInfo =<< loadCodebaseAndBranch
+load :: String -> IO CodeInfo
+load projectDirectory =
+  loadCodeInfo =<< loadCodebaseAndBranch projectDirectory
 
-loadCodebaseAndBranch :: IO (Codebase IO Symbol Ann, Branch0 IO)
-loadCodebaseAndBranch = do
+loadCodebaseAndBranch :: String -> IO (Codebase IO Symbol Ann, Branch0 IO)
+loadCodebaseAndBranch projectDirectory = do
   let codebasePath :: FilePath
-      codebasePath =
-        ".unison/v1"
+      codebasePath = projectDirectory <> "/.unison/v1"
       codebase :: Codebase IO Symbol Ann
       codebase =
         FileCodebase.codebase1 formatSymbol formatAnn codebasePath
 
   exists <- FileCodebase.exists codebasePath
-  when (not exists) (die "No codebase found")
+  when (not exists) (die ("No codebase found in " <> codebasePath))
 
   branch <- Codebase.getRootBranch codebase
 

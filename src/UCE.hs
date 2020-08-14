@@ -11,9 +11,9 @@ import qualified UCE.Code
 import UCE.Prelude
 import qualified UCE.UI
 
-run :: Int -> IO ()
-run port = do
-  codeinfo <- UCE.Code.load
+run :: Int -> String -> IO ()
+run port projectDirectory = do
+  codeinfo <- UCE.Code.load projectDirectory
   Concur.Replica.Run.run
     port
     index

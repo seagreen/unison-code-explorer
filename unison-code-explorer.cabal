@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 23482ffbddab708be609b1d7fdb591a583fe60ec56bfbadfd858742c48fa6085
+-- hash: c492f64962b0e7e58614186029965e2a7af71db7fbdf58f23320107c71f6e86e
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -37,6 +37,7 @@ library
     , filepath
     , gitrev
     , hashable
+    , json
     , lens
     , mtl
     , random
@@ -73,6 +74,7 @@ executable unison-code-explorer
     , filepath
     , gitrev
     , hashable
+    , json
     , lens
     , mtl
     , optparse-applicative

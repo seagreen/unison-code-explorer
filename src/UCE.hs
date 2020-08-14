@@ -1,4 +1,7 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module UCE where
+
+import Text.JSON.Generic
 
 import Concur.Replica (Attr (..), Attrs, HTML, VDOM (..), clientDriver)
 import qualified Concur.Replica.Run
@@ -10,6 +13,11 @@ import Network.WebSockets (defaultConnectionOptions)
 import qualified UCE.Code
 import UCE.Prelude
 import qualified UCE.UI
+
+-- run :: Int -> String -> IO ()
+-- run _port projectDirectory = do
+--   codeinfo <- UCE.Code.load projectDirectory
+--   print "Folks"
 
 run :: Int -> String -> IO ()
 run port projectDirectory = do

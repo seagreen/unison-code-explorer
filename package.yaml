@@ -42,6 +42,7 @@ dependencies:
   - wai
   - wai-middleware-static
   - websockets
+  - json
 
   # Other
 

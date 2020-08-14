@@ -10,7 +10,8 @@ import qualified UCE
 import UCE.Prelude
 
 data Config = Config
-  { configPort :: Int
+  { configPort :: Int,
+    directory  :: String
   }
   deriving (Show)
 
@@ -18,7 +19,7 @@ main :: IO ()
 main = do
   logLn "Starting"
   conf <- runParser
-  UCE.run (configPort conf)
+  UCE.run (configPort conf) (directory conf)
   where
     runParser :: IO Config
     runParser =
@@ -47,5 +48,11 @@ main = do
           ( long "port"
               <> help "Port to run server on"
               <> value 8080
+              <> showDefault
+          )
+        <*> strOption
+          ( long "directory"
+              <> help "Project directory to explore"
+              <> value "."
               <> showDefault
           )

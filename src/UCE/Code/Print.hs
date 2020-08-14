@@ -6,7 +6,9 @@ import UCE.Prelude
 import Unison.Codebase (Codebase)
 import Unison.Codebase
 import Unison.Codebase.Branch (Branch0 (..))
+import qualified Unison.ABT
 import qualified Unison.Codebase.Branch as Branch
+import qualified Unison.Term
 import Unison.DataDeclaration (Decl)
 import Unison.DeclPrinter
 import Unison.HashQualified
@@ -14,11 +16,29 @@ import Unison.Name (Name)
 import qualified Unison.Name as Name
 import Unison.Names3
 import qualified Unison.PrettyPrintEnv as PPE
-import Unison.Reference (Reference (..))
+import Unison.Reference (Reference (..), Id(..))
 import Unison.Symbol (Symbol)
 import Unison.TermPrinter
 import Unison.Util.Pretty hiding (toPlain)
 import Unison.Util.SyntaxText
+
+getTermWithTypeAnnotation ::
+  (Monad m, Ord v) =>
+  Codebase m v ap ->
+  Id ->
+  m (Maybe (Unison.Term.Term v ap))
+getTermWithTypeAnnotation codebase id = do
+  mTerm <- getTerm codebase id
+  case mTerm of
+    Nothing -> pure Nothing
+    Just term -> case term of
+      -- if the term already has an annotation, leave it alone
+      Unison.Term.Ann' _ _ -> pure $ Just term
+      _ -> do
+        mType <- getTypeOfTermImpl codebase id
+        case mType of
+          Nothing -> pure $ Just term
+          Just typ -> pure $ Just (Unison.Term.ann (Unison.ABT.annotation term) term typ)
 
 printTerm ::
   Codebase IO Symbol ann ->
@@ -31,7 +51,7 @@ printTerm codebase branch0 ref nameSet =
     Builtin _ ->
       pure "<builtin>"
     DerivedId id -> do
-      mTerm <- getTerm codebase id
+      mTerm <- getTermWithTypeAnnotation codebase id
       case mTerm of
         Nothing ->
           panic (showText (name, id))

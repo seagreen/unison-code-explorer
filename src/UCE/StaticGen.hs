@@ -5,14 +5,11 @@ import System.Directory (createDirectory)
 import UCE.Prelude
 import qualified Data.Text
 import UCE.DeclarationJson
-import qualified Data.List
-import qualified Data.Set
-import qualified UCE.Code
 import qualified Unison.Util.Relation as Relation
 import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import qualified Data.Map.Strict as Map
-import Unison.Reference (Reference, toShortHash)
+import Unison.Reference (toShortHash)
 import qualified Unison.Hash as Hash
 import Unison.ShortHash (ShortHash(..))
 import qualified Unison.HashQualified as Unison.HashQualified
@@ -21,6 +18,7 @@ import Unison.Util.AnnotatedText ( AnnotatedText(..) )
 
 type ScopeMap = Map [Text] (Maybe Reference, [([Text], Reference)])
 
+dots :: [Text] -> Text
 dots = Data.Text.intercalate "."
 
 parentPath :: [a] -> [a]
@@ -35,17 +33,6 @@ itemHref :: Reference -> Text
 itemHref (Reference.Builtin b) = "__builtin__" <> b
 itemHref (Reference.Derived h _ 1) = (Hash.base32Hex h)
 itemHref (Reference.Derived h i n) = (Hash.base32Hex h) <> Reference.showSuffix i n
-
--- makeHrefMap :: EntryMap -> Map [Text] Text
--- makeHrefMap scopeMap =
---     Map.mapWithKey f scopeMap
---     where
---         f path (Nothing, _) = indexHref path <> ".html"
---         f path (Just child, []) = (case (Map.lookup (parentPath path) scopeMap) of
---             Nothing -> "FAILURE" & Data.Text.pack
---             Just (Nothing, _) -> indexHref (parentPath path)
---             Just (Just r, _) -> itemHref r) <> ".html#" <> itemHref child
---         f _path (Just r, _) = itemHref r <> ".html"
 
 makeHref :: [Text] -> Maybe Reference -> ChildMap -> EntryMap -> Text
 makeHref path Nothing _ _ = indexHref path <> ".html"
@@ -68,7 +55,7 @@ makeHrefMap scopeMap =
 type ChildMap = Map [Text] (Maybe Reference)
 type EntryMap = Map [Text] (Maybe Reference, ChildMap)
 
--- makeScopeMap :: UCE.Code.CodeInfo -> EntryMap
+makeScopeMap :: CodeInfo -> ([([Text], Reference)], Map [Text] (Maybe Reference, ChildMap))
 makeScopeMap codeinfo =
     let names = codeinfo & UCE.Code.codeDeclarationNames & Relation.domain & Map.toAscList
         refs = map fst names
@@ -118,13 +105,10 @@ makeScopeMap' codeinfo =
                 Nothing -> Map.insert name (Nothing, childRefs name refsAndNames) mmap
                 Just _ -> mmap
 
--- makeHashMap :: Foldable t => t (a, Reference) -> Map (Text, Bool) a
+makeHashMap :: Foldable t => t (a, Reference) -> Map ShortHash a
 makeHashMap paths = foldl f Map.empty paths
     where
         f mmap (path, r) = Map.insert (Reference.toShortHash r) path mmap
-        -- f mmap (path, Reference.Builtin b) = Map.insert (b, False) path mmap
-        -- f mmap (path, Reference.Derived h _ 1) = Map.insert (Hash.base32Hex h, True) path mmap
-        -- f mmap (path, Reference.Derived h i n) = Map.insert (Hash.base32Hex h <> Reference.showSuffix i n, True) path mmap
 
 build :: String -> UCE.Code.CodeInfo -> IO ()
 build dest codeinfo = do
@@ -141,9 +125,7 @@ htmlTop title = "<!doctype html><head><title>" <> title <> "</title><style>" <> 
 htmlBottom :: Text
 htmlBottom = "\n</body></html>"
 
--- don't render a page for something without children
--- writePage :: String -> Map [Text] Text -> UCE.Code.CodeInfo -> ([Text], (Maybe Reference, ChildMap)) -> IO ()
--- writePage _dest _hrefs (_path, (_ref, children)) = pure ()
+writePage :: String -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> ([Text], (Maybe Reference, Map [Text] (Maybe Reference))) -> IO ()
 writePage dest hashRef hrefs codeinfo entryMap (path, (ref, children)) =
     if Map.size children == 0 then
         pure ()
@@ -159,9 +141,8 @@ childRefs :: Eq a => [a] -> [([a], b)] -> [([a], b)]
 childRefs base refs =
     filter (isChild base . fst) refs
 
--- renderPage :: [Text] -> Maybe Reference -> ChildMap -> Text -> Map [Text] Text -> Text
--- renderPage :: [Text] -> Maybe Reference -> Map [Text] (Maybe Reference) -> Map [Text] Text -> UCE.Code.CodeInfo -> Text
-renderPage path ref children href hashRef hrefs codeinfo entryMap =
+renderPage :: [Text] -> Maybe Reference -> Map [Text] (Maybe Reference) -> p -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
+renderPage path ref children _href hashRef hrefs codeinfo entryMap =
     [htmlTop (dots path)
     , "<h1>" <> (dots path) <> "</h1>"
     , case ref of
@@ -173,26 +154,30 @@ renderPage path ref children href hashRef hrefs codeinfo entryMap =
 divv :: Text -> Text
 divv text = "<div>" <> text <> "</div>"
 
+a :: Text -> Map [Text] Text -> [Text] -> Text -> Text
 a cls hrefs path contents = case (Map.lookup path hrefs) of
     Nothing -> contents
     Just href -> "<a class=\"" <> cls <> "\" href=\"" <> href <> "\">" <> contents <> "</a>"
 
--- childrenListing :: p -> Map [Text] (Maybe Reference) -> (ShortHash -> Text) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
-childrenListing path children hashRef hrefs codeinfo entryMap =
+childrenListing :: p -> Map [Text] (Maybe Reference) -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
+childrenListing _path children hashRef hrefs codeinfo entryMap =
     children & Map.toAscList & map (divv . makeChild ) & Data.Text.intercalate "\n"
     where
         makeChild (path, ref) = "<h1 id=\"" <> (case ref of
              Nothing -> ""
-             Just ref -> itemHref ref) <> "\">" <> a "" hrefs path (dots path) <> "</h1>" <> makeBody path ref <> subItems  path
+             Just ref' -> itemHref ref')
+             <> "\">"
+             <> a "" hrefs path (dots path) <> "</h1>"
+             <> makeBody path ref <> subItems  path
         subItems path = case (Map.lookup path entryMap) of
             Nothing -> ""
-            Just (_, children) -> if Map.size children == 0 then "" else
-                "<div class='children'>" <> (children & Map.toAscList & map (divv . makeSubChild path) & Data.Text.intercalate "\n") <> "</div>"
-        makeSubChild parentPath (childPath, _) = a "sub-name" hrefs childPath (dots (drop (length parentPath) childPath))
+            Just (_, children') -> if Map.size children' == 0 then "" else
+                "<div class='children'>" <> (children' & Map.toAscList & map (divv . makeSubChild path) & Data.Text.intercalate "\n") <> "</div>"
+        makeSubChild parentPath' (childPath, _) = a "sub-name" hrefs childPath (dots (drop (length parentPath') childPath))
         makeBody _path Nothing = ""
         makeBody _path (Just ref) = divv (showItem hrefs hashRef ref codeinfo)
 
--- showItem :: Reference -> CodeInfo -> Text
+showItem :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> Reference -> CodeInfo -> Text
 showItem hrefs hashRef ref codeinfo =
     "<code><pre>" <> body <> "</code></pre>"
     where
@@ -200,7 +185,7 @@ showItem hrefs hashRef ref codeinfo =
             Nothing -> "No BODY FOUND"
             Just t -> codeBody hrefs hashRef t
 
--- codeBody :: SyntaxText.SyntaxText -> Text
+codeBody :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> AnnotatedText SyntaxText.Element -> Text
 codeBody hrefs hashRef (AnnotatedText items) =
     toList items & map (renderElement hrefs hashRef) & Data.Text.concat
 
@@ -217,12 +202,11 @@ refHash (ShortHash h (Just suffix) _) = (h <> suffix, True)
 
 
 renderElement :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> (String, Maybe SyntaxText.Element) -> Text
-renderElement hrefs hashRef (contents, Nothing) = escapeHTML contents
+renderElement _hrefs _hashRef (contents, Nothing) = escapeHTML contents
 renderElement hrefs hashRef (contents, Just kind) = 
     case (hash >>= hashRef) of
         Nothing -> "<span class=\"" <> cls <> "\">" <> escapeHTML contents <> "</span>"
         Just h -> a cls hrefs h (escapeHTML contents)
-            -- "<a href=\"" <> hashRef h <> "\">" <> escapeHTML contents <> "</a>"
     where
         hash = case kind of
                 SyntaxText.Reference r -> Just $ Unison.Reference.toShortHash r

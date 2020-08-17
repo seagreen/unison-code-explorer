@@ -1,6 +1,22 @@
+/**
+ * Static-site documentation generator!
+ *
+ * This is in javascript for ease-of-hacking, will translate into haskell pretty soon.
+ *
+ * Usage:
+ * ```
+ * $ stack run -- --json --directory path/to/unison/project > dump.json
+ * $ node compile.js dump.json path/to/output/directory
+ * ```
+ *
+ * NOTE: This is very much at the proof-of-concept stage.
+ */
 const path = require('path');
 const fs = require('fs');
-const data = require('./out.json');
+
+const [_, __, jsonFile, destDir] = process.argv;
+
+const data = require(path.resolve(jsonFile));
 
 const byHash = {};
 const byName = {};
@@ -65,19 +81,11 @@ pre {
 </style>
 `;
 
-// console.log(names.join('\n'));
-
-// Things that don't have subItems don't get their own page
-// Things with subitems get their own page
-// Maybe thats it?
-
 const hByHash = {};
 const hierarchy = { children: {}, parent: null };
 names.forEach((name) => {
     const parts = name === 'base..' ? ['base', '.'] : name.split('.');
-    // console.log(name);
     let last = parts.pop();
-    // if (last === '.')
 
     let current = hierarchy;
     parts.forEach((part) => {
@@ -130,11 +138,9 @@ const pathForHash = (hash) => {
     }
     const h = hByHash[hash];
     if (Object.keys(h.children).length) {
-        console.log('self');
         return pathEscape(hash) + '.html';
     }
     if (h.parent && h.parent.index) {
-        console.log('parent');
         return (
             pathEscape(h.parent.index.name.rhash) +
             '.html#' +
@@ -143,7 +149,6 @@ const pathForHash = (hash) => {
     }
     const name = item.name.primaryName;
     const parentName = name.split('.').slice(0, -1).join('.');
-    // console.log('fail', h);
     return parentName + '.html#' + pathEscape(item.name.rhash);
 };
 
@@ -174,15 +179,6 @@ const renderItem = (path, item) => {
 
 const renderChild = (path, page) => {
     const childNames = Object.keys(page.children);
-    // if (childNames.length) {
-    //     return `<div class="child">
-    //     <h3>
-    //     <a href="${path[path.length - 1]}/index.html">
-    //         ${path.join('.')}
-    //         </a>
-    //     </h3>
-    //     </div>`;
-    // }
     return `<div class="child" id="${
         page.index ? pathEscape(page.index.name.rhash) : ''
     }"><h3>
@@ -225,7 +221,6 @@ const mkdirp = (d) => {
 };
 
 const traverse = (dest, trail, page) => {
-    // const fileName = path.join(dest, pathEscape(trail.join('/')), 'index.html');
     const fileName = path.join(
         dest,
         page.index
@@ -241,6 +236,4 @@ const traverse = (dest, trail, page) => {
     });
 };
 
-// fs.writeFileSync('hi.json', JSON.stringify(hierarchy, null, 2));
-// fs.writeFileSync('hash.json', JSON.stringify(byHash, null, 2));
-traverse('docs', [], hierarchy);
+traverse(destDir, [], hierarchy);

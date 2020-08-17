@@ -8,6 +8,7 @@ default-extensions:
   - DeriveFunctor
   - DeriveGeneric
   - DerivingStrategies
+  - DeriveDataTypeable
   - ExistentialQuantification
   - FlexibleContexts
   - FlexibleInstances
@@ -42,6 +43,7 @@ dependencies:
   - wai
   - wai-middleware-static
   - websockets
+  - json
 
   # Other
 

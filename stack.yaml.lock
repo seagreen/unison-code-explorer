@@ -5,143 +5,127 @@
 
 packages:
 - completed:
-    subdir: yaks/easytest
-    cabal-file:
-      size: 1797
-      sha256: 84ff3f67733554cb21924f13e521b65bb12c75dc8332da2e18d58ddf71bbc929
-    name: easytest
-    version: '0.1'
-    git: git@github.com:unisonweb/unison.git
+    size: 15989
+    url: https://github.com/unisonweb/configurator/archive/e47e9e9fe1f576f8c835183b9def52d73c01327a.tar.gz
+    name: configurator
+    version: 0.3.0.0
+    sha256: d4fd87fb7bfc5d8e9fbc3e4ee7302c6b1500cdc00fdb9b659d0f4849b6ebe2d5
     pantry-tree:
-      size: 274
-      sha256: e4710d8a58911703da6aae5e3215a8e9eb9fbcb88c15dedde91660392890f19b
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
+      size: 955
+      sha256: 90547cd983fd15ebdc803e057d3ef8735fe93a75e29a00f8a74eadc13ee0f6e9
   original:
-    subdir: yaks/easytest
-    git: git@github.com:unisonweb/unison.git
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
+    url: https://github.com/unisonweb/configurator/archive/e47e9e9fe1f576f8c835183b9def52d73c01327a.tar.gz
 - completed:
-    subdir: parser-typechecker
-    cabal-file:
-      size: 7461
-      sha256: 4ef5e8e164c715a0c67d5b062cd73ee7743f493e293ee620497bac52f7e9a447
-    name: unison-parser-typechecker
-    version: '0.1'
-    git: git@github.com:unisonweb/unison.git
-    pantry-tree:
-      size: 9546
-      sha256: 85ef679cbd65fc45c0594bdfcb633c15fad9fb2e2f8624f04bb616570c1fb46b
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
-  original:
-    subdir: parser-typechecker
-    git: git@github.com:unisonweb/unison.git
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
-- completed:
-    subdir: yaks/haskeline
-    cabal-file:
-      size: 4814
-      sha256: d081aa7d1751a13f3527a35d5250022ed6900f66556422db13266da96c9fdafd
+    size: 75098
+    url: https://github.com/unisonweb/haskeline/archive/2944b11d19ee034c48276edc991736105c9d6143.tar.gz
     name: haskeline
     version: 0.7.5.0
-    git: git@github.com:unisonweb/unison.git
+    sha256: 6d44207a4e94a16bc99d13dccbbb79bf676190c0476436b03235eeeaf6c72f9d
     pantry-tree:
       size: 3717
-      sha256: 6d3e0222c9ccc276aa8899c3a81c52dfadd7234ee6c9a64d8f2d2441d19522a0
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
+      sha256: 878c7fb5801ec7418761a49b529ca3fdab274f22707c7d2759f2b3a2df06c3ea
   original:
-    subdir: yaks/haskeline
-    git: git@github.com:unisonweb/unison.git
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
+    url: https://github.com/unisonweb/haskeline/archive/2944b11d19ee034c48276edc991736105c9d6143.tar.gz
 - completed:
-    subdir: unison-core
-    cabal-file:
-      size: 2241
-      sha256: adcac20c6e00157d783477963bdf18bd1b48fabb583020d3ed207910546b9038
-    name: unison-core
-    version: '0.1'
-    git: git@github.com:unisonweb/unison.git
+    size: 92490
+    url: https://github.com/unisonweb/megaparsec/archive/c4463124c578e8d1074c04518779b5ce5957af6b.tar.gz
+    name: megaparsec
+    version: 6.5.0
+    sha256: 94f9573735fefda868371ff735a6b1f52bea22b9e52289abeb8114c99bbf8832
     pantry-tree:
-      size: 2288
-      sha256: 0b41f868247441af55eb17c06f5edeea7e1f2040a515ad1bf223b719c8c5dd7e
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
+      size: 2635
+      sha256: 7d3f8b23c862d878b4adce628caaf7bc337f0ac10b2556e1cdf0913c28a45929
   original:
-    subdir: unison-core
-    git: git@github.com:unisonweb/unison.git
-    commit: ff50b3b4f836b0da8da4ce01bea7595587240a90
+    url: https://github.com/unisonweb/megaparsec/archive/c4463124c578e8d1074c04518779b5ce5957af6b.tar.gz
 - completed:
-    hackage: base58-bytestring-0.1.0@sha256:a1da72ee89d5450bac1c792d9fcbe95ed7154ab7246f2172b57bd4fd9b5eab79,1913
+    hackage: base16-0.2.1.0@sha256:62e9abde29287913a775ec658b62ecba20270b9e1ac0a008e6acb4616b79a22d,2183
     pantry-tree:
-      size: 419
-      sha256: 053784f8edef6433518c873a7c502dc75348f812e2384e1306f90467ea54f40b
+      size: 1161
+      sha256: 434826aa90b65b25b80f767eeffb2fa7d49f93a8c0f7998988ab09dbfd1dfbdb
   original:
-    hackage: base58-bytestring-0.1.0
+    hackage: base16-0.2.1.0@sha256:62e9abde29287913a775ec658b62ecba20270b9e1ac0a008e6acb4616b79a22d,2183
 - completed:
-    hackage: relation-0.2.1@sha256:74eac96dfefd6600f0185b4aac0fbeaab522f672a6fb342e160115d40d97e596,3032
+    hackage: concurrent-supply-0.1.8@sha256:9373f4868ad28936a7b93781b214ef4afdeacf377ef4ac729583073491c9f9fb,1627
     pantry-tree:
-      size: 449
-      sha256: f37c667d9b0427a3280c2e2c531f86016455b24f919341e200d9648464f22188
+      size: 400
+      sha256: bdfaa167ae3249f858ba248aea2e9b97ab9b13af6e68c73b7c3192e717e11b83
   original:
-    hackage: relation-0.2.1
-- completed:
-    hackage: shellmet-0.0.1@sha256:4535d5cd7b92becb3676becaf98f432bac20e3b44d01803afe11af559f2bd26c,3500
-    pantry-tree:
-      size: 367
-      sha256: 45de1727f0f152486fac116a02e90031262cb4ee757be61403a5df9d8a1a8d2b
-  original:
-    hackage: shellmet-0.0.1
-- completed:
-    hackage: filepattern-0.1.1@sha256:984f43798572e325e9509b3b59fd4ccc2b0f94b8b065585e0505570c98aa1016,2480
-    pantry-tree:
-      size: 998
-      sha256: 9b2829a8c9b47bb5dcee3c6547fcd3867354ed2b0094271e01fb2df89a3fc6fd
-  original:
-    hackage: filepattern-0.1.1
-- completed:
-    hackage: strings-1.1@sha256:0285dec4c8ab262359342b3e5ef1eb567074669461b9b38404f1cb870c881c5c,1617
-    pantry-tree:
-      size: 212
-      sha256: 876e5a679244143e2a7e74357427c7522a8d61f68a4cc3ae265fe4960b75a2e2
-  original:
-    hackage: strings-1.1@sha256:0285dec4c8ab262359342b3e5ef1eb567074669461b9b38404f1cb870c881c5c
+    hackage: concurrent-supply-0.1.8@sha256:9373f4868ad28936a7b93781b214ef4afdeacf377ef4ac729583073491c9f9fb,1627
 - completed:
     hackage: guid-0.1.0@sha256:a7c975be473f6f142d5cc1b39bc807a99043d20b1bb0873fdfe7a3ce84d2faf1,1078
     pantry-tree:
       size: 364
       sha256: a33838b7b1c54f6ac3e1b436b25674948713a4189658e4d82e639b9a689bc90d
   original:
-    hackage: guid-0.1.0@sha256:a7c975be473f6f142d5cc1b39bc807a99043d20b1bb0873fdfe7a3ce84d2faf1
-- completed:
-    hackage: fsutils-0.1.2@sha256:fb3eb68e03e4317352032642d3ed18c796c30f5a3bec40caef69cee0b859df5e,1028
-    pantry-tree:
-      size: 210
-      sha256: f92ef28c1edc20a1653f074bc85e7862c81ff850893b4417b64a8582ce62b531
-  original:
-    hackage: fsutils-0.1.2@sha256:fb3eb68e03e4317352032642d3ed18c796c30f5a3bec40caef69cee0b859df5e
+    hackage: guid-0.1.0@sha256:a7c975be473f6f142d5cc1b39bc807a99043d20b1bb0873fdfe7a3ce84d2faf1,1078
 - completed:
     hackage: prelude-extras-0.4.0.3@sha256:1c10b0123ea13a6423d74a8fcbaeb2d5249b472588abde418a36b47b7c4f48c8,1163
     pantry-tree:
       size: 476
       sha256: a03f60a1250c9d0daaf208ba58ccf24e05e0807f2e3dc7892fad3f2f3a196f7f
   original:
-    hackage: prelude-extras-0.4.0.3@sha256:1c10b0123ea13a6423d74a8fcbaeb2d5249b472588abde418a36b47b7c4f48c8
+    hackage: prelude-extras-0.4.0.3@sha256:1c10b0123ea13a6423d74a8fcbaeb2d5249b472588abde418a36b47b7c4f48c8,1163
 - completed:
     hackage: sandi-0.5@sha256:b278d072ca717706ea38f9bd646e023f7f2576a778fb43565b434f93638849aa,3010
     pantry-tree:
       size: 3455
       sha256: 5ca7ce4bc22ab9d4427bb149b5e283ab9db43375df14f7131fdfd48775f36350
   original:
-    hackage: sandi-0.5@sha256:b278d072ca717706ea38f9bd646e023f7f2576a778fb43565b434f93638849aa
+    hackage: sandi-0.5@sha256:b278d072ca717706ea38f9bd646e023f7f2576a778fb43565b434f93638849aa,3010
 - completed:
-    hackage: megaparsec-6.5.0@sha256:510b5471f31e965a06f91d110456f24ad7e191e0778f4fc8ec053dcb182abcbf,6125
+    hackage: strings-1.1@sha256:0285dec4c8ab262359342b3e5ef1eb567074669461b9b38404f1cb870c881c5c,1617
     pantry-tree:
-      size: 2533
-      sha256: f6a429fc9c666b82eba5b2e60b5d7d35ea44a5116705c239fb79956339f3c150
+      size: 212
+      sha256: 876e5a679244143e2a7e74357427c7522a8d61f68a4cc3ae265fe4960b75a2e2
   original:
-    hackage: megaparsec-6.5.0
+    hackage: strings-1.1@sha256:0285dec4c8ab262359342b3e5ef1eb567074669461b9b38404f1cb870c881c5c,1617
 - completed:
-    cabal-file:
-      size: 5175
-      sha256: b0ef708cc578ed345217e88d93679f76999a50f10243892901731fd61fba505f
+    subdir: yaks/easytest
+    name: easytest
+    version: '0.1'
+    git: git@github.com:unisonweb/unison.git
+    pantry-tree:
+      size: 274
+      sha256: bde15d894ab2444006f281a28094a4019f82c6c5130b615a801b2c9fac738993
+    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+  original:
+    subdir: yaks/easytest
+    git: git@github.com:unisonweb/unison.git
+    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+- completed:
+    subdir: parser-typechecker
+    name: unison-parser-typechecker
+    version: '0.1'
+    git: git@github.com:unisonweb/unison.git
+    pantry-tree:
+      size: 10722
+      sha256: af36c9048c569427af0551e20964e2ee2782efde69c8bb45b64603ae8e033110
+    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+  original:
+    subdir: parser-typechecker
+    git: git@github.com:unisonweb/unison.git
+    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+- completed:
+    subdir: unison-core
+    name: unison-core
+    version: '0.1'
+    git: git@github.com:unisonweb/unison.git
+    pantry-tree:
+      size: 2283
+      sha256: c164804d85a4cbbc0faabb5b6f5bab0f183dab043a2e3f143558dde229ed8167
+    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+  original:
+    subdir: unison-core
+    git: git@github.com:unisonweb/unison.git
+    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+- completed:
+    hackage: json-0.10@sha256:d9fc6b07ce92b8894825a17d2cf14799856767eb30c8bf55962baa579207d799,3210
+    pantry-tree:
+      size: 3190
+      sha256: 5654f66b7cd8bf087ac040a9b0a83eb064219eab32230f61a3adeddfdbb4d4cd
+  original:
+    hackage: json-0.10@sha256:d9fc6b07ce92b8894825a17d2cf14799856767eb30c8bf55962baa579207d799,3210
+- completed:
     name: concur-replica
     version: 0.1.0.0
     git: git@github.com:pkamenarsky/concur-replica
@@ -153,9 +137,6 @@ packages:
     git: git@github.com:pkamenarsky/concur-replica
     commit: 0bcf622fce055be4cdc3793ef73a16e227384817
 - completed:
-    cabal-file:
-      size: 2016
-      sha256: 37fbd822c4b163189e676bd7d7dfcbef24ea3dfc989a66a20352283f4b02b46d
     name: replica
     version: 0.1.0.0
     git: git@github.com:pkamenarsky/replica
@@ -168,9 +149,6 @@ packages:
     commit: db4af3572705bb20222fff1203a1eea3ca5cd542
 - completed:
     subdir: concur-core
-    cabal-file:
-      size: 1239
-      sha256: 6faa067cee99685b9121f3bf790775af40950d0612cca24a409764fcaec984c0
     name: concur-core
     version: 0.1.0.0
     git: git@github.com:ajnsit/concur
@@ -184,7 +162,7 @@ packages:
     commit: 6c6bcc07b2688182945b28f154a013eee3f624c5
 snapshots:
 - completed:
-    size: 523700
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/14/7.yaml
-    sha256: 8e3f3c894be74d71fa4bf085e0a8baae7e4d7622d07ea31a52736b80f8b9bb1a
-  original: lts-14.7
+    size: 496112
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/15/15.yaml
+    sha256: 86169722ad0056ffc9eacc157ef80ee21d7024f92c0d2961c89ccf432db230a3
+  original: lts-15.15

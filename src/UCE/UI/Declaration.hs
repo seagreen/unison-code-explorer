@@ -12,6 +12,7 @@ import UCE.Code
 import UCE.Prelude
 import qualified Unison.Name as Name
 import qualified Unison.Util.Relation as Relation
+import UCE.Code.Print (syntaxToPlain)
 
 viewBody :: CodeInfo -> Set Reference -> Widget HTML Reference
 viewBody codeinfo refs =
@@ -92,7 +93,7 @@ viewBody codeinfo refs =
             Nothing ->
               "<not found>"
             Just t ->
-              t
+              syntaxToPlain t
         _ ->
           "<confliced name>"
 

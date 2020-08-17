@@ -1,6 +1,5 @@
 module UCE where
 
--- import Text.JSON.Generic
 import qualified Text.JSON.Generic
 
 import Concur.Replica (Attr (..), Attrs, HTML, VDOM (..), clientDriver)

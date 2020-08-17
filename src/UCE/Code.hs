@@ -13,7 +13,6 @@ where
 import Data.Map.Strict ()
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
--- import Data.Text (Text)
 import qualified Data.Text.IO as TIO
 import System.IO (stderr)
 import UCE.Code.Print
@@ -193,11 +192,3 @@ mapMaybeRelation f =
     g :: (a, c) -> Maybe (b, c)
     g (a, c) =
       (,c) <$> f a
-
--- referentToRef :: Referent -> Maybe Reference
--- referentToRef referent =
---   case referent of
---     Con {} ->
---       Nothing
---     Ref ref ->
---       Just ref

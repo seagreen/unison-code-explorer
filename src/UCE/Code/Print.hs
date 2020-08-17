@@ -1,9 +1,7 @@
 module UCE.Code.Print where
 
--- import Data.Text (Text)
 import qualified Data.Text as Text
 import UCE.Prelude hiding (element)
--- import Unison.Codebase (Codebase)
 import Unison.Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.ABT
@@ -24,7 +22,6 @@ import Unison.Util.SyntaxText (SyntaxText, toPlain)
 import Unison.Util.AnnotatedText ( AnnotatedText(..) )
 
 import qualified Unison.ShortHash
--- import qualified Unison.HashQualified
 import qualified Unison.Reference
 import qualified Unison.Referent
 import qualified Unison.Util.SyntaxText    as ST
@@ -36,7 +33,7 @@ data SegmentKind =
   | Other String
   | None
   deriving (Show, Data, Typeable)
-  
+
 
 data Segment = Segment
     { contents :: String

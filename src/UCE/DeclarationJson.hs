@@ -2,11 +2,6 @@ module UCE.DeclarationJson where
 
 import Text.JSON.Generic
 
--- import Concur.Core (Widget)
--- import Concur.Replica (HTML)
--- import qualified Concur.Replica.DOM as H
--- import qualified Concur.Replica.DOM.Events as P
--- import qualified Concur.Replica.DOM.Props as P
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
@@ -37,19 +32,6 @@ viewBody codeinfo ref =
     dependencies = depList,
     dependents = mentionList
   }
-  -- H.div
-  --   [P.className "box"]
-  --   [ H.pre
-  --       []
-  --       [ H.code
-  --           []
-  --           [H.text bodyTxt]
-  --       ],
-  --     depTitle,
-  --     H.ul [] depList,
-  --     mentionTitle,
-  --     H.ul [] mentionList
-  --   ]
   where
     depList :: [Ref]
     depList =
@@ -63,26 +45,9 @@ viewBody codeinfo ref =
           mentions =
                 shallowReferences ref (codeDependencies codeinfo)
        in namesToRefs mentions
-    -- viewLink :: (Text, Reference) -> Widget HTML Reference
-    -- viewLink (name, ref) = do
-    --   _ <-
-    --     H.li
-    --       [P.onClick]
-    --       [ H.a
-    --           []
-    --           [H.text name]
-    --       ]
-    --   pure ref
     namesToRefs :: Set Reference -> [Ref]
     namesToRefs =
       List.sortOn primaryName . fmap (\r -> (refName r codeinfo)) . Set.toList
-    -- bodyTxt :: Text
-    -- bodyTxt =
-    --       case Map.lookup ref (codeBodies codeinfo) of
-    --         Nothing ->
-    --           "<not found>"
-    --         Just t ->
-    --           syntaxToPlain t
 
 refName :: Reference -> CodeInfo -> Ref
 refName ref codeinfo =

@@ -11,6 +11,7 @@ import UCE.Prelude
 
 data Config = Config
   { configPort :: Int,
+    json :: Bool,
     directory  :: String
   }
   deriving (Show)
@@ -19,8 +20,10 @@ main :: IO ()
 main = do
   logLn "Starting"
   conf <- runParser
-  UCE.dumpJson (directory conf)
-  -- UCE.run (configPort conf) (directory conf)
+  if (json conf) then
+    UCE.dumpJson (directory conf)
+  else
+    UCE.run (configPort conf) (directory conf)
   where
     runParser :: IO Config
     runParser =
@@ -49,6 +52,12 @@ main = do
           ( long "port"
               <> help "Port to run server on"
               <> value 8080
+              <> showDefault
+          )
+        <*> switch
+          ( long "json"
+              <> help "Output a JSON dump of the project instead of running a server"
+              -- <> value False
               <> showDefault
           )
         <*> strOption

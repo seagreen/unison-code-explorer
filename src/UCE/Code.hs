@@ -10,10 +10,10 @@ module UCE.Code
   )
 where
 
-import Data.Map.Strict (Map)
+import Data.Map.Strict ()
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
-import Data.Text (Text)
+-- import Data.Text (Text)
 import qualified Data.Text.IO as TIO
 import System.IO (stderr)
 import UCE.Code.Print
@@ -30,7 +30,7 @@ import qualified Unison.DataDeclaration as Decl
 import Unison.Name (Name)
 import Unison.Parser (Ann (External))
 import Unison.Reference (Reference (..))
-import Unison.Referent (Referent (..), toTermReference)
+import Unison.Referent (Referent, toTermReference)
 import Unison.Symbol (Symbol)
 import Unison.Term (Term)
 import qualified Unison.Term as Term
@@ -81,8 +81,7 @@ loadCodebaseAndBranch :: String -> IO (Codebase IO Symbol Ann, Branch0 IO)
 loadCodebaseAndBranch projectDirectory = do
   cache <- Branch.boundedCache 4096
   let codebasePath :: FilePath
-      codebasePath = projectDirectory <> "/.unison/v1"
-      -- codebase :: Codebase IO Symbol Ann
+      codebasePath = projectDirectory
   codebase <- FileCodebase.codebase1 cache formatSymbol formatAnn codebasePath
 
   exists <- FileCodebase.codebaseExists codebasePath

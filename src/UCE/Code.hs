@@ -30,7 +30,7 @@ import qualified Unison.DataDeclaration as Decl
 import Unison.Name (Name)
 import Unison.Parser (Ann (External))
 import Unison.Reference (Reference (..))
-import Unison.Referent (Referent (..))
+import Unison.Referent (Referent (..), toTermReference)
 import Unison.Symbol (Symbol)
 import Unison.Term (Term)
 import qualified Unison.Term as Term
@@ -79,16 +79,21 @@ load projectDirectory =
 
 loadCodebaseAndBranch :: String -> IO (Codebase IO Symbol Ann, Branch0 IO)
 loadCodebaseAndBranch projectDirectory = do
+  cache <- Branch.boundedCache 4096
   let codebasePath :: FilePath
       codebasePath = projectDirectory <> "/.unison/v1"
-      codebase :: Codebase IO Symbol Ann
-      codebase =
-        FileCodebase.codebase1 formatSymbol formatAnn codebasePath
+      -- codebase :: Codebase IO Symbol Ann
+  codebase <- FileCodebase.codebase1 cache formatSymbol formatAnn codebasePath
 
-  exists <- FileCodebase.exists codebasePath
+  exists <- FileCodebase.codebaseExists codebasePath
   when (not exists) (die ("No codebase found in " <> codebasePath))
 
-  branch <- Codebase.getRootBranch codebase
+  branch' <- Codebase.getRootBranch codebase
+  let branch_ :: IO (Branch.Branch IO)
+      branch_ = case branch' of
+        Left _ -> die ("Unable to load root branch")
+        Right branch -> pure branch
+  branch <- branch_
 
   let head :: Branch0 IO
       head =
@@ -107,7 +112,7 @@ loadCodeInfo (codebase, head) = do
         Branch.deepTerms head
       termsNoConstructors :: Relation Reference Name
       termsNoConstructors =
-        mapMaybeRelation referentToRef terms
+        mapMaybeRelation toTermReference terms
       types :: Relation Reference Name
       types =
         Branch.deepTypes head
@@ -190,10 +195,10 @@ mapMaybeRelation f =
     g (a, c) =
       (,c) <$> f a
 
-referentToRef :: Referent -> Maybe Reference
-referentToRef referent =
-  case referent of
-    Con {} ->
-      Nothing
-    Ref ref ->
-      Just ref
+-- referentToRef :: Referent -> Maybe Reference
+-- referentToRef referent =
+--   case referent of
+--     Con {} ->
+--       Nothing
+--     Ref ref ->
+--       Just ref

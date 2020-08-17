@@ -23,18 +23,37 @@ import Unison.Util.Pretty hiding (toPlain, text)
 import Unison.Util.SyntaxText (SyntaxText, toPlain)
 import Unison.Util.AnnotatedText ( AnnotatedText(..) )
 
+import qualified Unison.ShortHash
+import qualified Unison.HashQualified
+import qualified Unison.Reference
+import qualified Unison.Referent
+import qualified Unison.Util.SyntaxText    as ST
+
 import Text.JSON.Generic
+
+data SegmentKind =
+  WithHash { name :: String, hash :: String }
+  | Other String
+  | None
+  deriving (Show, Data, Typeable)
+  
 
 data Segment = Segment
     { contents :: String
-    , kind     :: Maybe String
+    , kind     :: SegmentKind
     } deriving (Show, Data, Typeable)
 
 
-elementToSegments :: Show a => (String, Maybe a) -> Segment
+elementToSegments :: Show ST.Element => (String, Maybe ST.Element) -> Segment
 elementToSegments (text, element) = case element of
-  Nothing -> Segment { contents = text, kind = Nothing }
-  Just el -> Segment { contents = text, kind = Just  (show el) }
+  Nothing -> Segment { contents = text, kind = None }
+  Just el -> Segment { contents = text, kind = case el of
+      ST.Reference r         -> WithHash { hash = Unison.ShortHash.toString . Unison.Reference.toShortHash $ r, name = "Reference" }
+      ST.Referent r          -> WithHash { hash = Unison.ShortHash.toString . Unison.Referent.toShortHash $ r, name = "Referent" }
+      ST.HashQualifier hq    -> case (Unison.HashQualified.toHash hq) of
+        Nothing -> Other "HashQualifier"
+        Just hash -> WithHash { hash = Unison.ShortHash.toString hash, name = "HashQualifier" }
+      _ -> Other (show el) }
 
 toSegments :: SyntaxText -> [Segment]
 toSegments (AnnotatedText items) =

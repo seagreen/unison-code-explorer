@@ -14,14 +14,17 @@ import UCE.Prelude
 import qualified UCE.UI
 import qualified Unison.Util.Relation as Relation
 import qualified UCE.DeclarationJson
+import UCE.StaticGen as StaticGen
 
 dumpJson :: String -> IO ()
 dumpJson projectDirectory = do
+  putStrLn "Load"
   codeinfo <- UCE.Code.load projectDirectory
-  let names = codeinfo & UCE.Code.codeDeclarationNames & Relation.domain & Map.toAscList
-  let y = map (UCE.DeclarationJson.viewBody codeinfo . fst) names
-  let text = Text.JSON.Generic.encodeJSON y
-  putStrLn text
+  StaticGen.build "docs" codeinfo
+  -- let names = codeinfo & UCE.Code.codeDeclarationNames & Relation.domain & Map.toAscList
+  -- let y = map (UCE.DeclarationJson.viewBody codeinfo . fst) names
+  -- let text = Text.JSON.Generic.encodeJSON y
+  -- putStrLn text
 
 run :: Int -> String -> IO ()
 run port projectDirectory = do

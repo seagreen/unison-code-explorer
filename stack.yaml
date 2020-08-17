@@ -56,8 +56,3 @@ extra-deps:
     commit: '6c6bcc07b2688182945b28f154a013eee3f624c5'
     subdirs:
       - concur-core
-
-# ghc-options:
-#  # All packages
-#  "$locals": -Werror -Wno-type-defaults #-freverse-errors
-

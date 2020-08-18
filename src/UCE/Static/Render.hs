@@ -3,6 +3,7 @@ module UCE.Static.Render where
 
 import UCE.Code
 import UCE.Prelude
+import qualified Data.List
 import qualified Data.Text
 import qualified Unison.Referent as Referent
 import qualified Data.Map.Strict as Map
@@ -12,16 +13,31 @@ import qualified Unison.HashQualified as Unison.HashQualified
 import qualified Unison.Util.SyntaxText as SyntaxText
 import Unison.Util.AnnotatedText ( AnnotatedText(..) )
 import Data.String.QM
-import UCE.Static.Organize (dots, itemHref)
+import UCE.Static.Organize (dots, itemHref, parentPath)
+
+renderBreadcrumb :: [Text] -> Map [Text] Text -> Text
+renderBreadcrumb path hrefs =
+    a "item" hrefs [] "Home" <> " : " <>
+    (foldl process ([], []) path & snd & Data.Text.intercalate " . ")
+    where
+        process :: ([Text], [Text]) -> Text -> ([Text], [Text])
+        process (path', result) current =
+            (full, Data.List.concat [result, [a "item" hrefs full current]])
+            where
+                full = Data.List.concat [path', [current]]
+
 
 renderPage :: [Text] -> Maybe Reference -> Map [Text] (Maybe Reference) -> p -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
 renderPage path ref children _href hashRef hrefs codeinfo entryMap =
     htmlTop title
-    [qt|<h1>${title}</h1>
+    [qt|
+    ${breadcrumb}
+    <h1>${title}</h1>
     ${top}
     ${childrenHtml}
     |]
     where
+        breadcrumb = if path == [] then "" else "<div class='breadcrumb'>" <> renderBreadcrumb (parentPath path) hrefs <> "</div>"
         title = dots path
         top = case ref of
             Nothing -> ""
@@ -41,10 +57,7 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
     children & Map.toAscList & map makeChild & Data.Text.intercalate "\n"
     where
         makeChild (path, ref) =
-            if (not hasChildren && ref == Nothing)
-                then ""
-                else
-                    [qt|
+            [qt|
             <div>
                 <h2 id="${id}">${link}</h2>
                 ${sub}
@@ -75,7 +88,7 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
             else
                 "<div class='children'>" <> (subChildren & Map.toAscList & map (divv . makeSubChild path) & Data.Text.intercalate "\n") <> "</div>"
         makeSubChild parentPath' (childPath, _) = a "sub-name" hrefs childPath (dots (drop (length parentPath') childPath))
-        makeBody _path Nothing = "[index body]"
+        makeBody _path Nothing = ""
         makeBody _path (Just ref) = divv (showItem hrefs hashRef ref codeinfo)
 
 showItem :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> Reference -> CodeInfo -> Text
@@ -142,6 +155,14 @@ style = [qt|
      font-size: 16px;
      font-family: system-ui;
  }
+
+ .breadcrumb {
+     font-size: 80%;
+     padding: 16px;
+ }
+
+ .breadcrumb .item {
+ }
   
  pre {
      padding: 10px 20px;
@@ -158,7 +179,7 @@ style = [qt|
      background-color: #ccc;
      font-size: 80%;
  }
- .sub-name a {
+ a.sub-name {
      text-decoration: none;
  }
  .children {

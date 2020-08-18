@@ -12,6 +12,7 @@ import Unison.ShortHash (ShortHash(..))
 
 type ScopeMap = Map [Text] (Maybe Reference, [([Text], Reference)])
 
+splitParts :: Text -> [Text]
 splitParts name = fixDouble $ Data.Text.splitOn "." name
 
 fixDouble :: [Text] -> [Text]
@@ -20,7 +21,8 @@ fixDouble (head : rest) = head : fixDouble rest
 fixDouble [] = []
 
 dots :: [Text] -> Text
-dots = Data.Text.intercalate "."
+dots [] = "Home"
+dots x = Data.Text.intercalate "." x
 
 parentPath :: [a] -> [a]
 parentPath [] = []
@@ -77,6 +79,7 @@ makeScopeMap codeinfo =
             in
                 addToParent entryMap' path ref
 
+        addToParent mmap [] _ = mmap
         addToParent mmap path r =
             case (Map.lookup parent mmap) of
                 Nothing -> addEntry mmap parent Nothing (Map.fromList [(path, r)])

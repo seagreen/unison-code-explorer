@@ -17,21 +17,6 @@ build dest codeinfo = do
     let hashMap = Organize.makeHashMap paths
     let hrefMap = Organize.makeHrefMap scopeMap
     let hashRef hash = Map.lookup hash hashMap
-    let debugTxt = Map.toList scopeMap
-            & map (\(path, (idx, children)) ->
-                    Data.Text.intercalate "." path
-                    <> " "
-                    <> (
-                    case idx of
-                        Nothing -> " [index] "
-                        Just r -> " [ref] " <> (case Map.lookup r (codeBodies codeinfo) of
-                            Nothing -> "NO BODY "
-                            Just _ -> "A body ")
-                    )
-                    <> (Map.keys children & map (Data.Text.intercalate ".") & Data.Text.intercalate ", ")
-                    )
-            & Data.Text.intercalate "\n"
-    _ <- writeFile (dest <> "/" <> "debug.txt") (Data.Text.unpack debugTxt)
     _ <- Map.toList scopeMap & mapM (writePage dest hashRef hrefMap codeinfo scopeMap)
     pure ()
 

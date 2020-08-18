@@ -1,12 +1,12 @@
 module UCE.Code.Print where
 
 import qualified Data.Text as Text
+import Text.JSON.Generic
 import UCE.Prelude hiding (element)
+import qualified Unison.ABT
 import Unison.Codebase
 import Unison.Codebase.Branch (Branch0 (..))
-import qualified Unison.ABT
 import qualified Unison.Codebase.Branch as Branch
-import qualified Unison.Term
 import Unison.DataDeclaration (Decl)
 import Unison.DeclPrinter
 import Unison.HashQualified
@@ -14,43 +14,44 @@ import Unison.Name (Name)
 import qualified Unison.Name as Name
 import Unison.Names3
 import qualified Unison.PrettyPrintEnv as PPE
-import Unison.Reference (Reference (..), Id(..))
-import Unison.Symbol (Symbol)
-import Unison.TermPrinter
-import Unison.Util.Pretty hiding (toPlain, text)
-import Unison.Util.SyntaxText (SyntaxText, toPlain)
-import Unison.Util.AnnotatedText ( AnnotatedText(..) )
-
-import qualified Unison.ShortHash
+import Unison.Reference (Id (..), Reference (..))
 import qualified Unison.Reference
 import qualified Unison.Referent
-import qualified Unison.Util.SyntaxText    as ST
+import qualified Unison.ShortHash
+import Unison.Symbol (Symbol)
+import qualified Unison.Term
+import Unison.TermPrinter
+import Unison.Util.AnnotatedText (AnnotatedText (..))
+import Unison.Util.Pretty hiding (text, toPlain)
+import Unison.Util.SyntaxText (SyntaxText, toPlain)
+import qualified Unison.Util.SyntaxText as ST
 
-import Text.JSON.Generic
-
-data SegmentKind =
-  WithHash { name :: String, hash :: String }
+data SegmentKind
+  = WithHash {name :: String, hash :: String}
   | Other String
   | None
   deriving (Show, Data, Typeable)
 
-
 data Segment = Segment
-    { contents :: String
-    , kind     :: SegmentKind
-    } deriving (Show, Data, Typeable)
-
+  { contents :: String,
+    kind :: SegmentKind
+  }
+  deriving (Show, Data, Typeable)
 
 elementToSegments :: Show ST.Element => (String, Maybe ST.Element) -> Segment
 elementToSegments (text, element) = case element of
-  Nothing -> Segment { contents = text, kind = None }
-  Just el -> Segment { contents = text, kind = case el of
-      ST.Reference r         -> WithHash { hash = Unison.ShortHash.toString . Unison.Reference.toShortHash $ r, name = "Reference" }
-      ST.Referent r          -> WithHash { hash = Unison.ShortHash.toString . Unison.Referent.toShortHash $ r, name = "Referent" }
-      ST.HashQualifier hq    -> case (Unison.HashQualified.toHash hq) of
-        Nothing -> Other "HashQualifier"
-        Just hash -> WithHash { hash = Unison.ShortHash.toString hash, name = "HashQualifier" }
-      _ -> Other (show el) }
+  Nothing -> Segment {contents = text, kind = None}
+  Just el ->
+    Segment
+      { contents = text,
+        kind = case el of
+          ST.Reference r -> WithHash {hash = Unison.ShortHash.toString . Unison.Reference.toShortHash $ r, name = "Reference"}
+          ST.Referent r -> WithHash {hash = Unison.ShortHash.toString . Unison.Referent.toShortHash $ r, name = "Referent"}
+          ST.HashQualifier hq -> case (Unison.HashQualified.toHash hq) of
+            Nothing -> Other "HashQualifier"
+            Just hash -> WithHash {hash = Unison.ShortHash.toString hash, name = "HashQualifier"}
+          _ -> Other (show el)
+      }
 
 toSegments :: SyntaxText -> [Segment]
 toSegments (AnnotatedText items) =

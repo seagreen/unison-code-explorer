@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 97865e1151efadaa91593e3fc8e4ed8d17f07c95d75785948b9eb9451982423a
+-- hash: 954fdde1c3fd64cea48e79328a67cc0d7f3725fcc8f9639b832b69348934adcf
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -18,7 +18,9 @@ library
       UCE.Code.Print
       UCE.DeclarationJson
       UCE.Prelude
-      UCE.StaticGen
+      UCE.Static
+      UCE.Static.Organize
+      UCE.Static.Render
       UCE.UI
       UCE.UI.Declaration
       UCE.UI.Search
@@ -43,6 +45,7 @@ library
     , lens
     , mtl
     , random
+    , rawstring-qm
     , safe-exceptions
     , servant-server
     , stm
@@ -81,6 +84,7 @@ executable unison-code-explorer
     , mtl
     , optparse-applicative
     , random
+    , rawstring-qm
     , safe-exceptions
     , servant-server
     , stm

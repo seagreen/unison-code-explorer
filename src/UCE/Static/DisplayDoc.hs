@@ -1,35 +1,34 @@
-{-# Language PatternSynonyms #-}
-{-# Language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 module UCE.Static.DisplayDoc where
 
 -- import Data.Foldable ( fold )
 
-import UCE.Prelude
 -- import Unison.Reference (Reference)
 -- import Unison.Referent (Referent)
 -- import Unison.Term (Term)
 -- import Unison.Type (Type)
 -- import Unison.Var (Var)
+
+import Data.Text (pack, unpack)
+import qualified Data.Text
+import UCE.Prelude
+import UCE.Static.Utils
 import qualified Unison.Builtin.Decls as DD
 import qualified Unison.DataDeclaration as DD
 import qualified Unison.DeclPrinter as DP
 import qualified Unison.NamePrinter as NP
 import qualified Unison.PrettyPrintEnv as PPE
-import qualified Unison.Referent as Referent
 import qualified Unison.Reference as Reference
+import qualified Unison.Referent as Referent
 import qualified Unison.Term as Term
 import qualified Unison.TermPrinter as TP
 import qualified Unison.TypePrinter as TypePrinter
 import qualified Unison.Util.Pretty as P
 import qualified Unison.Util.SyntaxText as S
-import qualified Data.Text
-import Data.Text (pack, unpack)
-
-import UCE.Static.Utils
 
 type Pretty = P.Pretty P.ColorText
-
 
 -- displayTerm pped terms typeOf eval types tm = case tm of
 --   Term.Ref' r -> eval r >>= \case
@@ -39,15 +38,16 @@ type Pretty = P.Pretty P.ColorText
 
 displayDoc showLink showItem showSignature showResult = go
   where
-  go (DD.DocJoin docs) = docs & toList & map go & Data.Text.concat
-  go (DD.DocBlob txt) = txt & unpack & escapeHTML
-  go (DD.DocLink (DD.LinkTerm (Term.TermLink' r))) = showLink (Referent.toReference r)
-  go (DD.DocLink (DD.LinkType (Term.TypeLink' r))) = showLink r
-  go (DD.DocSource (DD.LinkTerm (Term.TermLink' r))) = showItem (Referent.toReference r)
-  go (DD.DocSource (DD.LinkType (Term.TypeLink' r))) = showItem r
-  go (DD.DocSignature (Term.TermLink' r)) = showSignature r
-  go (DD.DocEvaluate (Term.TermLink' r)) = showResult r
-  go tm = show tm & pack
+    go (DD.DocJoin docs) = docs & toList & map go & Data.Text.concat
+    go (DD.DocBlob txt) = txt & unpack & escapeHTML
+    go (DD.DocLink (DD.LinkTerm (Term.TermLink' r))) = showLink (Referent.toReference r)
+    go (DD.DocLink (DD.LinkType (Term.TypeLink' r))) = showLink r
+    go (DD.DocSource (DD.LinkTerm (Term.TermLink' r))) = showItem (Referent.toReference r)
+    go (DD.DocSource (DD.LinkType (Term.TypeLink' r))) = showItem r
+    go (DD.DocSignature (Term.TermLink' r)) = showSignature r
+    go (DD.DocEvaluate (Term.TermLink' r)) = showResult r
+    go tm = show tm & pack
+
 --   prettySignature r = typeOf r >>= \case
 --     Nothing -> pure $ termName (PPE.unsuffixifiedPPE pped) r
 --     Just typ -> pure . P.group $
@@ -72,10 +72,14 @@ displayDoc showLink showItem showSignature showResult = go
 --     Nothing -> pure $ "😶  Missing type source for: " <> typeName ppe r
 --     Just ty -> pure . P.syntaxToColor $ P.group $ DP.prettyDecl ppe r (PPE.typeName ppe r) ty
 
-termName ppe r = P.syntaxToColor $
-  NP.styleHashQualified'' (NP.fmt $ S.Referent r) name
-  where name = PPE.termName ppe r
+termName ppe r =
+  P.syntaxToColor $
+    NP.styleHashQualified'' (NP.fmt $ S.Referent r) name
+  where
+    name = PPE.termName ppe r
 
-typeName ppe r = P.syntaxToColor $
-  NP.styleHashQualified'' (NP.fmt $ S.Reference r) name
-  where name = PPE.typeName ppe r
+typeName ppe r =
+  P.syntaxToColor $
+    NP.styleHashQualified'' (NP.fmt $ S.Reference r) name
+  where
+    name = PPE.typeName ppe r

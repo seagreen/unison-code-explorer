@@ -62,31 +62,31 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
                 ${body}
             </div>
             |]
-        where
-                --  debugPath = Data.Text.intercalate ", " (map (\f -> "\"" <> f <> "\"") path) <> (
-                --      if ref == Nothing
-                --          then " [index] "
-                --          else " [item] "
-                --     ) <> (Map.size subChildren & show & Data.Text.pack) <> " children"
-                 body = makeBody path ref
-                 subChildren = case (Map.lookup path entryMap) of
-                    Nothing -> Map.empty
-                    Just (_, children') -> children'
-                 sub = subItems path subChildren
-                 id = case ref of
-                    Nothing -> ""
-                    Just ref' -> itemHref ref'
-                 hasChildren = Map.size subChildren == 0
-                 shortName = (drop (length _path) path)
-                 link = if hasChildren
-                     then (dots shortName)
-                     else a "" hrefs path (dots shortName)
+      where
+        --  debugPath = Data.Text.intercalate ", " (map (\f -> "\"" <> f <> "\"") path) <> (
+        --      if ref == Nothing
+        --          then " [index] "
+        --          else " [item] "
+        --     ) <> (Map.size subChildren & show & Data.Text.pack) <> " children"
+        body = makeBody path ref
+        subChildren = case (Map.lookup path entryMap) of
+          Nothing -> Map.empty
+          Just (_, children') -> children'
+        sub = subItems path subChildren
+        id = case ref of
+          Nothing -> ""
+          Just ref' -> itemHref ref'
+        hasChildren = Map.size subChildren == 0
+        shortName = (drop (length _path) path)
+        link =
+          if hasChildren
+            then (dots shortName)
+            else a "" hrefs path (dots shortName)
 
     subItems path subChildren =
-        if Map.size subChildren == 0
+      if Map.size subChildren == 0
         then ""
-        else
-            "<div class='children'>" <> (subChildren & Map.toAscList & map (divv . makeSubChild path) & Data.Text.intercalate "\n") <> "</div>"
+        else "<div class='children'>" <> (subChildren & Map.toAscList & map (divv . makeSubChild path) & Data.Text.intercalate "\n") <> "</div>"
     makeSubChild parentPath' (childPath, _) = a "sub-name" hrefs childPath (dots (drop (length parentPath') childPath))
     makeBody _path Nothing = ""
     makeBody _path (Just ref) = divv (showItem hrefs hashRef ref codeinfo)

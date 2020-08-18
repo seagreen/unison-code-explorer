@@ -14,6 +14,7 @@ import qualified Unison.Util.SyntaxText as SyntaxText
 import Unison.Util.AnnotatedText ( AnnotatedText(..) )
 import Data.String.QM
 import UCE.Static.Organize (dots, itemHref, parentPath)
+import UCE.Static.Utils
 
 renderBreadcrumb :: [Text] -> Map [Text] Text -> Text
 renderBreadcrumb path hrefs =
@@ -47,12 +48,7 @@ renderPage path ref children _href hashRef hrefs codeinfo entryMap =
 divv :: Text -> Text
 divv text = "<div>" <> text <> "</div>"
 
-a :: Text -> Map [Text] Text -> [Text] -> Text -> Text
-a cls hrefs path contents = case (Map.lookup path hrefs) of
-    Nothing -> contents
-    Just href -> [qt|<a class="${cls}" href="${href}">${contents}</a>|]
-
-childrenListing :: p -> Map [Text] (Maybe Reference) -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
+childrenListing :: [Text] -> Map [Text] (Maybe Reference) -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
 childrenListing _path children hashRef hrefs codeinfo entryMap =
     children & Map.toAscList & map makeChild & Data.Text.intercalate "\n"
     where
@@ -79,9 +75,10 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
                     Nothing -> ""
                     Just ref' -> itemHref ref'
                  hasChildren = Map.size subChildren == 0
+                 shortName = (drop (length _path) path)
                  link = if hasChildren
-                     then (dots path)
-                     else a "" hrefs path (dots path)
+                     then (dots shortName)
+                     else a "" hrefs path (dots shortName)
         subItems path subChildren =
             if Map.size subChildren == 0
             then ""
@@ -102,12 +99,6 @@ showItem hrefs hashRef ref codeinfo =
 codeBody :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> AnnotatedText SyntaxText.Element -> Text
 codeBody hrefs hashRef (AnnotatedText items) =
     toList items & map (renderElement hrefs hashRef) & Data.Text.concat
-
-escapeHTML :: String -> Text
-escapeHTML text = text & Data.Text.pack
-    & Data.Text.replace "&" "&amp;"
-    & Data.Text.replace "<" "&lt;"
-    & Data.Text.replace ">" "&gt;"
 
 refHash :: ShortHash -> (Text, Bool)
 refHash (Builtin b) = (b, False)

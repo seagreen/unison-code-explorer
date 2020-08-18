@@ -2,7 +2,7 @@ module UCE.Code.Print where
 
 import qualified Data.Text as Text
 import Text.JSON.Generic
-import UCE.Prelude hiding (element)
+import UCE.Prelude
 import qualified Unison.ABT
 import Unison.Codebase
 import Unison.Codebase.Branch (Branch0 (..))
@@ -101,7 +101,7 @@ printTerm codebase branch0 ref nameSet =
       mTerm <- getTermWithTypeAnnotation codebase id
       case mTerm of
         Nothing ->
-          panic (showText (name, id))
+          panic (show (name, id))
         Just term ->
           let pret :: Pretty SyntaxText
               pret =
@@ -131,7 +131,7 @@ printType codebase branch0 ref nameSet =
       mDecl <- getTypeDeclaration codebase id
       case mDecl of
         Nothing ->
-          panic (showText (name, id))
+          panic (show (name, id))
         Just (decl :: Decl Symbol ann) ->
           case decl of
             Left effectDecl ->

@@ -57,9 +57,9 @@ refName ref codeinfo =
 plainName :: CodeInfo -> Reference -> (Text, Set Text)
 plainName codeinfo ref = case Set.toAscList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
   Nothing ->
-    (showText ref, Set.empty)
+    (show ref, Set.empty)
   Just [] ->
-    (showText ref, Set.empty)
+    (show ref, Set.empty)
   Just [n] ->
     (Name.toText n, Set.empty)
   Just (x : others) ->

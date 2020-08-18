@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 954fdde1c3fd64cea48e79328a67cc0d7f3725fcc8f9639b832b69348934adcf
+-- hash: 02e365f719246a3439442c3d6f7d4dbbd3feea0d117f863d04a223878fee5972
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -46,6 +46,7 @@ library
     , mtl
     , random
     , rawstring-qm
+    , relude
     , safe-exceptions
     , servant-server
     , stm
@@ -85,6 +86,7 @@ executable unison-code-explorer
     , optparse-applicative
     , random
     , rawstring-qm
+    , relude
     , safe-exceptions
     , servant-server
     , stm

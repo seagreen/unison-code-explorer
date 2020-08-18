@@ -37,14 +37,15 @@ dependencies:
   - concur-core
   - concur-replica
   - gitrev
+  - json
+  - rawstring-qm
+  - relude
   - servant-server
   - unison-core
   - unison-parser-typechecker
   - wai
   - wai-middleware-static
   - websockets
-  - json
-  - rawstring-qm
 
   # Other
 

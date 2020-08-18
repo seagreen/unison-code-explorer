@@ -1,5 +1,6 @@
 module UCE.Static.Organize where
 
+import Data.Foldable as X (foldl)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text
 import UCE.Code
@@ -9,6 +10,7 @@ import qualified Unison.Hash as Hash
 import qualified Unison.Reference as Reference
 import Unison.ShortHash (ShortHash (..))
 import qualified Unison.Util.Relation as Relation
+import qualified Prelude
 
 type ScopeMap = Map [Text] (Maybe Reference, [([Text], Reference)])
 
@@ -17,7 +19,7 @@ splitParts name = fixDouble $ Data.Text.splitOn "." name
 
 fixDouble :: [Text] -> [Text]
 fixDouble ("" : "" : rest) = "." : fixDouble rest
-fixDouble (head : rest) = head : fixDouble rest
+fixDouble (head' : rest) = head' : fixDouble rest
 fixDouble [] = []
 
 dots :: [Text] -> Text
@@ -26,7 +28,7 @@ dots x = Data.Text.intercalate "." x
 
 parentPath :: [a] -> [a]
 parentPath [] = []
-parentPath path = reverse path & tail & reverse
+parentPath path = reverse path & Prelude.tail & reverse
 
 indexHref :: [Text] -> Text
 indexHref [] = "index"

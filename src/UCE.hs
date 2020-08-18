@@ -3,7 +3,6 @@ module UCE where
 import Concur.Replica (Attr (..), Attrs, HTML, VDOM (..), clientDriver)
 import qualified Concur.Replica.Run
 import qualified Data.Map.Strict as Map
-import Data.Text.Encoding (decodeUtf8)
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Middleware.Static as Static
 import Network.WebSockets (defaultConnectionOptions)

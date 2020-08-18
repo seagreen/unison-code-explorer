@@ -101,9 +101,9 @@ refName :: Reference -> CodeInfo -> Text
 refName ref codeinfo =
   case Set.toAscList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
     Nothing ->
-      showText ref
+      show ref
     Just [] ->
-      showText ref
+      show ref
     Just [n] ->
       Name.toText n
     Just (x : y : []) ->

@@ -27,7 +27,7 @@ main = do
       if (static conf)
         then UCE.buildStatic (directory conf) (dest conf)
         else do
-          logLn "Starting"
+          logLine "Starting"
           UCE.run (configPort conf) (directory conf)
   where
     runParser :: IO Config

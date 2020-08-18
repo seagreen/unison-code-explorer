@@ -16,7 +16,7 @@ import qualified Data.Set as Set
 import qualified Data.Text.IO as TIO
 import System.IO (stderr)
 import UCE.Code.Print
-import UCE.Prelude
+import UCE.Prelude hiding (head)
 import Unison.Codebase (Codebase)
 import qualified Unison.Codebase as Codebase
 import Unison.Codebase.Branch (Branch0 (..))
@@ -148,7 +148,7 @@ functionCallGraph codebase terms types = do
           mTerm <- Codebase.getTerm codebase id
           case mTerm of
             Nothing -> do
-              TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> showText id)
+              TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find term): " <> show id)
               pure (ref, mempty)
             Just (t :: Term Symbol Ann) ->
               pure (ref, Term.dependencies t)
@@ -161,7 +161,7 @@ functionCallGraph codebase terms types = do
           mType <- Codebase.getTypeDeclaration codebase id
           case mType of
             Nothing -> do
-              TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find type): " <> showText id)
+              TIO.hPutStrLn System.IO.stderr ("Skipping reference (can't find type): " <> show id)
               pure (ref, mempty)
             Just (t :: Decl Symbol Ann) ->
               pure (ref, Decl.declDependencies t)

@@ -12,6 +12,13 @@ import Unison.ShortHash (ShortHash(..))
 
 type ScopeMap = Map [Text] (Maybe Reference, [([Text], Reference)])
 
+splitParts name = fixDouble $ Data.Text.splitOn "." name
+
+fixDouble :: [Text] -> [Text]
+fixDouble ("" : "" : rest) = "." : fixDouble rest
+fixDouble (head : rest) = head : fixDouble rest
+fixDouble [] = []
+
 dots :: [Text] -> Text
 dots = Data.Text.intercalate "."
 
@@ -53,9 +60,9 @@ makeScopeMap :: CodeInfo -> ([([Text], Reference)], Map [Text] (Maybe Reference,
 makeScopeMap codeinfo =
     let names = codeinfo & UCE.Code.codeDeclarationNames & Relation.domain & Map.toAscList
         refs = map fst names
-        paths = map (\r -> (plainName codeinfo r & fst & Data.Text.splitOn ".", r)) refs
+        paths = map (\r -> (plainName codeinfo r & fst & splitParts, r)) refs
     in
-        (paths, foldl f (Map.fromList []) paths)
+        (paths, foldl f Map.empty paths)
     where
         addToChildren :: ChildMap -> [Text] -> (Maybe Reference) -> ChildMap
         addToChildren children path Nothing = case (Map.lookup path children) of
@@ -64,7 +71,9 @@ makeScopeMap codeinfo =
         addToChildren children path (Just ref) = Map.insert path (Just ref) children
 
         addEntry entryMap path ref = 
-            let entryMap' = Map.insert path (ref, Map.empty) entryMap
+            let entryMap' = case (Map.lookup path entryMap) of
+                    Nothing -> Map.insert path (ref, Map.empty) entryMap
+                    Just (_, children) -> Map.insert path (ref, children) entryMap
             in
                 addToParent entryMap' path ref
 

@@ -40,28 +40,46 @@ childrenListing :: p -> Map [Text] (Maybe Reference) -> (ShortHash -> Maybe [Tex
 childrenListing _path children hashRef hrefs codeinfo entryMap =
     children & Map.toAscList & map makeChild & Data.Text.intercalate "\n"
     where
-        makeChild (path, ref) = [qt|
-        <div>
-            <h1 id="${id}">${link}</h1>
-            ${sub}
-            ${body}
-        </div>
-        |]
+        makeChild (path, ref) =
+            if (not hasChildren && ref == Nothing)
+                then ""
+                else
+                    [qt|
+            <div>
+                <h2 id="${id}">${link}</h2>
+                ${debugPath}
+                ${sub}
+                ${body}
+            </div>
+            |]
              where
+                 debugPath = Data.Text.intercalate ", " (map (\f -> "\"" <> f <> "\"") path) <> (
+                    --  case ref of
+                    --      Nothing -> " [index] "
+                    --      Just ref -> (refName ref codeinfo)
+                     if ref == Nothing
+                         then " [index] "
+                         else " [item] "
+                    ) <> (Map.size subChildren & show & Data.Text.pack) <> " children"
                  body = makeBody path ref
-                 sub = subItems path
+                 subChildren = case (Map.lookup path entryMap) of
+                    Nothing -> Map.empty
+                    Just (_, children') -> children'
+                 sub = subItems path subChildren
                  id = case ref of
                     Nothing -> ""
                     Just ref' -> itemHref ref'
-                 link = a "" hrefs path (dots path)
-        subItems path = case (Map.lookup path entryMap) of
-            Nothing -> ""
-            Just (_, children') -> if Map.size children' == 0
-                then ""
-                else
-                    "<div class='children'>" <> (children' & Map.toAscList & map (divv . makeSubChild path) & Data.Text.intercalate "\n") <> "</div>"
+                 hasChildren = Map.size subChildren == 0
+                 link = if hasChildren
+                     then (dots path)
+                     else a "" hrefs path (dots path)
+        subItems path subChildren =
+            if Map.size subChildren == 0
+            then ""
+            else
+                "<div class='children'>" <> (subChildren & Map.toAscList & map (divv . makeSubChild path) & Data.Text.intercalate "\n") <> "</div>"
         makeSubChild parentPath' (childPath, _) = a "sub-name" hrefs childPath (dots (drop (length parentPath') childPath))
-        makeBody _path Nothing = ""
+        makeBody _path Nothing = "[index body]"
         makeBody _path (Just ref) = divv (showItem hrefs hashRef ref codeinfo)
 
 showItem :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> Reference -> CodeInfo -> Text

@@ -1,10 +1,8 @@
 ; Use with this in your Emacs config:
 ;
 ; (use-package reformatter)
-; (reformatter-define ormolu-format-0.0.5.0
-;   :program "ormolu-0.0.5.0"
-;   :args '("--ghc-opt" "-XBangPatterns"
-;           "--ghc-opt" "-XTypeApplications"))
+; (reformatter-define ormolu-format
+;   :program "ormolu")
 
 ((haskell-mode
-   (mode . ormolu-format-0.0.5.0-on-save)))
+   (mode . ormolu-format-on-save)))

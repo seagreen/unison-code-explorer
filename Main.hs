@@ -11,18 +11,22 @@ import UCE.Prelude
 
 data Config = Config
   { configPort :: Int,
+    directory :: String,
     json :: Bool,
-    directory  :: String
+    static :: Bool,
+    dest :: String
   }
   deriving (Show)
 
 main :: IO ()
 main = do
-  logLn "Starting"
   conf <- runParser
   if (json conf) then
     UCE.dumpJson (directory conf)
-  else
+  else if (static conf) then
+    UCE.buildStatic (directory conf) (dest conf)
+  else do
+    logLn "Starting"
     UCE.run (configPort conf) (directory conf)
   where
     runParser :: IO Config
@@ -54,15 +58,25 @@ main = do
               <> value 8080
               <> showDefault
           )
-        <*> switch
-          ( long "json"
-              <> help "Output a JSON dump of the project instead of running a server"
-              -- <> value False
-              <> showDefault
-          )
         <*> strOption
           ( long "directory"
               <> help "Project directory to explore"
               <> value "."
+              <> showDefault
+          )
+        <*> switch
+          ( long "json"
+              <> help "Output a JSON dump of the project instead of running a server"
+              <> showDefault
+          )
+        <*> switch
+          ( long "static"
+              <> help "Generate a static site instead of running a server"
+              <> showDefault
+          )
+        <*> strOption
+          ( long "dest"
+              <> help "For --static, the destination to write the generated documentation"
+              <> value "docs"
               <> showDefault
           )

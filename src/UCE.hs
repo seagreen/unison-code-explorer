@@ -14,6 +14,12 @@ import UCE.Prelude
 import qualified UCE.UI
 import qualified Unison.Util.Relation as Relation
 import qualified UCE.DeclarationJson
+import qualified UCE.Static
+
+buildStatic :: String -> String -> IO ()
+buildStatic projectDirectory outputDirectory = do
+  codeinfo <- UCE.Code.load projectDirectory
+  UCE.Static.build outputDirectory codeinfo
 
 dumpJson :: String -> IO ()
 dumpJson projectDirectory = do

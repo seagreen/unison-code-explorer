@@ -51,7 +51,12 @@ viewBody codeinfo ref =
 
 refName :: Reference -> CodeInfo -> Ref
 refName ref codeinfo =
-  let (name, alt) = case Set.toAscList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
+  let (name, alt) = plainName codeinfo ref
+  in
+  Ref { primaryName = name, rhash = R.toText ref, alt = alt }
+
+plainName :: CodeInfo -> Reference -> (Text, Set Text)
+plainName codeinfo ref = case Set.toAscList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
         Nothing ->
           (showText ref, Set.empty)
         Just [] ->
@@ -60,5 +65,3 @@ refName ref codeinfo =
           (Name.toText n, Set.empty)
         Just (x : others) ->
           (Name.toText x, Set.fromList (map Name.toText others))
-  in
-  Ref { primaryName = name, rhash = R.toText ref, alt = alt }

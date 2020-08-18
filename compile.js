@@ -49,7 +49,11 @@ pre {
     border-radius: 5px;
     background-color: #ccc;
     font-size: 80%;
+}
 
+.children {
+    display: flex;
+    flex-direction: row;
 }
 
 .Constructor {

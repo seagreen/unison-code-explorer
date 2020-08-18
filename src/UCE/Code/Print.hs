@@ -144,7 +144,9 @@ printDoc codebase branch0 termMap typeMap ref nameSet =
     showTypeSource reference =
       printType codebase branch0 reference Set.empty
       -- pure (AnnotatedText (Seq.singleton ("type source", Nothing)))
-    showTermSource referent = pure (AnnotatedText (Seq.singleton ("term source", Nothing)))
+    showTermSource referent =
+      printTerm codebase branch0 (Unison.Referent.toReference referent) Set.empty
+      -- pure (AnnotatedText (Seq.singleton ("term source", Nothing)))
     showSignature _ = pure (AnnotatedText (Seq.singleton ("sig source", Nothing)))
     showResult _ = pure (AnnotatedText (Seq.singleton ("res source", Nothing)))
     -- name =

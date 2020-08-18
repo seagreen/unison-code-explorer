@@ -7,9 +7,9 @@ import Data.String.QM
 import qualified Data.Text
 import UCE.Prelude
 
-escapeHTML :: String -> Text
+escapeHTML :: Text -> Text
 escapeHTML text =
-  text & Data.Text.pack
+  text
     & Data.Text.replace "&" "&amp;"
     & Data.Text.replace "<" "&lt;"
     & Data.Text.replace ">" "&gt;"

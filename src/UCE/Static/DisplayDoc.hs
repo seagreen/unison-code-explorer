@@ -27,8 +27,18 @@ import qualified Unison.TermPrinter as TP
 import qualified Unison.TypePrinter as TypePrinter
 import qualified Unison.Util.Pretty as P
 import qualified Unison.Util.SyntaxText as S
+-- import Unison.Util.AnnotatedText      ( AnnotatedText(..), annotate )
+import qualified Data.List as List
 
 type Pretty = P.Pretty P.ColorText
+
+data Element = Text Text
+    | TermLink Referent.Referent
+    | TypeLink Reference.Reference
+    | TermSource S.SyntaxText
+    | TypeSource S.SyntaxText
+    | Eval S.SyntaxText
+    | Signature S.SyntaxText
 
 -- displayTerm pped terms typeOf eval types tm = case tm of
 --   Term.Ref' r -> eval r >>= \case
@@ -36,17 +46,28 @@ type Pretty = P.Pretty P.ColorText
 --     Just tm -> displayDoc pped terms typeOf eval types tm
 --   _ -> displayDoc pped terms typeOf eval types tm
 
-displayDoc showLink showItem showSignature showResult = go
+displayDoc showTypeSource showTermSource showSignature showResult = go
   where
-    go (DD.DocJoin docs) = docs & toList & map go & Data.Text.concat
-    go (DD.DocBlob txt) = txt & unpack & escapeHTML
-    go (DD.DocLink (DD.LinkTerm (Term.TermLink' r))) = showLink (Referent.toReference r)
-    go (DD.DocLink (DD.LinkType (Term.TypeLink' r))) = showLink r
-    go (DD.DocSource (DD.LinkTerm (Term.TermLink' r))) = showItem (Referent.toReference r)
-    go (DD.DocSource (DD.LinkType (Term.TypeLink' r))) = showItem r
-    go (DD.DocSignature (Term.TermLink' r)) = showSignature r
-    go (DD.DocEvaluate (Term.TermLink' r)) = showResult r
-    go tm = show tm & pack
+    go (DD.DocJoin docs) = fold <$> traverse go docs
+    -- go (DD.DocJoin docs) = docs & toList & map go & List.concat
+    go (DD.DocBlob txt) = pure [txt & Text]
+    go (DD.DocLink (DD.LinkTerm (Term.TermLink' r))) =
+        pure [TermLink r]
+    go (DD.DocLink (DD.LinkType (Term.TypeLink' r))) =
+        pure [TypeLink r]
+    go (DD.DocSource (DD.LinkTerm (Term.TermLink' r))) = do
+        source <- (showTermSource r)
+        pure [TermSource source]
+    go (DD.DocSource (DD.LinkType (Term.TypeLink' r))) = do
+        source <- (showTypeSource r)
+        pure [TypeSource source]
+    go (DD.DocSignature (Term.TermLink' r)) = do
+        sig <- (showSignature r)
+        pure [Signature sig]
+    go (DD.DocEvaluate (Term.TermLink' r)) = do
+        res <- (showResult r)
+        pure [Eval res]
+    go tm = pure [Text (show tm)]
 
 --   prettySignature r = typeOf r >>= \case
 --     Nothing -> pure $ termName (PPE.unsuffixifiedPPE pped) r

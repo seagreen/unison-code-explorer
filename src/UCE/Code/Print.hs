@@ -1,9 +1,11 @@
 module UCE.Code.Print where
 
+import qualified Data.Set as Set
+import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
 import Text.JSON.Generic
 import UCE.Prelude
-import qualified Unison.ABT
+import qualified Unison.ABT as ABT
 import Unison.Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
@@ -25,6 +27,9 @@ import Unison.Util.AnnotatedText (AnnotatedText (..))
 import Unison.Util.Pretty hiding (text, toPlain)
 import Unison.Util.SyntaxText (SyntaxText, toPlain)
 import qualified Unison.Util.SyntaxText as ST
+import qualified UCE.Static.DisplayDoc as DisplayDoc
+import qualified Unison.Builtin.Decls as DD
+import qualified Unison.DataDeclaration as DD
 
 data SegmentKind
   = WithHash {name :: String, hash :: String}
@@ -82,10 +87,70 @@ getTermWithTypeAnnotation codebase id = do
         mType <- getTypeOfTermImpl codebase id
         case mType of
           Nothing -> pure $ Just term
-          Just typ -> pure $ Just (Unison.Term.ann (Unison.ABT.annotation term) term typ)
+          Just typ -> pure $ Just (Unison.Term.ann (ABT.annotation term) term typ)
 
 syntaxToPlain :: SyntaxText -> Text
 syntaxToPlain = Text.pack . toPlain
+
+
+
+termAsDoc term = case term of
+  DD.DocJoin _ -> Just term
+  DD.DocBlob _ -> Just term
+  DD.DocLink _ -> Just term
+  DD.DocSource _ -> Just term
+  DD.DocSignature _ -> Just term
+  DD.DocEvaluate _ -> Just term
+  Unison.Term.Ann' inner _ -> termAsDoc inner
+  _ -> Nothing
+
+debugTerm codebase ref =
+  case ref of
+    Builtin _ -> pure "<builtin>"
+    DerivedId id -> do
+      mTerm <- getTerm codebase id
+      pure $ show mTerm
+
+printDoc ::
+  Codebase IO Symbol ann ->
+  Branch0 IO ->
+  Map Reference (Set Name) ->
+  Map Reference (Set Name) ->
+  Reference ->
+  Set Name ->
+  IO (Maybe [DisplayDoc.Element])
+printDoc codebase branch0 termMap typeMap ref nameSet =
+  case ref of
+    Builtin _ -> pure Nothing
+    DerivedId id -> do
+      mTerm <- getTerm codebase id
+      case mTerm of
+        Nothing -> pure Nothing
+        Just term -> case (termAsDoc term) of
+          Nothing -> pure Nothing
+          Just doc -> do
+            result <- (DisplayDoc.displayDoc showTypeSource showTermSource showSignature showResult doc)
+            pure (Just result)
+      -- mTerm <- getTermWithTypeAnnotation codebase id
+      -- case mTerm of
+      --   Nothing ->
+      --     panic (show (name, id))
+      --   Just term ->
+      --     let pret :: Pretty SyntaxText
+      --         pret =
+      --           prettyBinding (printEnv branch0) (NameOnly name) term
+      --      in pure $ render 80 pret
+  where
+    showTypeSource reference =
+      printType codebase branch0 reference Set.empty
+      -- pure (AnnotatedText (Seq.singleton ("type source", Nothing)))
+    showTermSource referent = pure (AnnotatedText (Seq.singleton ("term source", Nothing)))
+    showSignature _ = pure (AnnotatedText (Seq.singleton ("sig source", Nothing)))
+    showResult _ = pure (AnnotatedText (Seq.singleton ("res source", Nothing)))
+    -- name =
+    --   case setToMaybe nameSet of
+    --     Nothing -> Name.fromString "<name not found>"
+    --     Just n -> n
 
 printTerm ::
   Codebase IO Symbol ann ->

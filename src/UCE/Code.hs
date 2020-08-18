@@ -36,6 +36,7 @@ import qualified Unison.Term as Term
 import Unison.Util.Relation (Relation)
 import qualified Unison.Util.Relation as Relation
 import Unison.Util.SyntaxText (SyntaxText)
+import UCE.Static.DisplayDoc as DisplayDoc
 
 -- A Referent can be a value, function, or constructor.
 --
@@ -56,7 +57,9 @@ data CodeInfo = CodeInfo
     -- with the data constructors filtered out.
     codeDeclarationNames :: Relation Reference Name,
     codeBodies :: Map Reference SyntaxText,
-    codeDependencies :: DependencyGraph
+    codeDependencies :: DependencyGraph,
+    docBodies :: Map Reference [DisplayDoc.Element],
+    showBodies :: Map Reference Text
   }
 
 newtype DependencyGraph
@@ -116,6 +119,8 @@ loadCodeInfo (codebase, head) = do
         Branch.deepTypes head
 
   refsToBodies <- getBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
+  refsToDocBodies <- getDocBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
+  refsToShowBodies <- getShowBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
 
   callGraph <-
     functionCallGraph
@@ -129,7 +134,9 @@ loadCodeInfo (codebase, head) = do
         codeTypeNames = types,
         codeDeclarationNames = termsNoConstructors <> types,
         codeBodies = refsToBodies,
-        codeDependencies = callGraph
+        codeDependencies = callGraph,
+        docBodies = refsToDocBodies,
+        showBodies = refsToShowBodies
       }
 
 -- | Ceremony around 'Term.dependencies' and 'Type.dependencies'.
@@ -179,6 +186,24 @@ getBodies codebase branch0 termMap typeMap = do
   termBodies <- Map.traverseWithKey (printTerm codebase branch0) termMap
   typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap
   pure (termBodies <> typeBodies)
+
+getDocBodies ::
+  Codebase IO Symbol ann ->
+  Branch0 IO ->
+  Map Reference (Set Name) ->
+  Map Reference (Set Name) ->
+  IO (Map Reference [DisplayDoc.Element])
+getDocBodies codebase branch0 termMap typeMap = do
+  Map.traverseMaybeWithKey (printDoc codebase branch0 termMap typeMap) termMap
+
+getShowBodies ::
+  Codebase IO Symbol ann ->
+  Branch0 IO ->
+  Map Reference (Set Name) ->
+  Map Reference (Set Name) ->
+  IO (Map Reference Text)
+getShowBodies codebase branch0 termMap typeMap = do
+  Map.traverseWithKey (\a b -> debugTerm codebase a) termMap
 
 mapMaybeRelation ::
   forall a b c.

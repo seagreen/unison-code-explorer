@@ -34,7 +34,7 @@ error :: Text -> a
 error =
   Prelude.error . toString
 
-panic :: Text -> a
+panic :: HasCallStack => Text -> a
 panic =
   Prelude.error . toString
 

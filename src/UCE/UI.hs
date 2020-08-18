@@ -7,7 +7,7 @@ import qualified Concur.Replica.DOM.Events as P
 import qualified Concur.Replica.DOM.Props as P
 import qualified Data.Set as Set
 import UCE.Code
-import UCE.Prelude
+import UCE.Prelude hiding (State, state)
 import UCE.UI.Declaration
 import UCE.UI.Search
 

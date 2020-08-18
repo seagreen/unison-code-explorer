@@ -9,10 +9,10 @@ import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import UCE.Code
+import UCE.Code.Print (syntaxToPlain)
 import UCE.Prelude
 import qualified Unison.Name as Name
 import qualified Unison.Util.Relation as Relation
-import UCE.Code.Print (syntaxToPlain)
 
 viewBody :: CodeInfo -> Set Reference -> Widget HTML Reference
 viewBody codeinfo refs =
@@ -101,9 +101,9 @@ refName :: Reference -> CodeInfo -> Text
 refName ref codeinfo =
   case Set.toAscList <$> Map.lookup ref (Relation.domain (codeDeclarationNames codeinfo)) of
     Nothing ->
-      showText ref
+      show ref
     Just [] ->
-      showText ref
+      show ref
     Just [n] ->
       Name.toText n
     Just (x : y : []) ->

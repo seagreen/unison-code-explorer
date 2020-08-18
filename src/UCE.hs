@@ -1,20 +1,18 @@
 module UCE where
 
-import qualified Text.JSON.Generic
-
 import Concur.Replica (Attr (..), Attrs, HTML, VDOM (..), clientDriver)
 import qualified Concur.Replica.Run
 import qualified Data.Map.Strict as Map
-import Data.Text.Encoding (decodeUtf8)
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Middleware.Static as Static
 import Network.WebSockets (defaultConnectionOptions)
+import qualified Text.JSON.Generic
 import qualified UCE.Code
+import qualified UCE.DeclarationJson
 import UCE.Prelude
+import qualified UCE.Static
 import qualified UCE.UI
 import qualified Unison.Util.Relation as Relation
-import qualified UCE.DeclarationJson
-import qualified UCE.Static
 
 buildStatic :: String -> String -> IO ()
 buildStatic projectDirectory outputDirectory = do

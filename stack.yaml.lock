@@ -119,13 +119,6 @@ packages:
     git: git@github.com:unisonweb/unison.git
     commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
 - completed:
-    hackage: json-0.10@sha256:d9fc6b07ce92b8894825a17d2cf14799856767eb30c8bf55962baa579207d799,3210
-    pantry-tree:
-      size: 3190
-      sha256: 5654f66b7cd8bf087ac040a9b0a83eb064219eab32230f61a3adeddfdbb4d4cd
-  original:
-    hackage: json-0.10@sha256:d9fc6b07ce92b8894825a17d2cf14799856767eb30c8bf55962baa579207d799,3210
-- completed:
     name: concur-replica
     version: 0.1.0.0
     git: git@github.com:pkamenarsky/concur-replica
@@ -160,6 +153,20 @@ packages:
     subdir: concur-core
     git: git@github.com:ajnsit/concur
     commit: 6c6bcc07b2688182945b28f154a013eee3f624c5
+- completed:
+    hackage: relude-0.7.0.0@sha256:09b7eead4ee71a3a411cef392f9b84afbd0fdc100a3efb54a5e854649417e48d,10948
+    pantry-tree:
+      size: 4249
+      sha256: 22eae9cd3bdea7f1844cfdfc9366fb92570263dff1fb514ff4e4c1903d9b9ed5
+  original:
+    hackage: relude-0.7.0.0
+- completed:
+    hackage: json-0.10@sha256:d9fc6b07ce92b8894825a17d2cf14799856767eb30c8bf55962baa579207d799,3210
+    pantry-tree:
+      size: 3190
+      sha256: 5654f66b7cd8bf087ac040a9b0a83eb064219eab32230f61a3adeddfdbb4d4cd
+  original:
+    hackage: json-0.10@sha256:d9fc6b07ce92b8894825a17d2cf14799856767eb30c8bf55962baa579207d799,3210
 snapshots:
 - completed:
     size: 496112

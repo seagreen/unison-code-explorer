@@ -21,13 +21,14 @@ data Config = Config
 main :: IO ()
 main = do
   conf <- runParser
-  if (json conf) then
-    UCE.dumpJson (directory conf)
-  else if (static conf) then
-    UCE.buildStatic (directory conf) (dest conf)
-  else do
-    logLn "Starting"
-    UCE.run (configPort conf) (directory conf)
+  if (json conf)
+    then UCE.dumpJson (directory conf)
+    else
+      if (static conf)
+        then UCE.buildStatic (directory conf) (dest conf)
+        else do
+          logLine ("Starting on port " <> show (configPort conf))
+          UCE.run (configPort conf) (directory conf)
   where
     runParser :: IO Config
     runParser =

@@ -47,20 +47,16 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
                     [qt|
             <div>
                 <h2 id="${id}">${link}</h2>
-                ${debugPath}
                 ${sub}
                 ${body}
             </div>
             |]
              where
-                 debugPath = Data.Text.intercalate ", " (map (\f -> "\"" <> f <> "\"") path) <> (
-                    --  case ref of
-                    --      Nothing -> " [index] "
-                    --      Just ref -> (refName ref codeinfo)
-                     if ref == Nothing
-                         then " [index] "
-                         else " [item] "
-                    ) <> (Map.size subChildren & show & Data.Text.pack) <> " children"
+                --  debugPath = Data.Text.intercalate ", " (map (\f -> "\"" <> f <> "\"") path) <> (
+                --      if ref == Nothing
+                --          then " [index] "
+                --          else " [item] "
+                --     ) <> (Map.size subChildren & show & Data.Text.pack) <> " children"
                  body = makeBody path ref
                  subChildren = case (Map.lookup path entryMap) of
                     Nothing -> Map.empty

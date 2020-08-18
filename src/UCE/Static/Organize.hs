@@ -70,20 +70,20 @@ makeScopeMap codeinfo =
             _ -> children
         addToChildren children path (Just ref) = Map.insert path (Just ref) children
 
-        addEntry entryMap path ref = 
+        addEntry entryMap path ref childMap = 
             let entryMap' = case (Map.lookup path entryMap) of
-                    Nothing -> Map.insert path (ref, Map.empty) entryMap
+                    Nothing -> Map.insert path (ref, childMap) entryMap
                     Just (_, children) -> Map.insert path (ref, children) entryMap
             in
                 addToParent entryMap' path ref
 
         addToParent mmap path r =
             case (Map.lookup parent mmap) of
-                Nothing -> addEntry mmap parent Nothing
+                Nothing -> addEntry mmap parent Nothing (Map.fromList [(path, r)])
                 Just (item, children) -> Map.insert parent (item, addToChildren children path r) mmap
             where
                 parent = parentPath path
-        f mmap (path, ref) = addEntry mmap path (Just ref)
+        f mmap (path, ref) = addEntry mmap path (Just ref) Map.empty
 
 makeHashMap :: Foldable t => t (a, Reference) -> Map ShortHash a
 makeHashMap paths = foldl f Map.empty paths

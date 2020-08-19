@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 915196389400a89bce5cb713573af19de3ea04076688a14ca8f822dd5563aa6f
+-- hash: f668203ed34a9138b2988c7300fe5c534be2c4f9c24483b32f0fd25692046cda
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -36,6 +36,7 @@ library
       async
     , base
     , bytestring
+    , cmark-gfm
     , concur-core
     , concur-replica
     , containers
@@ -75,6 +76,7 @@ executable unison-code-explorer
       async
     , base
     , bytestring
+    , cmark-gfm
     , concur-core
     , concur-replica
     , containers

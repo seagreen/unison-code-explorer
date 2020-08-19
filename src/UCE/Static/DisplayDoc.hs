@@ -41,6 +41,7 @@ data Element
   | TypeSource S.SyntaxText
   | Eval S.SyntaxText
   | Signature S.SyntaxText
+  deriving (Show)
 
 -- displayTerm pped terms typeOf eval types tm = case tm of
 --   Term.Ref' r -> eval r >>= \case

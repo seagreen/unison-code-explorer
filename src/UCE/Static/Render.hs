@@ -2,6 +2,7 @@
 
 module UCE.Static.Render where
 
+import qualified CMarkGFM
 import Data.Foldable as X (foldl)
 import qualified Data.List
 import qualified Data.Map.Strict as Map
@@ -21,7 +22,22 @@ import Unison.ShortHash (ShortHash (..))
 import Unison.Util.AnnotatedText (AnnotatedText (..))
 import qualified Unison.Util.SyntaxText as SyntaxText
 
--- renderDoc :: DD.Element -> Text
+renderDocs codeinfo hrefs hashRef docs =
+  let (map, result) = foldl process (Map.empty, []) docs
+      raw = Data.List.reverse result & Data.Text.concat
+      formatted = CMarkGFM.commonmarkToHtml [CMarkGFM.optUnsafe] [] raw
+   in Map.foldlWithKey replace formatted map
+  where
+    -- map (renderDoc codeinfo hrefs hashRef) docs & Data.Text.concat
+
+    replace text k v = Data.Text.replace k v text
+    process (map, result) k = case k of
+      DD.Text t -> (map, t : result)
+      _ ->
+        let key = "UNISON" <> show (Map.size map) <> "NOSINU"
+            rendered = (renderDoc codeinfo hrefs hashRef k)
+         in (Map.insert key rendered map, key : result)
+
 renderDoc codeinfo hrefs hashRef = \case
   DD.Text t -> t
   DD.TermLink r ->
@@ -33,12 +49,10 @@ renderDoc codeinfo hrefs hashRef = \case
     where
       contents = primaryName (refName r codeinfo)
   -- primaryName (refName r codeinfo)
-  DD.TermSource s -> codeBody hrefs hashRef s
-  DD.TypeSource s -> codeBody hrefs hashRef s
-  DD.Eval s -> codeBody hrefs hashRef s
-  DD.Signature s -> codeBody hrefs hashRef s
-
-renderDocs codeinfo hrefs hashRef docs = map (renderDoc codeinfo hrefs hashRef) docs & Data.Text.concat
+  DD.TermSource s -> "<pre><code>" <> codeBody hrefs hashRef s <> "</pre></code>"
+  DD.TypeSource s -> "<pre><code>" <> codeBody hrefs hashRef s <> "</pre></code>"
+  DD.Eval s -> "<code>" <> codeBody hrefs hashRef s <> "</code>"
+  DD.Signature s -> "<code>" <> codeBody hrefs hashRef s <> "</code>"
 
 renderBreadcrumb :: [Text] -> Map [Text] Text -> Text
 renderBreadcrumb path hrefs =
@@ -115,19 +129,17 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
 
 showItem :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> Reference -> CodeInfo -> Text
 showItem hrefs hashRef ref codeinfo =
-  [qt| ${doc} <code><pre>${body}</code></pre>|]
+  case Map.lookup ref (docBodies codeinfo) of
+    Nothing -> body
+    Just t -> "<div class='docs'>" <> renderDocs codeinfo hrefs hashRef t <> "</div><details><summary>Source</summary>" <> body <> "</details>"
   where
-    doc :: Text
-    doc = case Map.lookup ref (docBodies codeinfo) of
-      Nothing -> ""
-      Just t -> "<div class='docs'>" <> renderDocs codeinfo hrefs hashRef t <> "</div>"
-    -- debug = case Map.lookup ref (showBodies codeinfo) of
-    --     Nothing -> "no show body? I guess"
-    --     Just t -> t
-    body :: Text
-    body = case Map.lookup ref (codeBodies codeinfo) of
-      Nothing -> "No BODY FOUND"
-      Just t -> codeBody hrefs hashRef t
+    body =
+      "<pre><code>"
+        <> ( case Map.lookup ref (codeBodies codeinfo) of
+               Nothing -> "No BODY FOUND"
+               Just t -> codeBody hrefs hashRef t
+           )
+        <> "</code></pre>"
 
 codeBody :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> AnnotatedText SyntaxText.Element -> Text
 codeBody hrefs hashRef (AnnotatedText items) =
@@ -192,7 +204,7 @@ style =
  }
 
  .docs {
-     white-space: pre-wrap;
+     line-height: 1.5;
  }
   
  pre {
@@ -200,6 +212,13 @@ style =
      box-shadow: 0 0 2px;
      border-radius: 3px;
  }
+
+ p > code {
+    background-color: #fafafa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 0 2px inset #aaa;
+}
   
  .sub-name {
      display: inline-block;

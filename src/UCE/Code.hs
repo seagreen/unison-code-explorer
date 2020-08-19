@@ -17,7 +17,8 @@ import qualified Data.Text.IO as TIO
 import System.IO (stderr)
 import UCE.Code.Print
 import UCE.Prelude hiding (head)
-import Unison.Codebase (Codebase)
+import qualified Unison.Codebase.Runtime as Runtime
+import Unison.Codebase (Codebase, BuiltinAnnotation)
 import qualified Unison.Codebase as Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
@@ -37,6 +38,7 @@ import Unison.Util.Relation (Relation)
 import qualified Unison.Util.Relation as Relation
 import Unison.Util.SyntaxText (SyntaxText)
 import UCE.Static.DisplayDoc as DisplayDoc
+import qualified Unison.Runtime.Rt1IO as Rt1
 
 -- A Referent can be a value, function, or constructor.
 --
@@ -77,7 +79,7 @@ shallowReferences ref (DependencyGraph deps) =
 
 load :: String -> IO CodeInfo
 load projectDirectory =
-  loadCodeInfo =<< loadCodebaseAndBranch projectDirectory
+  (loadCodeInfo Rt1.runtime) =<< loadCodebaseAndBranch projectDirectory
 
 loadCodebaseAndBranch :: String -> IO (Codebase IO Symbol Ann, Branch0 IO)
 loadCodebaseAndBranch projectDirectory = do
@@ -106,8 +108,8 @@ loadCodebaseAndBranch projectDirectory = do
     formatAnn =
       Serialization.Format (pure External) (\_ -> pure ())
 
-loadCodeInfo :: (Codebase IO Symbol Ann, Branch0 IO) -> IO CodeInfo
-loadCodeInfo (codebase, head) = do
+loadCodeInfo :: Runtime.Runtime Symbol -> (Codebase IO Symbol Ann, Branch0 IO) -> IO CodeInfo
+loadCodeInfo runtime (codebase, head) = do
   let terms :: Relation Referent Name
       terms =
         Branch.deepTerms head
@@ -119,7 +121,7 @@ loadCodeInfo (codebase, head) = do
         Branch.deepTypes head
 
   refsToBodies <- getBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
-  refsToDocBodies <- getDocBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
+  refsToDocBodies <- getDocBodies codebase head runtime (Relation.domain termsNoConstructors) (Relation.domain types)
   refsToShowBodies <- getShowBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
 
   callGraph <-
@@ -188,13 +190,15 @@ getBodies codebase branch0 termMap typeMap = do
   pure (termBodies <> typeBodies)
 
 getDocBodies ::
+  (Monoid ann, BuiltinAnnotation ann) =>
   Codebase IO Symbol ann ->
   Branch0 IO ->
+  Runtime.Runtime Symbol ->
   Map Reference (Set Name) ->
   Map Reference (Set Name) ->
   IO (Map Reference [DisplayDoc.Element])
-getDocBodies codebase branch0 termMap typeMap = do
-  Map.traverseMaybeWithKey (printDoc codebase branch0 termMap typeMap) termMap
+getDocBodies codebase branch0 runtime termMap typeMap = do
+  Map.traverseMaybeWithKey (printDoc codebase branch0 runtime termMap typeMap) termMap
 
 getShowBodies ::
   Codebase IO Symbol ann ->

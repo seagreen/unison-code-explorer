@@ -121,7 +121,7 @@ showItem hrefs hashRef ref codeinfo =
   where
     doc :: Text
     doc = case Map.lookup ref (docBodies codeinfo) of
-        Nothing -> "no docs I guess"
+        Nothing -> ""
         Just t -> "<div class='docs'>" <> renderDocs codeinfo hrefs hashRef t <> "</div>"
     -- debug = case Map.lookup ref (showBodies codeinfo) of
     --     Nothing -> "no show body? I guess"

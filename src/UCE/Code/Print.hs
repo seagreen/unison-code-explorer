@@ -1,24 +1,27 @@
 module UCE.Code.Print where
 
-import qualified Data.Set as Set
+import qualified Data.Map as Map
 import qualified Data.Sequence as Seq
+import qualified Data.Set as Set
 import qualified Data.Text as Text
 import Text.JSON.Generic
 import UCE.Prelude
+import qualified UCE.Static.DisplayDoc as DisplayDoc
 import qualified Unison.ABT as ABT
-import qualified Data.Map as Map
-import qualified Unison.Codebase.Editor.HandleCommand
-import qualified Unison.Parser
+import qualified Unison.Builtin.Decls as DD
 import Unison.Codebase
-import qualified Unison.Codebase.Runtime as Runtime
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
+import qualified Unison.Codebase.Editor.HandleCommand
+import qualified Unison.Codebase.Runtime as Runtime
 import Unison.DataDeclaration (Decl)
+import qualified Unison.DataDeclaration as DD
 import Unison.DeclPrinter
 import Unison.HashQualified
 import Unison.Name (Name)
 import qualified Unison.Name as Name
 import Unison.Names3
+import qualified Unison.Parser
 import qualified Unison.PrettyPrintEnv as PPE
 import Unison.Reference (Id (..), Reference (..))
 import qualified Unison.Reference
@@ -32,9 +35,6 @@ import Unison.Util.AnnotatedText (AnnotatedText (..))
 import Unison.Util.Pretty hiding (text, toPlain)
 import Unison.Util.SyntaxText (SyntaxText, toPlain)
 import qualified Unison.Util.SyntaxText as ST
-import qualified UCE.Static.DisplayDoc as DisplayDoc
-import qualified Unison.Builtin.Decls as DD
-import qualified Unison.DataDeclaration as DD
 
 data SegmentKind
   = WithHash {name :: String, hash :: String}
@@ -97,8 +97,6 @@ getTermWithTypeAnnotation codebase id = do
 syntaxToPlain :: SyntaxText -> Text
 syntaxToPlain = Text.pack . toPlain
 
-
-
 termAsDoc term = case term of
   DD.DocJoin _ -> Just term
   DD.DocBlob _ -> Just term
@@ -119,7 +117,6 @@ debugTerm codebase ref =
 getOrDie map k = case Map.lookup k map of
   Nothing -> pure (Set.empty)
   Just m -> pure m
-
 
 printDoc ::
   (Monoid ann, BuiltinAnnotation ann) =>
@@ -143,70 +140,72 @@ printDoc codebase branch0 runtime termMap typeMap ref nameSet =
           Just doc -> do
             result <- (DisplayDoc.displayDoc showTypeSource showTermSource showSignature showResult doc)
             pure (Just result)
-      -- mTerm <- getTermWithTypeAnnotation codebase id
-      -- case mTerm of
-      --   Nothing ->
-      --     panic (show (name, id))
-      --   Just term ->
-      --     let pret :: Pretty SyntaxText
-      --         pret =
-      --           prettyBinding (printEnv branch0) (NameOnly name) term
-      --      in pure $ render 80 pret
   where
+    -- mTerm <- getTermWithTypeAnnotation codebase id
+    -- case mTerm of
+    --   Nothing ->
+    --     panic (show (name, id))
+    --   Just term ->
+    --     let pret :: Pretty SyntaxText
+    --         pret =
+    --           prettyBinding (printEnv branch0) (NameOnly name) term
+    --      in pure $ render 80 pret
+
     showTypeSource reference = do
       names <- getOrDie termMap reference
       printType codebase branch0 reference names
-      -- pure (AnnotatedText (Seq.singleton ("type source", Nothing)))
+    -- pure (AnnotatedText (Seq.singleton ("type source", Nothing)))
 
     -- showTermSource referent = do
     --   names <- getOrDie typeMap (Unison.Referent.toReference referent)
     --   printTerm codebase branch0 (Unison.Referent.toReference referent) names
     --   -- pure (AnnotatedText (Seq.singleton ("term source", Nothing)))
     showTermSource r = case r of
-        Unison.Referent.Ref (Unison.Reference.Builtin n) -> pure (AnnotatedText (Seq.singleton (n & Text.unpack, Nothing)))
-        Unison.Referent.Ref ref' -> do
-          names <- getOrDie termMap ref'
-          printTerm codebase branch0 ref' names
-        Unison.Referent.Con r' _ _ -> do
-          names <- getOrDie termMap r'
-          printTerm codebase branch0 r' names
+      Unison.Referent.Ref (Unison.Reference.Builtin n) -> pure (AnnotatedText (Seq.singleton (n & Text.unpack, Nothing)))
+      Unison.Referent.Ref ref' -> do
+        names <- getOrDie termMap ref'
+        printTerm codebase branch0 ref' names
+      Unison.Referent.Con r' _ _ -> do
+        names <- getOrDie termMap r'
+        printTerm codebase branch0 r' names
 
     showSignature r = do
       let x = Unison.Codebase.getTypeOfTerm codebase (Unison.Referent.toReference r)
       typeOf <- x
       case typeOf of
         Nothing -> pure (AnnotatedText (Seq.singleton ("No signature found", Nothing)))
-        Just t -> 
-          pure $ render 80 $
-            TypePrinter.pretty0 (printEnv branch0) Map.empty (-1) t
+        Just t ->
+          pure $
+            render 80 $
+              TypePrinter.pretty0 (printEnv branch0) Map.empty (-1) t
 
     showResult r = case r of
-        Unison.Referent.Ref (Unison.Reference.Builtin n) -> pure (AnnotatedText (Seq.singleton (n & Text.unpack, Nothing)))
-        Unison.Referent.Ref (Unison.Reference.DerivedId id) -> do
-          let ref' = (Unison.Reference.DerivedId id)
-          term <- getTerm codebase id
-          case term of
-            Nothing -> pure (AnnotatedText (Seq.singleton ("Term not found", Nothing)))
-            Just term' -> do
-                result <- eval1 runtime codebase (printEnv branch0) term'
-                case result of
-                  Left error' -> pure (AnnotatedText (Seq.singleton (show error', Nothing)))
-                  Right term'' -> 
-                      let pret :: Pretty SyntaxText
-                          pret =
-                            let term''' = printAnnotate (printEnv branch0) term'' in
-                            let (im', _uses) = calcImports Map.empty term''' in
-                            pretty0 (printEnv branch0) (ac 0 Block im' MaybeDoc) term'''
-                            -- prettyBinding (printEnv branch0) (NameOnly "EVAL") term''
-                      in pure $ render 80 pret
-                -- names <- getOrDie termMap ref'
-        Unison.Referent.Con r' _ _ -> do
-          names <- getOrDie termMap r'
-          printTerm codebase branch0 r' names
+      Unison.Referent.Ref (Unison.Reference.Builtin n) -> pure (AnnotatedText (Seq.singleton (n & Text.unpack, Nothing)))
+      Unison.Referent.Ref (Unison.Reference.DerivedId id) -> do
+        let ref' = (Unison.Reference.DerivedId id)
+        term <- getTerm codebase id
+        case term of
+          Nothing -> pure (AnnotatedText (Seq.singleton ("Term not found", Nothing)))
+          Just term' -> do
+            result <- eval1 runtime codebase (printEnv branch0) term'
+            case result of
+              Left error' -> pure (AnnotatedText (Seq.singleton (show error', Nothing)))
+              Right term'' ->
+                let pret :: Pretty SyntaxText
+                    pret =
+                      let term''' = printAnnotate (printEnv branch0) term''
+                       in let (im', _uses) = calcImports Map.empty term'''
+                           in pretty0 (printEnv branch0) (ac 0 Block im' MaybeDoc) term'''
+                 in -- prettyBinding (printEnv branch0) (NameOnly "EVAL") term''
+                    pure $ render 80 pret
+      -- names <- getOrDie termMap ref'
+      Unison.Referent.Con r' _ _ -> do
+        names <- getOrDie termMap r'
+        printTerm codebase branch0 r' names
 
-    -- let codeLookup = Codebase.toCodeLookup codebase
-    -- r <- Runtime.evaluateTerm codeLookup ppe rt tm
-    -- pure $ r <&> Term.amap (const Parser.External)
+-- let codeLookup = Codebase.toCodeLookup codebase
+-- r <- Runtime.evaluateTerm codeLookup ppe rt tm
+-- pure $ r <&> Term.amap (const Parser.External)
 
 -- eval1 :: PPE.PrettyPrintEnv -> Term v Ann -> _
 eval1 runtime codebase ppe tm = do

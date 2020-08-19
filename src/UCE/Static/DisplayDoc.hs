@@ -11,6 +11,8 @@ module UCE.Static.DisplayDoc where
 -- import Unison.Type (Type)
 -- import Unison.Var (Var)
 
+-- import Unison.Util.AnnotatedText      ( AnnotatedText(..), annotate )
+import qualified Data.List as List
 import Data.Text (pack, unpack)
 import qualified Data.Text
 import UCE.Prelude
@@ -27,18 +29,17 @@ import qualified Unison.TermPrinter as TP
 import qualified Unison.TypePrinter as TypePrinter
 import qualified Unison.Util.Pretty as P
 import qualified Unison.Util.SyntaxText as S
--- import Unison.Util.AnnotatedText      ( AnnotatedText(..), annotate )
-import qualified Data.List as List
 
 type Pretty = P.Pretty P.ColorText
 
-data Element = Text Text
-    | TermLink Referent.Referent
-    | TypeLink Reference.Reference
-    | TermSource S.SyntaxText
-    | TypeSource S.SyntaxText
-    | Eval S.SyntaxText
-    | Signature S.SyntaxText
+data Element
+  = Text Text
+  | TermLink Referent.Referent
+  | TypeLink Reference.Reference
+  | TermSource S.SyntaxText
+  | TypeSource S.SyntaxText
+  | Eval S.SyntaxText
+  | Signature S.SyntaxText
 
 -- displayTerm pped terms typeOf eval types tm = case tm of
 --   Term.Ref' r -> eval r >>= \case
@@ -52,21 +53,21 @@ displayDoc showTypeSource showTermSource showSignature showResult = go
     -- go (DD.DocJoin docs) = docs & toList & map go & List.concat
     go (DD.DocBlob txt) = pure [txt & Text]
     go (DD.DocLink (DD.LinkTerm (Term.TermLink' r))) =
-        pure [TermLink r]
+      pure [TermLink r]
     go (DD.DocLink (DD.LinkType (Term.TypeLink' r))) =
-        pure [TypeLink r]
+      pure [TypeLink r]
     go (DD.DocSource (DD.LinkTerm (Term.TermLink' r))) = do
-        source <- (showTermSource r)
-        pure [TermSource source]
+      source <- (showTermSource r)
+      pure [TermSource source]
     go (DD.DocSource (DD.LinkType (Term.TypeLink' r))) = do
-        source <- (showTypeSource r)
-        pure [TypeSource source]
+      source <- (showTypeSource r)
+      pure [TypeSource source]
     go (DD.DocSignature (Term.TermLink' r)) = do
-        sig <- (showSignature r)
-        pure [Signature sig]
+      sig <- (showSignature r)
+      pure [Signature sig]
     go (DD.DocEvaluate (Term.TermLink' r)) = do
-        res <- (showResult r)
-        pure [Eval res]
+      res <- (showResult r)
+      pure [Eval res]
     go tm = pure [Text (show tm)]
 
 --   prettySignature r = typeOf r >>= \case

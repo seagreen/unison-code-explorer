@@ -17,12 +17,13 @@ import qualified Data.Text.IO as TIO
 import System.IO (stderr)
 import UCE.Code.Print
 import UCE.Prelude hiding (head)
-import qualified Unison.Codebase.Runtime as Runtime
-import Unison.Codebase (Codebase, BuiltinAnnotation)
+import UCE.Static.DisplayDoc as DisplayDoc
+import Unison.Codebase (BuiltinAnnotation, Codebase)
 import qualified Unison.Codebase as Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
+import qualified Unison.Codebase.Runtime as Runtime
 import qualified Unison.Codebase.Serialization as Serialization
 import Unison.Codebase.Serialization.V1 (formatSymbol)
 import Unison.DataDeclaration (Decl)
@@ -31,14 +32,13 @@ import Unison.Name (Name)
 import Unison.Parser (Ann (External))
 import Unison.Reference (Reference (..))
 import Unison.Referent (Referent, toTermReference)
+import qualified Unison.Runtime.Rt1IO as Rt1
 import Unison.Symbol (Symbol)
 import Unison.Term (Term)
 import qualified Unison.Term as Term
 import Unison.Util.Relation (Relation)
 import qualified Unison.Util.Relation as Relation
 import Unison.Util.SyntaxText (SyntaxText)
-import UCE.Static.DisplayDoc as DisplayDoc
-import qualified Unison.Runtime.Rt1IO as Rt1
 
 -- A Referent can be a value, function, or constructor.
 --

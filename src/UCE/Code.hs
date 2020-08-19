@@ -189,14 +189,6 @@ getBodies codebase branch0 termMap typeMap = do
   typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap
   pure (termBodies <> typeBodies)
 
-getDocBodies ::
-  (Monoid ann, BuiltinAnnotation ann) =>
-  Codebase IO Symbol ann ->
-  Branch0 IO ->
-  Runtime.Runtime Symbol ->
-  Map Reference (Set Name) ->
-  Map Reference (Set Name) ->
-  IO (Map Reference [DisplayDoc.Element])
 getDocBodies codebase branch0 runtime termMap typeMap = do
   Map.traverseMaybeWithKey (printDoc codebase branch0 runtime termMap typeMap) termMap
 

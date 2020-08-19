@@ -105,6 +105,7 @@ termAsDoc term = case term of
   DD.DocSignature _ -> Just term
   DD.DocEvaluate _ -> Just term
   Unison.Term.Ann' inner _ -> termAsDoc inner
+  -- Unison.Term.Ref' _ -> Just term  -- @[include]
   _ -> Nothing
 
 debugTerm codebase ref =
@@ -118,16 +119,6 @@ getOrDie map k = case Map.lookup k map of
   Nothing -> pure (Set.empty)
   Just m -> pure m
 
-printDoc ::
-  (Monoid ann, BuiltinAnnotation ann) =>
-  Codebase IO Symbol ann ->
-  Branch0 IO ->
-  Runtime.Runtime Symbol ->
-  Map Reference (Set Name) ->
-  Map Reference (Set Name) ->
-  Reference ->
-  Set Name ->
-  IO (Maybe [DisplayDoc.Element])
 printDoc codebase branch0 runtime termMap typeMap ref nameSet =
   case ref of
     Builtin _ -> pure Nothing
@@ -138,7 +129,7 @@ printDoc codebase branch0 runtime termMap typeMap ref nameSet =
         Just term -> case (termAsDoc term) of
           Nothing -> pure Nothing
           Just doc -> do
-            result <- (DisplayDoc.displayDoc showTypeSource showTermSource showSignature showResult doc)
+            result <- (DisplayDoc.displayDoc showTypeSource showTermSource showSignature showResult getInclude doc)
             pure (Just result)
   where
     -- mTerm <- getTermWithTypeAnnotation codebase id
@@ -179,10 +170,26 @@ printDoc codebase branch0 runtime termMap typeMap ref nameSet =
             render 80 $
               TypePrinter.pretty0 (printEnv branch0) Map.empty (-1) t
 
+    getResult id = do
+      term <- getTerm codebase id
+      case term of
+        Nothing -> pure Nothing
+        Just term' -> do
+          result <- eval1 runtime codebase (printEnv branch0) term'
+          pure (Just result)
+
+    getInclude r = case r of
+      (Unison.Reference.DerivedId id) -> do
+        evaluated <- getResult id
+        pure $ case evaluated of
+          Nothing -> Nothing
+          Just (Left _) -> Nothing
+          Just (Right included) -> Just included
+      _ -> pure Nothing
+
     showResult r = case r of
       Unison.Referent.Ref (Unison.Reference.Builtin n) -> pure (AnnotatedText (Seq.singleton (n & Text.unpack, Nothing)))
       Unison.Referent.Ref (Unison.Reference.DerivedId id) -> do
-        let ref' = (Unison.Reference.DerivedId id)
         term <- getTerm codebase id
         case term of
           Nothing -> pure (AnnotatedText (Seq.singleton ("Term not found", Nothing)))

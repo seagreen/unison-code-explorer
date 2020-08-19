@@ -24,6 +24,7 @@ import qualified Unison.NamePrinter as NP
 import qualified Unison.PrettyPrintEnv as PPE
 import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
+import qualified Unison.Term
 import qualified Unison.Term as Term
 import qualified Unison.TermPrinter as TP
 import qualified Unison.TypePrinter as TypePrinter
@@ -47,7 +48,7 @@ data Element
 --     Just tm -> displayDoc pped terms typeOf eval types tm
 --   _ -> displayDoc pped terms typeOf eval types tm
 
-displayDoc showTypeSource showTermSource showSignature showResult = go
+displayDoc showTypeSource showTermSource showSignature showResult getInclude = go
   where
     go (DD.DocJoin docs) = fold <$> traverse go docs
     -- go (DD.DocJoin docs) = docs & toList & map go & List.concat
@@ -68,6 +69,11 @@ displayDoc showTypeSource showTermSource showSignature showResult = go
     go (DD.DocEvaluate (Term.TermLink' r)) = do
       res <- (showResult r)
       pure [Eval res]
+    go (Unison.Term.Ref' r) = do
+      evaled <- getInclude r
+      case evaled of
+        Nothing -> pure [Text "Unable to process include"]
+        Just included -> go included
     go tm = pure [Text (show tm)]
 
 --   prettySignature r = typeOf r >>= \case

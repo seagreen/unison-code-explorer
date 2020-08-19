@@ -46,6 +46,7 @@ dependencies:
   - wai
   - wai-middleware-static
   - websockets
+  - cmark-gfm
 
   # Other
 

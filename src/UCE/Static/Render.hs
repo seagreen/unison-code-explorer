@@ -31,12 +31,20 @@ renderDocs codeinfo hrefs hashRef docs =
     -- map (renderDoc codeinfo hrefs hashRef) docs & Data.Text.concat
 
     replace text k v = Data.Text.replace k v text
-    process (map, result) k = case k of
-      DD.Text t -> (map, t : result)
+    process (replacementMap, result) k = case k of
+      DD.Text t -> (replacementMap, t : result)
       _ ->
-        let key = "UNISON" <> show (Map.size map) <> "NOSINU"
+        -- This "key" is the way that we make our custom doc syntax play nice
+        -- with an off-the-shelf markdown parser. We replace any instances of
+        -- a @[pragma] with a unique token (e.g. UNISON10NOSINU), then have
+        -- cmark-gfm render it to html, and then go through and replace the
+        -- tokens with our custom-rendered widgets.
+        -- We can't get too fancy with the tokens because we need them to be
+        -- something that cmark-gfm won't alter in any way (for example "<"
+        -- turns into "&lt;" when it's inside of a code block).
+        let key = "UNISON" <> show (Map.size replacementMap) <> "NOSINU"
             rendered = (renderDoc codeinfo hrefs hashRef k)
-         in (Map.insert key rendered map, key : result)
+         in (Map.insert key rendered replacementMap, key : result)
 
 renderDoc codeinfo hrefs hashRef = \case
   DD.Text t -> t

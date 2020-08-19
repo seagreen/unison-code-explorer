@@ -23,10 +23,10 @@ import Unison.Util.AnnotatedText (AnnotatedText (..))
 import qualified Unison.Util.SyntaxText as SyntaxText
 
 renderDocs codeinfo hrefs hashRef docs =
-  let (map, result) = foldl process (Map.empty, []) docs
+  let (replacementMap, result) = foldl process (Map.empty, []) docs
       raw = Data.List.reverse result & Data.Text.concat
-      formatted = CMarkGFM.commonmarkToHtml [CMarkGFM.optUnsafe] [] raw
-   in Map.foldlWithKey replace formatted map
+      formatted = CMarkGFM.commonmarkToHtml [CMarkGFM.optUnsafe] [CMarkGFM.extTaskList, CMarkGFM.extTable, CMarkGFM.extStrikethrough, CMarkGFM.extAutolink] raw
+   in Map.foldlWithKey replace formatted replacementMap
   where
     -- map (renderDoc codeinfo hrefs hashRef) docs & Data.Text.concat
 

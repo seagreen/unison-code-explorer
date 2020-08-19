@@ -17,11 +17,13 @@ import qualified Data.Text.IO as TIO
 import System.IO (stderr)
 import UCE.Code.Print
 import UCE.Prelude hiding (head)
-import Unison.Codebase (Codebase)
+import UCE.Static.DisplayDoc as DisplayDoc
+import Unison.Codebase (BuiltinAnnotation, Codebase)
 import qualified Unison.Codebase as Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
+import qualified Unison.Codebase.Runtime as Runtime
 import qualified Unison.Codebase.Serialization as Serialization
 import Unison.Codebase.Serialization.V1 (formatSymbol)
 import Unison.DataDeclaration (Decl)
@@ -30,6 +32,7 @@ import Unison.Name (Name)
 import Unison.Parser (Ann (External))
 import Unison.Reference (Reference (..))
 import Unison.Referent (Referent, toTermReference)
+import qualified Unison.Runtime.Rt1IO as Rt1
 import Unison.Symbol (Symbol)
 import Unison.Term (Term)
 import qualified Unison.Term as Term
@@ -56,7 +59,9 @@ data CodeInfo = CodeInfo
     -- with the data constructors filtered out.
     codeDeclarationNames :: Relation Reference Name,
     codeBodies :: Map Reference SyntaxText,
-    codeDependencies :: DependencyGraph
+    codeDependencies :: DependencyGraph,
+    docBodies :: Map Reference [DisplayDoc.Element],
+    showBodies :: Map Reference Text
   }
 
 newtype DependencyGraph
@@ -74,7 +79,7 @@ shallowReferences ref (DependencyGraph deps) =
 
 load :: String -> IO CodeInfo
 load projectDirectory =
-  loadCodeInfo =<< loadCodebaseAndBranch projectDirectory
+  (loadCodeInfo Rt1.runtime) =<< loadCodebaseAndBranch projectDirectory
 
 loadCodebaseAndBranch :: String -> IO (Codebase IO Symbol Ann, Branch0 IO)
 loadCodebaseAndBranch projectDirectory = do
@@ -103,8 +108,8 @@ loadCodebaseAndBranch projectDirectory = do
     formatAnn =
       Serialization.Format (pure External) (\_ -> pure ())
 
-loadCodeInfo :: (Codebase IO Symbol Ann, Branch0 IO) -> IO CodeInfo
-loadCodeInfo (codebase, head) = do
+loadCodeInfo :: Runtime.Runtime Symbol -> (Codebase IO Symbol Ann, Branch0 IO) -> IO CodeInfo
+loadCodeInfo runtime (codebase, head) = do
   let terms :: Relation Referent Name
       terms =
         Branch.deepTerms head
@@ -116,6 +121,8 @@ loadCodeInfo (codebase, head) = do
         Branch.deepTypes head
 
   refsToBodies <- getBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
+  refsToDocBodies <- getDocBodies codebase head runtime (Relation.domain termsNoConstructors) (Relation.domain types)
+  refsToShowBodies <- getShowBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
 
   callGraph <-
     functionCallGraph
@@ -129,7 +136,9 @@ loadCodeInfo (codebase, head) = do
         codeTypeNames = types,
         codeDeclarationNames = termsNoConstructors <> types,
         codeBodies = refsToBodies,
-        codeDependencies = callGraph
+        codeDependencies = callGraph,
+        docBodies = refsToDocBodies,
+        showBodies = refsToShowBodies
       }
 
 -- | Ceremony around 'Term.dependencies' and 'Type.dependencies'.
@@ -179,6 +188,18 @@ getBodies codebase branch0 termMap typeMap = do
   termBodies <- Map.traverseWithKey (printTerm codebase branch0) termMap
   typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap
   pure (termBodies <> typeBodies)
+
+getDocBodies codebase branch0 runtime termMap typeMap = do
+  Map.traverseMaybeWithKey (printDoc codebase branch0 runtime termMap typeMap) termMap
+
+getShowBodies ::
+  Codebase IO Symbol ann ->
+  Branch0 IO ->
+  Map Reference (Set Name) ->
+  Map Reference (Set Name) ->
+  IO (Map Reference Text)
+getShowBodies codebase branch0 termMap typeMap = do
+  Map.traverseWithKey (\a b -> debugTerm codebase a) termMap
 
 mapMaybeRelation ::
   forall a b c.

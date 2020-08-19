@@ -8,14 +8,37 @@ import qualified Data.Map.Strict as Map
 import Data.String.QM
 import qualified Data.Text
 import UCE.Code
+import UCE.DeclarationJson (primaryName, refName)
 import UCE.Prelude
+import qualified UCE.Static.DisplayDoc as DD
 import UCE.Static.Organize (dots, itemHref, parentPath)
+import UCE.Static.Utils
 import qualified Unison.HashQualified as Unison.HashQualified
 import Unison.Reference (toShortHash)
+import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import Unison.ShortHash (ShortHash (..))
 import Unison.Util.AnnotatedText (AnnotatedText (..))
 import qualified Unison.Util.SyntaxText as SyntaxText
+
+-- renderDoc :: DD.Element -> Text
+renderDoc codeinfo hrefs hashRef = \case
+  DD.Text t -> t
+  DD.TermLink r ->
+    hashLink "termLink" hrefs hashRef (Just $ Referent.toShortHash r) contents
+    where
+      contents = primaryName (refName (Referent.toReference r) codeinfo)
+  DD.TypeLink r ->
+    hashLink "termLink" hrefs hashRef (Just $ Reference.toShortHash r) contents
+    where
+      contents = primaryName (refName r codeinfo)
+  -- primaryName (refName r codeinfo)
+  DD.TermSource s -> codeBody hrefs hashRef s
+  DD.TypeSource s -> codeBody hrefs hashRef s
+  DD.Eval s -> codeBody hrefs hashRef s
+  DD.Signature s -> codeBody hrefs hashRef s
+
+renderDocs codeinfo hrefs hashRef docs = map (renderDoc codeinfo hrefs hashRef) docs & Data.Text.concat
 
 renderBreadcrumb :: [Text] -> Map [Text] Text -> Text
 renderBreadcrumb path hrefs =
@@ -49,12 +72,7 @@ renderPage path ref children _href hashRef hrefs codeinfo entryMap =
 divv :: Text -> Text
 divv text = "<div>" <> text <> "</div>"
 
-a :: Text -> Map [Text] Text -> [Text] -> Text -> Text
-a cls hrefs path contents = case (Map.lookup path hrefs) of
-  Nothing -> contents
-  Just href -> [qt|<a class="${cls}" href="${href}">${contents}</a>|]
-
-childrenListing :: p -> Map [Text] (Maybe Reference) -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
+childrenListing :: [Text] -> Map [Text] (Maybe Reference) -> (ShortHash -> Maybe [Text]) -> Map [Text] Text -> CodeInfo -> Map [Text] (a, Map [Text] b) -> Text
 childrenListing _path children hashRef hrefs codeinfo entryMap =
   children & Map.toAscList & map makeChild & Data.Text.intercalate "\n"
   where
@@ -81,10 +99,12 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
           Nothing -> ""
           Just ref' -> itemHref ref'
         hasChildren = Map.size subChildren == 0
+        shortName = (drop (length _path) path)
         link =
           if hasChildren
-            then (dots path)
-            else a "" hrefs path (dots path)
+            then (dots shortName)
+            else a "" hrefs path (dots shortName)
+
     subItems path subChildren =
       if Map.size subChildren == 0
         then ""
@@ -95,8 +115,16 @@ childrenListing _path children hashRef hrefs codeinfo entryMap =
 
 showItem :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> Reference -> CodeInfo -> Text
 showItem hrefs hashRef ref codeinfo =
-  [qt|<code><pre>${body}</code></pre>|]
+  [qt| ${doc} <code><pre>${body}</code></pre>|]
   where
+    doc :: Text
+    doc = case Map.lookup ref (docBodies codeinfo) of
+      Nothing -> ""
+      Just t -> "<div class='docs'>" <> renderDocs codeinfo hrefs hashRef t <> "</div>"
+    -- debug = case Map.lookup ref (showBodies codeinfo) of
+    --     Nothing -> "no show body? I guess"
+    --     Just t -> t
+    body :: Text
     body = case Map.lookup ref (codeBodies codeinfo) of
       Nothing -> "No BODY FOUND"
       Just t -> codeBody hrefs hashRef t
@@ -105,26 +133,21 @@ codeBody :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> AnnotatedText Synt
 codeBody hrefs hashRef (AnnotatedText items) =
   toList items & map (renderElement hrefs hashRef) & Data.Text.concat
 
-escapeHTML :: String -> Text
-escapeHTML text =
-  text & Data.Text.pack
-    & Data.Text.replace "&" "&amp;"
-    & Data.Text.replace "<" "&lt;"
-    & Data.Text.replace ">" "&gt;"
-
-refHash :: ShortHash -> (Text, Bool)
-refHash (Builtin b) = (b, False)
-refHash (ShortHash h Nothing _) = (h, True)
-refHash (ShortHash h (Just suffix) _) = (h <> suffix, True)
+hashLink cls hrefs hashRef hash contents =
+  case (hash >>= hashRef) of
+    Nothing -> [qt|<span class="${cls}">${escaped}</span>|]
+    Just h -> a cls hrefs h escaped
+  where
+    escaped = escapeHTML contents
 
 renderElement :: Map [Text] Text -> (ShortHash -> Maybe [Text]) -> (String, Maybe SyntaxText.Element) -> Text
-renderElement _hrefs _hashRef (contents, Nothing) = escapeHTML contents
+renderElement _hrefs _hashRef (contents, Nothing) = escapeHTML (Data.Text.pack contents)
 renderElement hrefs hashRef (contents, Just kind) =
   case (hash >>= hashRef) of
     Nothing -> [qt|<span class="${cls}">${escaped}</span>|]
-    Just h -> a cls hrefs h (escaped)
+    Just h -> a cls hrefs h escaped
   where
-    escaped = escapeHTML contents
+    escaped = escapeHTML (Data.Text.pack contents)
     hash = case kind of
       SyntaxText.Reference r -> Just $ Unison.Reference.toShortHash r
       SyntaxText.Referent r -> Just $ Unison.Reference.toShortHash (Referent.toReference r)
@@ -166,6 +189,10 @@ style =
  }
 
  .breadcrumb .item {
+ }
+
+ .docs {
+     white-space: pre-wrap;
  }
   
  pre {

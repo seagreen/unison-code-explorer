@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-shopt -s globstar
+# shopt -s globstar
 
 ormolu --mode inplace **/*.hs

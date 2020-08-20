@@ -3,29 +3,41 @@ license: BSD3
 
 # NOTE: StrictData is on.
 default-extensions:
+  - BangPatterns
+  - BinaryLiterals
+  - BlockArguments
+  - ConstraintKinds
   - DataKinds
+  - DefaultSignatures
   - DeriveAnyClass
-  - DeriveFunctor
-  - DeriveGeneric
-  - DerivingStrategies
   - DeriveDataTypeable
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - EmptyCase
   - ExistentialQuantification
   - FlexibleContexts
   - FlexibleInstances
   - FunctionalDependencies
-  - GADTs
   - GeneralizedNewtypeDeriving
+  - HexFloatLiterals
   - InstanceSigs
+  - KindSignatures
   - LambdaCase
   - MultiParamTypeClasses
   - NamedFieldPuns
+  - NegativeLiterals
   - NoImplicitPrelude
+  - NumericUnderscores
   - OverloadedStrings
+  - PackageImports
   - RankNTypes
   - ScopedTypeVariables
+  - StandaloneDeriving
   - StrictData
   - TupleSections
-  - TypeFamilies
+  - TypeApplications
   - TypeOperators
 
 ghc-options: -Wall

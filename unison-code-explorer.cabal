@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f668203ed34a9138b2988c7300fe5c534be2c4f9c24483b32f0fd25692046cda
+-- hash: fe7e26b238ca7556b22d6b9e00232a1d8640b11e702338e0eb6d1d6dced14d0d
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -30,7 +30,7 @@ library
       Paths_unison_code_explorer
   hs-source-dirs:
       src
-  default-extensions: DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies DeriveDataTypeable ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables StrictData TupleSections TypeFamilies TypeOperators
+  default-extensions: BangPatterns BinaryLiterals BlockArguments ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GeneralizedNewtypeDeriving HexFloatLiterals InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses NamedFieldPuns NegativeLiterals NoImplicitPrelude NumericUnderscores OverloadedStrings PackageImports RankNTypes ScopedTypeVariables StandaloneDeriving StrictData TupleSections TypeApplications TypeOperators
   ghc-options: -Wall
   build-depends:
       async
@@ -70,7 +70,7 @@ executable unison-code-explorer
       Paths_unison_code_explorer
   hs-source-dirs:
       ./.
-  default-extensions: DataKinds DeriveAnyClass DeriveFunctor DeriveGeneric DerivingStrategies DeriveDataTypeable ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes ScopedTypeVariables StrictData TupleSections TypeFamilies TypeOperators
+  default-extensions: BangPatterns BinaryLiterals BlockArguments ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GeneralizedNewtypeDeriving HexFloatLiterals InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses NamedFieldPuns NegativeLiterals NoImplicitPrelude NumericUnderscores OverloadedStrings PackageImports RankNTypes ScopedTypeVariables StandaloneDeriving StrictData TupleSections TypeApplications TypeOperators
   ghc-options: -Wall -threaded -rtsopts
   build-depends:
       async

@@ -30,7 +30,7 @@ data OneOf4 a b c d = One4 a | Two4 b | Three4 c | Four4 d
 data OneOf5 a b c d e = One5 a | Two5 b | Three5 c | Four5 d | Five5 e
 
 {-# WARNING error "'error' remains in code" #-}
-error :: Text -> a
+error :: HasCallStack => Text -> a
 error =
   Prelude.error . toString
 

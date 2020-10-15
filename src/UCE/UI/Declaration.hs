@@ -11,9 +11,11 @@ import qualified Data.Set as Set
 import UCE.Code
 import UCE.Prelude
 import qualified Unison.Name as Name
+import qualified Unison.Referent as Referent
 import Unison.Util.AnnotatedText
 import qualified Unison.Util.Relation as Relation
-import Unison.Util.SyntaxText
+import Unison.Util.SyntaxText (SyntaxText)
+import qualified Unison.Util.SyntaxText as SyntaxText
 
 viewBody :: CodeInfo -> Set Reference -> Widget HTML Reference
 viewBody codeinfo refs =
@@ -108,7 +110,7 @@ viewBody codeinfo refs =
     syntaxTextToWidgets (AnnotatedText elements) =
       viewElement <$> toList elements
       where
-        viewElement :: (String, Maybe Element) -> Widget HTML Reference
+        viewElement :: (String, Maybe SyntaxText.Element) -> Widget HTML Reference
         viewElement (name, mElement) =
           let def = H.text (toText name)
            in case mElement of
@@ -116,9 +118,12 @@ viewBody codeinfo refs =
                   def
                 Just el ->
                   case el of
-                    Reference r -> do
+                    SyntaxText.Reference r -> do
                       _ <- H.a [P.onClick] [def]
                       pure r
+                    SyntaxText.Referent r -> do
+                      _ <- H.a [P.onClick] [def]
+                      pure (Referent.toReference r)
                     _ ->
                       def
 

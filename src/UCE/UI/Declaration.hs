@@ -9,10 +9,11 @@ import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import UCE.Code
-import UCE.Code.Print (syntaxToPlain)
 import UCE.Prelude
 import qualified Unison.Name as Name
+import Unison.Util.AnnotatedText
 import qualified Unison.Util.Relation as Relation
+import Unison.Util.SyntaxText
 
 viewBody :: CodeInfo -> Set Reference -> Widget HTML Reference
 viewBody codeinfo refs =
@@ -22,7 +23,7 @@ viewBody codeinfo refs =
         []
         [ H.code
             []
-            [H.text bodyTxt]
+            renderCode
         ],
       depTitle,
       H.ul [] depList,
@@ -39,6 +40,7 @@ viewBody codeinfo refs =
           H.h5
             [P.className "title is-5 dependency-header"]
             [H.text "Dependencies"]
+
     mentionTitle :: Widget HTML a
     mentionTitle =
       case mentionList of
@@ -48,6 +50,7 @@ viewBody codeinfo refs =
           H.h5
             [P.className "title is-5 dependency-header"]
             [H.text "Mentioned by"]
+
     depList :: [Widget HTML Reference]
     depList =
       let deps :: Set Reference
@@ -59,6 +62,7 @@ viewBody codeinfo refs =
                 shallowDependencies r (codeDependencies codeinfo)
               _ -> mempty -- todo
        in viewLink <$> namesToRefs deps
+
     mentionList :: [Widget HTML Reference]
     mentionList =
       let mentions :: Set Reference
@@ -70,6 +74,7 @@ viewBody codeinfo refs =
                 shallowReferences r (codeDependencies codeinfo)
               _ -> mempty -- todo
        in viewLink <$> namesToRefs mentions
+
     viewLink :: (Text, Reference) -> Widget HTML Reference
     viewLink (name, ref) = do
       _ <-
@@ -80,22 +85,42 @@ viewBody codeinfo refs =
               [H.text name]
           ]
       pure ref
+
     namesToRefs :: Set Reference -> [(Text, Reference)]
     namesToRefs =
       List.sortOn fst . fmap (\r -> (refName r codeinfo, r)) . Set.toList
-    bodyTxt :: Text
-    bodyTxt =
+
+    renderCode :: [Widget HTML Reference]
+    renderCode =
       case Set.toAscList refs of
         [] ->
-          "<programmer error: no ref>"
+          [H.text "<programmer error: no ref>"]
         [r] ->
           case Map.lookup r (codeBodies codeinfo) of
             Nothing ->
-              "<not found>"
-            Just t ->
-              syntaxToPlain t
+              [H.text "<not found>"]
+            Just st ->
+              syntaxTextToWidgets st
         _ ->
-          "<confliced name>"
+          [H.text "<conflicted name>"]
+
+    syntaxTextToWidgets :: SyntaxText -> [Widget HTML Reference]
+    syntaxTextToWidgets (AnnotatedText elements) =
+      viewElement <$> toList elements
+      where
+        viewElement :: (String, Maybe Element) -> Widget HTML Reference
+        viewElement (name, mElement) =
+          let def = H.text (toText name)
+           in case mElement of
+                Nothing ->
+                  def
+                Just el ->
+                  case el of
+                    Reference r -> do
+                      _ <- H.a [P.onClick] [def]
+                      pure r
+                    _ ->
+                      def
 
 refName :: Reference -> CodeInfo -> Text
 refName ref codeinfo =

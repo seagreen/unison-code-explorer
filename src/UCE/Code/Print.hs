@@ -94,9 +94,6 @@ getTermWithTypeAnnotation codebase id = do
           Nothing -> pure $ Just term
           Just typ -> pure $ Just (Unison.Term.ann (ABT.annotation term) term typ)
 
-syntaxToPlain :: SyntaxText -> Text
-syntaxToPlain = Text.pack . toPlain
-
 termAsDoc term = case term of
   DD.DocJoin _ -> Just term
   DD.DocBlob _ -> Just term

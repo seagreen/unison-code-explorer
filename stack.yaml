@@ -23,11 +23,10 @@ extra-deps:
 # Additional extra-deps for this repo:
 
 - git: git@github.com:unisonweb/unison.git
-  commit: '04eb051a8fb53010f618a7c57949753e1e87fed1'
+  commit: '0d58b02976c6aa3f840323652d33de0ad83077c4'
   subdirs:
     - yaks/easytest
     - parser-typechecker
-    # - yaks/haskeline
     - unison-core
 
 # The latest

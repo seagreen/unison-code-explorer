@@ -87,37 +87,37 @@ packages:
     pantry-tree:
       size: 274
       sha256: bde15d894ab2444006f281a28094a4019f82c6c5130b615a801b2c9fac738993
-    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+    commit: 0d58b02976c6aa3f840323652d33de0ad83077c4
   original:
     subdir: yaks/easytest
     git: git@github.com:unisonweb/unison.git
-    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+    commit: 0d58b02976c6aa3f840323652d33de0ad83077c4
 - completed:
     subdir: parser-typechecker
     name: unison-parser-typechecker
     version: '0.1'
     git: git@github.com:unisonweb/unison.git
     pantry-tree:
-      size: 10722
-      sha256: af36c9048c569427af0551e20964e2ee2782efde69c8bb45b64603ae8e033110
-    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+      size: 11780
+      sha256: 754314bd6f0e75240258369f88aa13d173510cd77439620e2ec041450dd8fc2b
+    commit: 0d58b02976c6aa3f840323652d33de0ad83077c4
   original:
     subdir: parser-typechecker
     git: git@github.com:unisonweb/unison.git
-    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+    commit: 0d58b02976c6aa3f840323652d33de0ad83077c4
 - completed:
     subdir: unison-core
     name: unison-core
     version: '0.1'
     git: git@github.com:unisonweb/unison.git
     pantry-tree:
-      size: 2283
-      sha256: c164804d85a4cbbc0faabb5b6f5bab0f183dab043a2e3f143558dde229ed8167
-    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+      size: 2352
+      sha256: 65a9e7c3fd5eb281212357282999bcaba541e3a49d1990a69a4b65939390fc15
+    commit: 0d58b02976c6aa3f840323652d33de0ad83077c4
   original:
     subdir: unison-core
     git: git@github.com:unisonweb/unison.git
-    commit: 04eb051a8fb53010f618a7c57949753e1e87fed1
+    commit: 0d58b02976c6aa3f840323652d33de0ad83077c4
 - completed:
     name: concur-replica
     version: 0.1.0.0

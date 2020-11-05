@@ -1,4 +1,4 @@
-module UCE.DeclarationJson where
+module UCE.DeclarationJson (viewBodyJson) where
 
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
@@ -21,8 +21,8 @@ data Declaration = Declaration
   }
   deriving (Show, Data, Typeable)
 
-viewBody :: CodeInfo -> Reference -> Declaration
-viewBody codeinfo ref =
+viewBodyJson :: CodeInfo -> Reference -> Declaration
+viewBodyJson codeinfo ref =
   Declaration
     { name = (refName ref codeinfo),
       body = case Map.lookup ref (codeBodies codeinfo) of

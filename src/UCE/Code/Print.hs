@@ -1,4 +1,12 @@
-module UCE.Code.Print where
+module UCE.Code.Print
+  ( printType,
+    printTerm,
+    debugTerm,
+    printDoc,
+    Segment (..),
+    toSegments,
+  )
+where
 
 import qualified Data.Map as Map
 import qualified Data.Sequence as Seq
@@ -64,15 +72,6 @@ elementToSegments (text, element) = case element of
 toSegments :: SyntaxText -> [Segment]
 toSegments (AnnotatedText items) =
   UCE.Prelude.map elementToSegments $ toList items
-
-elementToHtml :: Show a => (String, Maybe a) -> String
-elementToHtml (text, element) = case element of
-  Nothing -> text
-  Just el -> "<span class=\"" <> show el <> "\">" <> text <> "</span>"
-
-toHtml :: SyntaxText -> String
-toHtml (AnnotatedText items) =
-  join $ UCE.Prelude.map elementToHtml $ toList items
 
 getTermWithTypeAnnotation ::
   (Monad m, Ord v) =>

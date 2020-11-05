@@ -18,7 +18,7 @@ import System.IO (stderr)
 import UCE.Code.Print
 import UCE.Prelude hiding (head)
 import UCE.Static.DisplayDoc as DisplayDoc
-import Unison.Codebase (BuiltinAnnotation, Codebase)
+import Unison.Codebase (Codebase)
 import qualified Unison.Codebase as Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch

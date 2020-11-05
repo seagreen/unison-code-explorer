@@ -3,7 +3,6 @@
 module UCE.Static.Render where
 
 import qualified CMarkGFM
-import Data.Foldable as X (foldl)
 import qualified Data.List
 import qualified Data.Map.Strict as Map
 import Data.String.QM
@@ -23,7 +22,7 @@ import Unison.Util.AnnotatedText (AnnotatedText (..))
 import qualified Unison.Util.SyntaxText as SyntaxText
 
 renderDocs codeinfo hrefs hashRef docs =
-  let (replacementMap, result) = foldl process (Map.empty, []) docs
+  let (replacementMap, result) = foldl' process (Map.empty, []) docs
       raw = Data.List.reverse result & Data.Text.concat
       formatted = CMarkGFM.commonmarkToHtml [CMarkGFM.optUnsafe] [CMarkGFM.extTaskList, CMarkGFM.extTable, CMarkGFM.extStrikethrough, CMarkGFM.extAutolink] raw
    in Map.foldlWithKey replace formatted replacementMap
@@ -65,7 +64,7 @@ renderDoc codeinfo hrefs hashRef = \case
 renderBreadcrumb :: [Text] -> Map [Text] Text -> Text
 renderBreadcrumb path hrefs =
   a "item" hrefs [] "Home" <> " : "
-    <> (foldl process ([], []) path & snd & Data.Text.intercalate " . ")
+    <> (foldl' process ([], []) path & snd & Data.Text.intercalate " . ")
   where
     process :: ([Text], [Text]) -> Text -> ([Text], [Text])
     process (path', result) current =

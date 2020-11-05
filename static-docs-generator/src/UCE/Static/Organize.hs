@@ -1,10 +1,9 @@
 module UCE.Static.Organize where
 
-import Data.Foldable as X (foldl)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text
 import UCE.Code
-import UCE.DeclarationJson
+import UCE.DeclarationJson (plainName)
 import UCE.Prelude
 import qualified Unison.Hash as Hash
 import qualified Unison.Reference as Reference
@@ -68,7 +67,7 @@ makeScopeMap codeinfo =
   let names = codeinfo & UCE.Code.codeDeclarationNames & Relation.domain & Map.toAscList
       refs = map fst names
       paths = map (\r -> (plainName codeinfo r & fst & splitParts, r)) refs
-   in (paths, foldl f Map.empty paths)
+   in (paths, foldl' f Map.empty paths)
   where
     addToChildren :: ChildMap -> [Text] -> (Maybe Reference) -> ChildMap
     addToChildren children path Nothing = case (Map.lookup path children) of
@@ -90,7 +89,7 @@ makeScopeMap codeinfo =
     f mmap (path, ref) = addEntry mmap path (Just ref) Map.empty
 
 makeHashMap :: Foldable t => t (a, Reference) -> Map ShortHash a
-makeHashMap paths = foldl f Map.empty paths
+makeHashMap paths = foldl' f Map.empty paths
   where
     f mmap (path, r) = Map.insert (Reference.toShortHash r) path mmap
 

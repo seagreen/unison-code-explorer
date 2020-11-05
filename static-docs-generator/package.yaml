@@ -1,0 +1,93 @@
+name: unison-static-docs
+license: BSD3
+
+# NOTE: StrictData is on.
+default-extensions:
+  - BangPatterns
+  - BinaryLiterals
+  - BlockArguments
+  - ConstraintKinds
+  - DataKinds
+  - DefaultSignatures
+  - DeriveAnyClass
+  - DeriveDataTypeable
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - EmptyCase
+  - ExistentialQuantification
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GeneralizedNewtypeDeriving
+  - HexFloatLiterals
+  - InstanceSigs
+  - KindSignatures
+  - LambdaCase
+  - NamedFieldPuns
+  - NegativeLiterals
+  - NoImplicitPrelude
+  - NumericUnderscores
+  - OverloadedStrings
+  - PackageImports
+  - RankNTypes
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - StrictData
+  - TupleSections
+  - TypeApplications
+  - TypeOperators
+
+ghc-options: -Wall
+
+dependencies:
+
+  # Notable
+
+  - unison-code-explorer
+
+  - concur-core
+  - concur-replica
+  - gitrev
+  - json
+  - rawstring-qm
+  - relude
+  - servant-server
+  - unison-core
+  - unison-parser-typechecker
+  - wai
+  - wai-middleware-static
+  - websockets
+  - cmark-gfm
+
+  # Other
+
+  - async
+  - base
+  - bytestring
+  - containers
+  - directory
+  - filepath
+  - hashable
+  - lens
+  - mtl
+  - random
+  - safe-exceptions
+  - stm
+  - text
+  - time
+  - transformers
+  - unordered-containers
+
+library:
+  source-dirs: src
+
+executables:
+  unison-static-docs:
+    source-dirs: .
+    main: Main.hs
+    ghc-options: -threaded -rtsopts
+    dependencies:
+      - optparse-applicative
+      - unison-static-docs

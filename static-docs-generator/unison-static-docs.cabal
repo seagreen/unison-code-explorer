@@ -4,27 +4,20 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 60180ad9f2f85bb4bdb36332c48cd16384398c59d1c8043641d70f4978a13e2e
+-- hash: 107a70ebe4162f978dc266daecb571208f1fe26703f8589a041587a93019bbf4
 
-name:           unison-code-explorer
+name:           unison-static-docs
 version:        0.0.0
 license:        BSD3
 build-type:     Simple
 
 library
   exposed-modules:
-      UCE
-      UCE.Code
-      UCE.Code.Print
-      UCE.DeclarationJson
-      UCE.Prelude
-      UCE.Static.DisplayDoc
-      UCE.Static.Utils
-      UCE.UI
-      UCE.UI.Declaration
-      UCE.UI.Search
+      UCE.Static
+      UCE.Static.Organize
+      UCE.Static.Render
   other-modules:
-      Paths_unison_code_explorer
+      Paths_unison_static_docs
   hs-source-dirs:
       src
   default-extensions: BangPatterns BinaryLiterals BlockArguments ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GeneralizedNewtypeDeriving HexFloatLiterals InstanceSigs KindSignatures LambdaCase NamedFieldPuns NegativeLiterals NoImplicitPrelude NumericUnderscores OverloadedStrings PackageImports RankNTypes ScopedTypeVariables StandaloneDeriving StrictData TupleSections TypeApplications TypeOperators
@@ -53,6 +46,7 @@ library
     , text
     , time
     , transformers
+    , unison-code-explorer
     , unison-core
     , unison-parser-typechecker
     , unordered-containers
@@ -61,10 +55,10 @@ library
     , websockets
   default-language: Haskell2010
 
-executable unison-code-explorer
+executable unison-static-docs
   main-is: Main.hs
   other-modules:
-      Paths_unison_code_explorer
+      Paths_unison_static_docs
   hs-source-dirs:
       ./.
   default-extensions: BangPatterns BinaryLiterals BlockArguments ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GeneralizedNewtypeDeriving HexFloatLiterals InstanceSigs KindSignatures LambdaCase NamedFieldPuns NegativeLiterals NoImplicitPrelude NumericUnderscores OverloadedStrings PackageImports RankNTypes ScopedTypeVariables StandaloneDeriving StrictData TupleSections TypeApplications TypeOperators
@@ -97,6 +91,7 @@ executable unison-code-explorer
     , unison-code-explorer
     , unison-core
     , unison-parser-typechecker
+    , unison-static-docs
     , unordered-containers
     , wai
     , wai-middleware-static

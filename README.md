@@ -48,9 +48,7 @@ That sounds like a lot, but if you don't have any of those restrictions I think 
 
 # Static Docs Generation
 
-`unison-code-explorer --static --dest docs`
-
-Now you have documentation in the "docs" directory, this can be pushed to github (where github-pages can host it for you) or put somewhere else.
+See the REAMDE in the [./static-docs-generator](./static-docs-generator) package.
 
 # Development
 

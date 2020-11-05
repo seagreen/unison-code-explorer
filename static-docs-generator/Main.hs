@@ -5,25 +5,20 @@ module Main where
 import Data.Version (showVersion)
 import Development.GitRev (gitHash)
 import Options.Applicative
-import Paths_unison_code_explorer (version)
-import qualified UCE
+import Paths_unison_static_docs (version)
 import UCE.Prelude
+import qualified UCE.Static
 
 data Config = Config
-  { configPort :: Int,
-    configDirectory :: String,
-    configJson :: Bool
+  { directory :: String,
+    dest :: String
   }
   deriving (Show)
 
 main :: IO ()
 main = do
   conf <- runParser
-  if configJson conf
-    then UCE.dumpJson (configDirectory conf)
-    else do
-      logLine ("Starting on port " <> show (configPort conf))
-      UCE.run (configPort conf) (configDirectory conf)
+  UCE.Static.buildStatic (directory conf) (dest conf)
   where
     runParser :: IO Config
     runParser =
@@ -50,21 +45,15 @@ main = do
     parser :: Parser Config
     parser =
       Config
-        <$> option
-          auto
-          ( long "port"
-              <> help "Port to run server on"
-              <> value 8080
-              <> showDefault
-          )
-        <*> strOption
+        <$> strOption
           ( long "directory"
               <> help "Project directory to explore"
               <> value "."
               <> showDefault
           )
-        <*> switch
-          ( long "json"
-              <> help "Output a JSON dump of the project instead of running a server"
+        <*> strOption
+          ( long "dest"
+              <> help "For --static, the destination to write the generated documentation"
+              <> value "docs"
               <> showDefault
           )

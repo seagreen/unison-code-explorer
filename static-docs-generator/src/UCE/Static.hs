@@ -2,8 +2,6 @@
 
 module UCE.Static where
 
--- (createDirectory)
-
 import qualified Data.Map.Strict as Map
 import qualified Data.Text
 import qualified System.Directory
@@ -12,6 +10,11 @@ import UCE.Prelude
 import qualified UCE.Static.Organize as Organize
 import qualified UCE.Static.Render as Render
 import Unison.ShortHash (ShortHash (..))
+
+buildStatic :: String -> String -> IO ()
+buildStatic projectDirectory outputDirectory = do
+  codeinfo <- UCE.Code.load projectDirectory
+  UCE.Static.build outputDirectory codeinfo
 
 build :: String -> UCE.Code.CodeInfo -> IO ()
 build dest codeinfo = do

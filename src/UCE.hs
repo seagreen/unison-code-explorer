@@ -10,14 +10,8 @@ import qualified Text.JSON.Generic
 import qualified UCE.Code
 import qualified UCE.DeclarationJson
 import UCE.Prelude
-import qualified UCE.Static
 import qualified UCE.UI
 import qualified Unison.Util.Relation as Relation
-
-buildStatic :: String -> String -> IO ()
-buildStatic projectDirectory outputDirectory = do
-  codeinfo <- UCE.Code.load projectDirectory
-  UCE.Static.build outputDirectory codeinfo
 
 dumpJson :: String -> IO ()
 dumpJson projectDirectory = do
@@ -40,7 +34,10 @@ run port projectDirectory = do
 static :: Wai.Middleware
 static =
   Static.staticPolicy $
-    Static.only [("custom.css", "custom.css"), ("bulmaswatch.min.css", "bulmaswatch.min.css")]
+    Static.only
+      [ ("custom.css", "custom.css"),
+        ("bulmaswatch.min.css", "bulmaswatch.min.css")
+      ]
 
 index :: HTML
 index =

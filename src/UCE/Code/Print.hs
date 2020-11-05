@@ -1,9 +1,7 @@
 module UCE.Code.Print
-  ( Segment (..),
-    printDoc,
+  ( printDoc,
     printTerm,
     printType,
-    toSegments,
     debugTerm,
   )
 where
@@ -12,7 +10,6 @@ import qualified Data.Map as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import qualified Data.Text as Text
-import Text.JSON.Generic
 import UCE.Prelude
 import qualified UCE.Static.DisplayDoc as DisplayDoc
 import qualified Unison.ABT as ABT
@@ -30,9 +27,7 @@ import Unison.Names3
 import qualified Unison.Parser
 import qualified Unison.PrettyPrintEnv as PPE
 import Unison.Reference (Id (..), Reference (..))
-import qualified Unison.Reference
 import qualified Unison.Referent
-import qualified Unison.ShortHash
 import Unison.Symbol (Symbol)
 import qualified Unison.Term
 import Unison.TermPrinter
@@ -40,38 +35,6 @@ import qualified Unison.TypePrinter as TypePrinter
 import Unison.Util.AnnotatedText (AnnotatedText (..))
 import Unison.Util.Pretty hiding (text, toPlain)
 import Unison.Util.SyntaxText (SyntaxText)
-import qualified Unison.Util.SyntaxText as ST
-
-data SegmentKind
-  = WithHash {name :: String, hash :: String}
-  | Other String
-  | None
-  deriving (Show, Data, Typeable)
-
-data Segment = Segment
-  { contents :: String,
-    kind :: SegmentKind
-  }
-  deriving (Show, Data, Typeable)
-
-elementToSegments :: (String, Maybe ST.Element) -> Segment
-elementToSegments (text, element) = case element of
-  Nothing -> Segment {contents = text, kind = None}
-  Just el ->
-    Segment
-      { contents = text,
-        kind = case el of
-          ST.Reference r -> WithHash {hash = Unison.ShortHash.toString . Unison.Reference.toShortHash $ r, name = "Reference"}
-          ST.Referent r -> WithHash {hash = Unison.ShortHash.toString . Unison.Referent.toShortHash $ r, name = "Referent"}
-          ST.HashQualifier hq -> case (Unison.HashQualified.toHash hq) of
-            Nothing -> Other "HashQualifier"
-            Just hash -> WithHash {hash = Unison.ShortHash.toString hash, name = "HashQualifier"}
-          _ -> Other (show el)
-      }
-
-toSegments :: SyntaxText -> [Segment]
-toSegments (AnnotatedText items) =
-  UCE.Prelude.map elementToSegments $ toList items
 
 getTermWithTypeAnnotation ::
   (Monad m, Ord v) =>

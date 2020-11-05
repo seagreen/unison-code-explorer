@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 107a70ebe4162f978dc266daecb571208f1fe26703f8589a041587a93019bbf4
+-- hash: 22f10c90f1c67d80a3d0a4bf11bc6fffd64c6f1a5a1fc202ff84c9d8981173dc
 
 name:           unison-static-docs
 version:        0.0.0
@@ -16,6 +16,7 @@ library
       UCE.Static
       UCE.Static.Organize
       UCE.Static.Render
+      UCE.Static.Utils
   other-modules:
       Paths_unison_static_docs
   hs-source-dirs:

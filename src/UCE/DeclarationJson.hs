@@ -1,7 +1,7 @@
 module UCE.DeclarationJson
   ( viewBodyJson,
+    Ref (..),
     plainName,
-    primaryName,
     refName,
   )
 where

@@ -1,6 +1,10 @@
 {-# LANGUAGE PatternSynonyms #-}
 
-module UCE.Static.DisplayDoc where
+module UCE.Static.DisplayDoc
+  ( Element (..),
+    displayDoc,
+  )
+where
 
 import UCE.Prelude
 import qualified Unison.Builtin.Decls as DD

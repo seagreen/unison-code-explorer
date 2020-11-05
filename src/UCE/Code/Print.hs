@@ -1,10 +1,10 @@
 module UCE.Code.Print
-  ( printType,
-    printTerm,
-    debugTerm,
+  ( Segment (..),
     printDoc,
-    Segment (..),
+    printTerm,
+    printType,
     toSegments,
+    debugTerm,
   )
 where
 

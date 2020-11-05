@@ -12,10 +12,8 @@ import qualified Unison.Builtin.Decls as DD
 import Unison.Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
-import qualified Unison.Codebase.Editor.HandleCommand
 import qualified Unison.Codebase.Runtime as Runtime
 import Unison.DataDeclaration (Decl)
-import qualified Unison.DataDeclaration as DD
 import Unison.DeclPrinter
 import Unison.HashQualified
 import Unison.Name (Name)
@@ -33,7 +31,7 @@ import Unison.TermPrinter
 import qualified Unison.TypePrinter as TypePrinter
 import Unison.Util.AnnotatedText (AnnotatedText (..))
 import Unison.Util.Pretty hiding (text, toPlain)
-import Unison.Util.SyntaxText (SyntaxText, toPlain)
+import Unison.Util.SyntaxText (SyntaxText)
 import qualified Unison.Util.SyntaxText as ST
 
 data SegmentKind
@@ -48,7 +46,7 @@ data Segment = Segment
   }
   deriving (Show, Data, Typeable)
 
-elementToSegments :: Show ST.Element => (String, Maybe ST.Element) -> Segment
+elementToSegments :: (String, Maybe ST.Element) -> Segment
 elementToSegments (text, element) = case element of
   Nothing -> Segment {contents = text, kind = None}
   Just el ->

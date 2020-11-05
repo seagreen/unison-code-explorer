@@ -1,33 +1,15 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternSynonyms #-}
 
 module UCE.Static.DisplayDoc where
 
--- import Data.Foldable ( fold )
-
--- import Unison.Reference (Reference)
--- import Unison.Referent (Referent)
--- import Unison.Term (Term)
--- import Unison.Type (Type)
--- import Unison.Var (Var)
-
--- import Unison.Util.AnnotatedText      ( AnnotatedText(..), annotate )
-import qualified Data.List as List
-import Data.Text (pack, unpack)
-import qualified Data.Text
 import UCE.Prelude
-import UCE.Static.Utils
 import qualified Unison.Builtin.Decls as DD
-import qualified Unison.DataDeclaration as DD
-import qualified Unison.DeclPrinter as DP
 import qualified Unison.NamePrinter as NP
 import qualified Unison.PrettyPrintEnv as PPE
 import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import qualified Unison.Term
 import qualified Unison.Term as Term
-import qualified Unison.TermPrinter as TP
-import qualified Unison.TypePrinter as TypePrinter
 import qualified Unison.Util.Pretty as P
 import qualified Unison.Util.SyntaxText as S
 

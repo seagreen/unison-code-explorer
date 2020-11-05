@@ -113,7 +113,7 @@ getOrDie map k = case Map.lookup k map of
   Nothing -> pure (Set.empty)
   Just m -> pure m
 
-printDoc codebase branch0 runtime termMap typeMap ref nameSet =
+printDoc codebase branch0 runtime termMap ref nameSet =
   case ref of
     Builtin _ -> pure Nothing
     DerivedId id -> do

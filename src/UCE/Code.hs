@@ -121,8 +121,8 @@ loadCodeInfo runtime (codebase, head) = do
         Branch.deepTypes head
 
   refsToBodies <- getBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
-  refsToDocBodies <- getDocBodies codebase head runtime (Relation.domain termsNoConstructors) (Relation.domain types)
-  refsToShowBodies <- getShowBodies codebase head (Relation.domain termsNoConstructors) (Relation.domain types)
+  refsToDocBodies <- getDocBodies codebase head runtime (Relation.domain termsNoConstructors)
+  refsToShowBodies <- getShowBodies codebase (Relation.domain termsNoConstructors)
 
   callGraph <-
     functionCallGraph
@@ -189,17 +189,15 @@ getBodies codebase branch0 termMap typeMap = do
   typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap
   pure (termBodies <> typeBodies)
 
-getDocBodies codebase branch0 runtime termMap typeMap = do
-  Map.traverseMaybeWithKey (printDoc codebase branch0 runtime termMap typeMap) termMap
+getDocBodies codebase branch0 runtime termMap = do
+  Map.traverseMaybeWithKey (printDoc codebase branch0 runtime termMap) termMap
 
 getShowBodies ::
   Codebase IO Symbol ann ->
-  Branch0 IO ->
-  Map Reference (Set Name) ->
   Map Reference (Set Name) ->
   IO (Map Reference Text)
-getShowBodies codebase branch0 termMap typeMap = do
-  Map.traverseWithKey (\a b -> debugTerm codebase a) termMap
+getShowBodies codebase termMap = do
+  Map.traverseWithKey (\a _ -> debugTerm codebase a) termMap
 
 mapMaybeRelation ::
   forall a b c.

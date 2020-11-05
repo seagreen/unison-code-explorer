@@ -58,9 +58,12 @@ data CodeInfo = CodeInfo
     -- | A combination of @codeTermNames@ and @codeTypeNames@,
     -- with the data constructors filtered out.
     codeDeclarationNames :: Relation Reference Name,
+    -- | This @SyntaxText@ used to be @Text@,
+    -- but got upgraded so that we can support clickable identifiers.
     codeBodies :: Map Reference SyntaxText,
     codeDependencies :: DependencyGraph,
     docBodies :: Map Reference [DisplayDoc.Element],
+    -- | For debugging.
     showBodies :: Map Reference Text
   }
 
@@ -189,6 +192,12 @@ getBodies codebase branch0 termMap typeMap = do
   typeBodies <- Map.traverseWithKey (printType codebase branch0) typeMap
   pure (termBodies <> typeBodies)
 
+getDocBodies ::
+  Codebase IO Symbol Ann ->
+  Branch0 IO ->
+  Runtime.Runtime Symbol ->
+  Map Reference (Set Name) ->
+  IO (Map Reference [Element])
 getDocBodies codebase branch0 runtime termMap = do
   Map.traverseMaybeWithKey (printDoc codebase branch0 runtime termMap) termMap
 

@@ -17,6 +17,7 @@ import qualified Unison.Builtin.Decls as DD
 import Unison.Codebase
 import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
+import Unison.Codebase.Runtime (Runtime)
 import qualified Unison.Codebase.Runtime as Runtime
 import Unison.DataDeclaration (Decl)
 import Unison.DeclPrinter
@@ -24,6 +25,7 @@ import Unison.HashQualified
 import Unison.Name (Name)
 import qualified Unison.Name as Name
 import Unison.Names3
+import Unison.Parser (Ann)
 import qualified Unison.Parser
 import qualified Unison.PrettyPrintEnv as PPE
 import Unison.Reference (Id (..), Reference (..))
@@ -76,6 +78,7 @@ getOrDie map k = case Map.lookup k map of
   Nothing -> pure (Set.empty)
   Just m -> pure m
 
+printDoc :: Codebase IO Symbol Ann -> Branch0 IO -> Runtime Symbol -> Map Reference (Set Name) -> Reference -> p -> IO (Maybe [DisplayDoc.Element])
 printDoc codebase branch0 runtime termMap ref nameSet =
   case ref of
     Builtin _ -> pure Nothing

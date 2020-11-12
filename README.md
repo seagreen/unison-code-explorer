@@ -53,3 +53,7 @@ See the REAMDE in the [./static-docs-generator](./static-docs-generator) package
 # Development
 
 Formatting with Ormolu is a bonus (use [./bin/format](./bin/format) to hit the whole codebase).
+
+# Module Graph
+
+![misc/module-graph.svg](./misc/module-graph.svg)

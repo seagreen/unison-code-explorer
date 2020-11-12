@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+find ./src -name '*.hs' | xargs graphmod -q -p > ./misc/module-graph.dot
+dot -Tsvg ./misc/module-graph.dot > ./misc/module-graph.svg

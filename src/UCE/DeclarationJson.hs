@@ -14,6 +14,7 @@ import UCE.Code
 import UCE.Prelude
 import Unison.HashQualified
 import qualified Unison.Name as Name
+import Unison.Reference (Reference (..))
 import qualified Unison.Reference
 import qualified Unison.Reference as R
 import qualified Unison.Referent

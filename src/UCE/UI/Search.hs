@@ -11,7 +11,9 @@ import qualified Data.Text as Text
 import UCE.Code
 import UCE.Prelude
 import UCE.UI.Declaration
+import Unison.Name (Name)
 import qualified Unison.Name as Name
+import Unison.Reference (Reference (..))
 import qualified Unison.Util.Relation as Relation
 
 newtype OpenNames = OpenNames {unOpenNames :: Set Name}

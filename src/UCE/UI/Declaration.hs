@@ -8,9 +8,10 @@ import qualified Concur.Replica.DOM.Props as P
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
-import UCE.Code
+import UCE.Code (CodeInfo (..), shallowDependencies, shallowReferences)
 import UCE.Prelude
 import qualified Unison.Name as Name
+import Unison.Reference (Reference (..))
 import qualified Unison.Referent as Referent
 import Unison.Util.AnnotatedText
 import qualified Unison.Util.Relation as Relation

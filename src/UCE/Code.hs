@@ -5,8 +5,6 @@ module UCE.Code
     DependencyGraph (..),
     shallowDependencies,
     shallowReferences,
-    Name,
-    Reference,
   )
 where
 

@@ -10,11 +10,15 @@ import UCE.Prelude
 import qualified Unison.Builtin.Decls as DD
 import qualified Unison.NamePrinter as NP
 import qualified Unison.PrettyPrintEnv as PPE
+import Unison.Reference (Reference (..))
 import qualified Unison.Reference as Reference
+import Unison.Referent (Referent)
 import qualified Unison.Referent as Referent
+import Unison.Term (Term)
 import qualified Unison.Term
 import qualified Unison.Term as Term
 import qualified Unison.Util.Pretty as P
+import Unison.Util.SyntaxText (SyntaxText)
 import qualified Unison.Util.SyntaxText as S
 
 type Pretty = P.Pretty P.ColorText
@@ -35,6 +39,15 @@ data Element
 --     Just tm -> displayDoc pped terms typeOf eval types tm
 --   _ -> displayDoc pped terms typeOf eval types tm
 
+displayDoc ::
+  (Monad f, Show v) =>
+  (Reference -> f SyntaxText) ->
+  (Referent -> f SyntaxText) ->
+  (Referent -> f SyntaxText) ->
+  (Referent -> f SyntaxText) ->
+  (Reference -> f (Maybe (Term v a))) ->
+  Term v a ->
+  f [Element]
 displayDoc showTypeSource showTermSource showSignature showResult getInclude = go
   where
     go (DD.DocJoin docs) = fold <$> traverse go docs

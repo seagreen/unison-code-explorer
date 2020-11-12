@@ -57,3 +57,9 @@ Formatting with Ormolu is a bonus (use [./bin/format](./bin/format) to hit the w
 # Module Graph
 
 ![misc/module-graph.svg](./misc/module-graph.svg)
+
+`UCE.Code` is responsible for reading the Unison code from the filesystem and getting it into a format that's easy for the UI to consume.
+
+`UCE.UI` is the only part of the code that knows about `concur-replica`.
+
+`UCE` pulls them together.

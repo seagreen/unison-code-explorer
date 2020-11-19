@@ -67,7 +67,7 @@ viewBodyJson codeinfo ref =
 
     namesToRefs :: Set Reference -> [Ref]
     namesToRefs =
-      List.sortOn primaryName . fmap (\r -> (refName r codeinfo)) . Set.toList
+      List.sortOn primaryName . fmap (\r -> refName r codeinfo) . Set.toList
 
 refName :: Reference -> CodeInfo -> Ref
 refName ref codeinfo =
@@ -124,7 +124,7 @@ elementToSegments (text, element) = case element of
                   segmentName = "Referent"
                 }
             ST.HashQualifier hq ->
-              case (Unison.HashQualified.toHash hq) of
+              case Unison.HashQualified.toHash hq of
                 Nothing ->
                   Other "HashQualifier"
                 Just hash ->

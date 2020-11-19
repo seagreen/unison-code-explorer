@@ -79,9 +79,10 @@ debugTerm codebase ref =
       pure $ show mTerm
 
 getOrDie :: (Ord k, Applicative f) => Map k (Set a) -> k -> f (Set a)
-getOrDie map' k = case Map.lookup k map' of
-  Nothing -> pure (Set.empty)
-  Just m -> pure m
+getOrDie map' k =
+  case Map.lookup k map' of
+    Nothing -> pure Set.empty
+    Just m -> pure m
 
 printDoc ::
   Codebase IO Symbol Ann ->
@@ -93,16 +94,20 @@ printDoc ::
   IO (Maybe [DisplayDoc.Element])
 printDoc codebase branch0 runtime termMap ref _nameSet =
   case ref of
-    Builtin _ -> pure Nothing
+    Builtin _ ->
+      pure Nothing
     DerivedId id -> do
       mTerm <- getTerm codebase id
       case mTerm of
-        Nothing -> pure Nothing
-        Just term -> case (termAsDoc term) of
-          Nothing -> pure Nothing
-          Just doc -> do
-            result <- (DisplayDoc.displayDoc showTypeSource showTermSource showSignature showResult getInclude doc)
-            pure (Just result)
+        Nothing ->
+          pure Nothing
+        Just term ->
+          case termAsDoc term of
+            Nothing ->
+              pure Nothing
+            Just doc -> do
+              result <- DisplayDoc.displayDoc showTypeSource showTermSource showSignature showResult getInclude doc
+              pure (Just result)
   where
     -- mTerm <- getTermWithTypeAnnotation codebase id
     -- case mTerm of

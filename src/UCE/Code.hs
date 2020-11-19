@@ -80,7 +80,7 @@ shallowReferences ref (DependencyGraph deps) =
 
 load :: String -> IO CodeInfo
 load projectDirectory =
-  (loadCodeInfo Rt1.runtime) =<< loadCodebaseAndBranch projectDirectory
+  loadCodeInfo Rt1.runtime =<< loadCodebaseAndBranch projectDirectory
 
 loadCodebaseAndBranch :: String -> IO (Codebase IO Symbol Ann, Branch0 IO)
 loadCodebaseAndBranch projectDirectory = do
@@ -95,7 +95,7 @@ loadCodebaseAndBranch projectDirectory = do
   branch' <- Codebase.getRootBranch codebase
   let branch_ :: IO (Branch.Branch IO)
       branch_ = case branch' of
-        Left _ -> die ("Unable to load root branch")
+        Left _ -> die "Unable to load root branch"
         Right branch -> pure branch
   branch <- branch_
 

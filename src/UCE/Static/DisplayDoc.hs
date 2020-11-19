@@ -42,16 +42,16 @@ displayDoc showTypeSource showTermSource showSignature showResult getInclude = g
     go (DD.DocLink (DD.LinkType (Term.TypeLink' r))) =
       pure [TypeLink r]
     go (DD.DocSource (DD.LinkTerm (Term.TermLink' r))) = do
-      source <- (showTermSource r)
+      source <- showTermSource r
       pure [TermSource source]
     go (DD.DocSource (DD.LinkType (Term.TypeLink' r))) = do
-      source <- (showTypeSource r)
+      source <- showTypeSource r
       pure [TypeSource source]
     go (DD.DocSignature (Term.TermLink' r)) = do
-      sig <- (showSignature r)
+      sig <- showSignature r
       pure [Signature sig]
     go (DD.DocEvaluate (Term.TermLink' r)) = do
-      res <- (showResult r)
+      res <- showResult r
       pure [Eval res]
     go (Term.Ref' r) = do
       evaled <- getInclude r

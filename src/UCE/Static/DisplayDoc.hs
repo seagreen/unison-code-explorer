@@ -9,7 +9,6 @@ import qualified Unison.Reference as Reference
 import Unison.Referent (Referent)
 import qualified Unison.Referent as Referent
 import Unison.Term (Term)
-import qualified Unison.Term
 import qualified Unison.Term as Term
 import Unison.Util.SyntaxText (SyntaxText)
 import qualified Unison.Util.SyntaxText as S
@@ -54,7 +53,7 @@ displayDoc showTypeSource showTermSource showSignature showResult getInclude = g
     go (DD.DocEvaluate (Term.TermLink' r)) = do
       res <- (showResult r)
       pure [Eval res]
-    go (Unison.Term.Ref' r) = do
+    go (Term.Ref' r) = do
       evaled <- getInclude r
       case evaled of
         Nothing -> pure [Text "Unable to process include"]

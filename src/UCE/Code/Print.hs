@@ -31,12 +31,14 @@ import qualified Unison.PrettyPrintEnv as PPE
 import Unison.Reference (Id (..), Reference (..))
 import qualified Unison.Referent
 import Unison.Symbol (Symbol)
+import Unison.Term (Term)
 import qualified Unison.Term
 import Unison.TermPrinter
 import qualified Unison.TypePrinter as TypePrinter
 import Unison.Util.AnnotatedText (AnnotatedText (..))
 import Unison.Util.Pretty hiding (text, toPlain)
 import Unison.Util.SyntaxText (SyntaxText)
+import qualified Unison.Var
 
 getTermWithTypeAnnotation ::
   (Monad m, Ord v) =>
@@ -56,6 +58,7 @@ getTermWithTypeAnnotation codebase id = do
           Nothing -> pure $ Just term
           Just typ -> pure $ Just (Unison.Term.ann (ABT.annotation term) term typ)
 
+termAsDoc :: Term v a -> Maybe (Term v a)
 termAsDoc term = case term of
   DD.DocJoin _ -> Just term
   DD.DocBlob _ -> Just term
@@ -67,6 +70,7 @@ termAsDoc term = case term of
   -- Unison.Term.Ref' _ -> Just term  -- @[include]
   _ -> Nothing
 
+debugTerm :: (IsString a1, Monad f, Show v) => Codebase f v a2 -> Reference -> f a1
 debugTerm codebase ref =
   case ref of
     Builtin _ -> pure "<builtin>"
@@ -74,12 +78,20 @@ debugTerm codebase ref =
       mTerm <- getTerm codebase id
       pure $ show mTerm
 
-getOrDie map k = case Map.lookup k map of
+getOrDie :: (Ord k, Applicative f) => Map k (Set a) -> k -> f (Set a)
+getOrDie map' k = case Map.lookup k map' of
   Nothing -> pure (Set.empty)
   Just m -> pure m
 
-printDoc :: Codebase IO Symbol Ann -> Branch0 IO -> Runtime Symbol -> Map Reference (Set Name) -> Reference -> p -> IO (Maybe [DisplayDoc.Element])
-printDoc codebase branch0 runtime termMap ref nameSet =
+printDoc ::
+  Codebase IO Symbol Ann ->
+  Branch0 IO ->
+  Runtime Symbol ->
+  Map Reference (Set Name) ->
+  Reference ->
+  a ->
+  IO (Maybe [DisplayDoc.Element])
+printDoc codebase branch0 runtime termMap ref _nameSet =
   case ref of
     Builtin _ -> pure Nothing
     DerivedId id -> do
@@ -175,6 +187,13 @@ printDoc codebase branch0 runtime termMap ref nameSet =
 -- pure $ r <&> Term.amap (const Parser.External)
 
 -- eval1 :: PPE.PrettyPrintEnv -> Term v Ann -> _
+eval1 ::
+  (Unison.Var.Var v, Monoid a) =>
+  Runtime v ->
+  Codebase IO v a ->
+  PPE.PrettyPrintEnv ->
+  Term v a ->
+  IO (Either Runtime.Error (Term v Ann))
 eval1 runtime codebase ppe tm = do
   let codeLookup = Unison.Codebase.toCodeLookup codebase
   r <- Runtime.evaluateTerm codeLookup ppe runtime tm

@@ -12,16 +12,13 @@ import qualified Data.Set as Set
 import Text.JSON.Generic
 import UCE.Code
 import UCE.Prelude
-import Unison.HashQualified
+import Unison.HashQualified (toHash)
 import qualified Unison.Name as Name
-import Unison.Reference (Reference (..))
 import qualified Unison.Reference
 import qualified Unison.Reference as R
 import qualified Unison.Referent
 import qualified Unison.ShortHash
-import Unison.Util.AnnotatedText (AnnotatedText (..))
 import qualified Unison.Util.Relation as Relation
-import Unison.Util.SyntaxText (SyntaxText)
 import qualified Unison.Util.SyntaxText as ST
 
 data Ref = Ref

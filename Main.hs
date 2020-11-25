@@ -1,3 +1,4 @@
+{-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Main where
@@ -48,23 +49,26 @@ main = do
     -- Make sure you include the `help` section or that flag won't show up
     -- under "Available options".
     parser :: Parser Config
-    parser =
-      Config
-        <$> option
+    parser = do
+      configPort <-
+        option
           auto
           ( long "port"
               <> help "Port to run server on"
               <> value 8080
               <> showDefault
           )
-        <*> strOption
+      configDirectory <-
+        strOption
           ( long "directory"
               <> help "Project directory to explore"
               <> value "."
               <> showDefault
           )
-        <*> switch
+      configJson <-
+        switch
           ( long "json"
               <> help "Output a JSON dump of the project instead of running a server"
               <> showDefault
           )
+      pure Config {configPort, configDirectory, configJson}

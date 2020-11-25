@@ -17,8 +17,8 @@ dumpJson :: String -> IO ()
 dumpJson projectDirectory = do
   codeinfo <- UCE.Code.load projectDirectory
   let names = codeinfo & UCE.Code.codeDeclarationNames & Relation.domain & Map.toAscList
-  let y = map (UCE.DeclarationJson.viewBodyJson codeinfo . fst) names
-  let text = Text.JSON.Generic.encodeJSON y
+      y = map (UCE.DeclarationJson.viewBodyJson codeinfo . fst) names
+      text = Text.JSON.Generic.encodeJSON y
   putStrLn text
 
 run :: Int -> String -> IO ()

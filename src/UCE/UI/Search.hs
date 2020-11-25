@@ -13,7 +13,6 @@ import UCE.Prelude
 import UCE.UI.Declaration
 import Unison.Name (Name)
 import qualified Unison.Name as Name
-import Unison.Reference (Reference (..))
 import qualified Unison.Util.Relation as Relation
 
 newtype OpenNames = OpenNames {unOpenNames :: Set Name}
@@ -50,6 +49,7 @@ search codeinfo searchStr openNames = do
               ]
           ]
       pure (P.targetValue (P.target e))
+
     results :: Widget HTML (Either OpenNames Reference)
     results =
       H.ul
@@ -65,6 +65,7 @@ search codeinfo searchStr openNames = do
         strLower :: Text
         strLower =
           Text.toLower searchStr
+
     viewResult :: (Name, Set Reference) -> Widget HTML (Either OpenNames Reference)
     viewResult (name, refs) = do
       H.li
@@ -80,10 +81,12 @@ search codeinfo searchStr openNames = do
         isOpen :: Bool
         isOpen =
           Set.member name (unOpenNames openNames)
+
         btn :: Text
         btn
           | isOpen = "-"
           | otherwise = "+"
+
         body :: Widget HTML Reference
         body
           | not isOpen = H.div [] []

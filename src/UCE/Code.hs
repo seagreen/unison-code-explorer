@@ -17,24 +17,18 @@ import UCE.Code.LoadCodebase (loadCodebaseAndBranch)
 import UCE.Code.Print
 import UCE.Prelude hiding (head)
 import UCE.Static.DisplayDoc as DisplayDoc
-import Unison.Codebase (Codebase)
 import qualified Unison.Codebase as Codebase
-import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.Runtime as Runtime
 import Unison.DataDeclaration (Decl)
 import qualified Unison.DataDeclaration as Decl
 import Unison.Name (Name)
 import Unison.Parser (Ann (..))
-import Unison.Reference (Reference (..))
-import Unison.Referent (Referent, toTermReference)
+import qualified Unison.Reference as Reference
+import qualified Unison.Referent as Referent
 import qualified Unison.Runtime.Rt1IO as Rt1
-import Unison.Symbol (Symbol)
-import Unison.Term (Term)
 import qualified Unison.Term as Term
-import Unison.Util.Relation (Relation)
 import qualified Unison.Util.Relation as Relation
-import Unison.Util.SyntaxText (SyntaxText)
 
 -- A Referent can be a value, function, or constructor.
 --
@@ -87,7 +81,7 @@ loadCodeInfo runtime (codebase, head) = do
         Branch.deepTerms head
       termsNoConstructors :: Relation Reference Name
       termsNoConstructors =
-        mapMaybeRelation toTermReference terms
+        mapMaybeRelation Referent.toTermReference terms
       types :: Relation Reference Name
       types =
         Branch.deepTypes head
@@ -123,9 +117,9 @@ functionCallGraph codebase terms types = do
     termDependencies :: Reference -> IO (Reference, Set Reference)
     termDependencies ref =
       case ref of
-        Builtin _ ->
+        Reference.Builtin _ ->
           pure (ref, mempty)
-        DerivedId id -> do
+        Reference.DerivedId id -> do
           mTerm <- Codebase.getTerm codebase id
           case mTerm of
             Nothing -> do
@@ -133,12 +127,13 @@ functionCallGraph codebase terms types = do
               pure (ref, mempty)
             Just (t :: Term Symbol Ann) ->
               pure (ref, Term.dependencies t)
+
     typeDependencies :: Reference -> IO (Reference, Set Reference)
     typeDependencies ref =
       case ref of
-        Builtin _ ->
+        Reference.Builtin _ ->
           pure (ref, mempty)
-        DerivedId id -> do
+        Reference.DerivedId id -> do
           mType <- Codebase.getTypeDeclaration codebase id
           case mType of
             Nothing -> do
@@ -146,6 +141,7 @@ functionCallGraph codebase terms types = do
               pure (ref, mempty)
             Just (t :: Decl Symbol Ann) ->
               pure (ref, Decl.declDependencies t)
+
     dropSelfEdges :: Ord a => Relation a a -> Relation a a
     dropSelfEdges =
       Relation.filter (uncurry (/=))

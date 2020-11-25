@@ -3,17 +3,13 @@ module UCE.Code.LoadCodebase
   )
 where
 
-import Data.Map.Strict ()
 import UCE.Prelude hiding (head)
-import Unison.Codebase (Codebase)
 import qualified Unison.Codebase as Codebase
-import Unison.Codebase.Branch (Branch0 (..))
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.FileCodebase as FileCodebase
 import qualified Unison.Codebase.Serialization as Serialization
 import Unison.Codebase.Serialization.V1 (formatSymbol)
 import Unison.Parser (Ann (External))
-import Unison.Symbol (Symbol)
 
 loadCodebaseAndBranch :: String -> IO (Codebase IO Symbol Ann, Branch0 IO)
 loadCodebaseAndBranch projectDirectory = do

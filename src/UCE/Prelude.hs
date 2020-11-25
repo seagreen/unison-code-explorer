@@ -1,4 +1,4 @@
--- | Tweak @Relude@. Includes no domain logic.
+-- | Tweak @Relude@. Includes no app-specific logic.
 module UCE.Prelude
   ( module UCE.Prelude,
     module X,
@@ -7,19 +7,33 @@ where
 
 {- ORMOLU_DISABLE -}
 
--- Re-exports:
+-- Re-exports
+--
+-- Both for Relude and bringing part of Unison into scope.
 
 import Relude as X hiding (error, id)
 
 import Data.Traversable as X (for)
-
--- Local stuff:
-
-import qualified Data.Set as Set
-import qualified Prelude
-import qualified System.IO
+import Unison.Codebase as X (Codebase)
+import Unison.Codebase.Branch as X (Branch0)
+import Unison.Codebase.Runtime as X (Runtime)
+import Unison.HashQualified as X (HashQualified')
+import Unison.Reference as X (Reference)
+import Unison.Referent as X (Referent)
+import Unison.Symbol as X (Symbol)
+import Unison.Term as X (Term)
+import Unison.Util.AnnotatedText as X (AnnotatedText(AnnotatedText))
+import Unison.Util.Pretty as X (Pretty)
+import Unison.Util.Relation as X (Relation)
+import Unison.Util.SyntaxText as X (SyntaxText)
 
 {- ORMOLU_ENABLE -}
+
+-- Local imports:
+
+import qualified Data.Set as Set
+import qualified System.IO
+import qualified Prelude
 
 data OneOf2 a b = One2 a | Two2 b
 

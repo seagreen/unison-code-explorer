@@ -10,7 +10,6 @@ import UCE.Code
 import UCE.Prelude hiding (State, state)
 import UCE.UI.Declaration
 import UCE.UI.Search
-import Unison.Reference (Reference (..))
 
 data State = Searching | ViewSingle Reference
 

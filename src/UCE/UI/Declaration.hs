@@ -11,11 +11,8 @@ import qualified Data.Set as Set
 import UCE.Code (CodeInfo (..), shallowDependencies, shallowReferences)
 import UCE.Prelude
 import qualified Unison.Name as Name
-import Unison.Reference (Reference (..))
 import qualified Unison.Referent as Referent
-import Unison.Util.AnnotatedText
 import qualified Unison.Util.Relation as Relation
-import Unison.Util.SyntaxText (SyntaxText)
 import qualified Unison.Util.SyntaxText as SyntaxText
 
 viewBody :: CodeInfo -> Set Reference -> Widget HTML Reference

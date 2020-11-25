@@ -1,16 +1,10 @@
-{-# LANGUAGE PatternSynonyms #-}
-
 module UCE.Static.DisplayDoc where
 
 import UCE.Prelude
 import qualified Unison.Builtin.Decls as DD
-import Unison.Reference (Reference (..))
 import qualified Unison.Reference as Reference
-import Unison.Referent (Referent)
 import qualified Unison.Referent as Referent
-import Unison.Term (Term)
 import qualified Unison.Term as Term
-import Unison.Util.SyntaxText (SyntaxText)
 import qualified Unison.Util.SyntaxText as S
 
 data Element
@@ -32,7 +26,8 @@ displayDoc ::
   (Reference -> f (Maybe (Term v a))) ->
   Term v a ->
   f [Element]
-displayDoc showTypeSource showTermSource showSignature showResult getInclude = go
+displayDoc showTypeSource showTermSource showSignature showResult getInclude =
+  go
   where
     go (DD.DocJoin docs) = fold <$> traverse go docs
     -- go (DD.DocJoin docs) = docs & toList & map go & List.concat

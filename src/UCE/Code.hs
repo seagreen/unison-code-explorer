@@ -13,10 +13,10 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text.IO as TIO
 import System.IO (stderr)
+import UCE.Code.DisplayDoc as DisplayDoc
 import UCE.Code.LoadCodebase (loadCodebaseAndBranch)
 import UCE.Code.Print
 import UCE.Prelude hiding (head)
-import UCE.Static.DisplayDoc as DisplayDoc
 import qualified Unison.Codebase as Codebase
 import qualified Unison.Codebase.Branch as Branch
 import qualified Unison.Codebase.Runtime as Runtime

@@ -1,4 +1,4 @@
-module UCE.Static.DisplayDoc where
+module UCE.Code.DisplayDoc where
 
 import UCE.Prelude
 import qualified Unison.Builtin.Decls as DD

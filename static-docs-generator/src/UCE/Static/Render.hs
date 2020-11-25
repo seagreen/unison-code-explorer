@@ -8,9 +8,9 @@ import qualified Data.Map.Strict as Map
 import Data.String.QM
 import qualified Data.Text
 import UCE.Code
+import qualified UCE.Code.DisplayDoc as DD
 import UCE.DeclarationJson (primaryName, refName)
 import UCE.Prelude
-import qualified UCE.Static.DisplayDoc as DD
 import UCE.Static.Organize (dots, itemHref, parentPath)
 import UCE.Static.Utils
 import qualified Unison.HashQualified as Unison.HashQualified
@@ -18,7 +18,6 @@ import Unison.Reference (toShortHash)
 import qualified Unison.Reference as Reference
 import qualified Unison.Referent as Referent
 import Unison.ShortHash (ShortHash (..))
-import Unison.Util.AnnotatedText (AnnotatedText (..))
 import qualified Unison.Util.SyntaxText as SyntaxText
 
 renderDocs codeinfo hrefs hashRef docs =

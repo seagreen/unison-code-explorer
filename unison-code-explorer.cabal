@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7830d39bd491590b774391051cdce79669b4fee860739ca4a5775517cef0e0a5
+-- hash: 01b690e2d4f87aa6b59059855025b1cb990506b5da1ca1052207d93e75c46992
 
 name:           unison-code-explorer
 version:        0.0.0
@@ -15,11 +15,11 @@ library
   exposed-modules:
       UCE
       UCE.Code
+      UCE.Code.DisplayDoc
       UCE.Code.LoadCodebase
       UCE.Code.Print
       UCE.DeclarationJson
       UCE.Prelude
-      UCE.Static.DisplayDoc
       UCE.UI
       UCE.UI.Declaration
       UCE.UI.Search

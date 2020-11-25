@@ -10,8 +10,8 @@ import qualified Data.Map as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import qualified Data.Text as Text
+import qualified UCE.Code.DisplayDoc as DisplayDoc
 import UCE.Prelude
-import qualified UCE.Static.DisplayDoc as DisplayDoc
 import qualified Unison.ABT as ABT
 import qualified Unison.Builtin.Decls as DD
 import qualified Unison.Codebase as Codebase
